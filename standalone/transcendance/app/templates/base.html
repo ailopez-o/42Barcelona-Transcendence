@@ -16,7 +16,13 @@
                     <li><a href="{% url 'profile' %}">Perfil</a></li>
                     <li><a href="{% url 'new_game' %}">Nueva Partida</a></li>
                     <li><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
-                    <li><a href="{% url 'logout' %}">Salir</a></li>
+                    <!-- Logout con POST para mayor seguridad -->
+                    <li>
+                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background:none; border:none; color:blue; cursor:pointer; font-size:16px;">Salir</button>
+                        </form>
+                    </li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Ingresar</a></li>
                     <li><a href="{% url 'register' %}">Registrarse</a></li>
@@ -24,10 +30,12 @@
             </ul>
         </nav>
     </header>
+
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
     <footer>
         <p>&copy; 2023 Ping Pong App</p>
     </footer>
