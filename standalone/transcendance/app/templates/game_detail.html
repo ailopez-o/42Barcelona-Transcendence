@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Partida #{{ game.id }}{% endblock %}
+
+{% block content %}
+    <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
+    <p><strong>Estado:</strong> {{ game.status }}</p>
+
+    <!-- Contenedor del juego de Ping Pong -->
+    <div id="game-container">
+        <canvas id="pongCanvas"></canvas>
+    </div>
+
+    <!-- Mostrar mensajes de WebSocket -->
+    <div id="status-message"></div>
+
+    <!-- Script del juego -->
+    <script>
+        const gameId = "{{ game.id }}";
+        const username = "{{ request.user.username }}";
+        const socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
+
+        socket.onopen = function(event) {
+            console.log("Conectado al servidor WebSocket");
+        };
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            document.getElementById("status-message").innerText = data.message;
+        };
+
+        socket.onclose = function(event) {
+            console.log("Conexión cerrada");
+        };
+
+        // Lógica básica del juego (esto puede mejorarse con un script separado)
+        const canvas = document.getElementById("pongCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = 800;
+        canvas.height = 400;
+
+        function drawGame() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(20, 150, 10, 100); // Pala izquierda
+            ctx.fillRect(770, 150, 10, 100); // Pala derecha
+            ctx.beginPath();
+            ctx.arc(400, 200, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        drawGame();
+    </script>
+{% endblock %}
