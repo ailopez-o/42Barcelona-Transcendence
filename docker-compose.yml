@@ -1,35 +1,59 @@
-version: '3.9'
+name: tr
 
 services:
-  python-app:
+
+  django:
+    container_name: tr-backend
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    volumes:
-      - ./app:/app
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
+      context: ./
+      dockerfile: django.dockerfile
+    entrypoint: ./django-entrypoint.sh
+    # depends_on:
+    #     - database
     environment:
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
+      DEBUG: ${DEBUG:-false}
+      API_42_ENDPOINT: https://api.intra.42.fr
+      # API_42_UID: ${API_42_UID}
+      # API_42_SECRET: ${API_42_SECRET}
+      # ALLOWED_HOSTS: localhost,dump-ubuntu-barcelona
+      # SECRET_KEY: tr-secret-key
+      # DB_ENGINE: django.db.backends.postgresql
+      # DB_NAME: ${DB_NAME?err}
+      # DB_USER: ${DB_USER?err}
+      # DB_PASSWORD: ${DB_PASSWORD?err}
+      # DB_HOST: database
+      # DB_PORT: 5432
+      # DOMAIN: ${DOMAIN?err}
+      # DOMAIN_URL: ${DOMAIN_URL?err}
+      # REDIS_HOST: redis
+      # REDIS_PORT: 6379
+      # STATIC_URL: /static/
+      # STATIC_ROOT: static
+      # MEDIA_URL: /media/
+    expose:
+      - 80
+      - 443
+    image: python:3.12-alpine3.20-django
+    networks:
+      - tr-network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./:/usr/app/
 
-volumes:
-  postgres_data:
+  database:
+      image: postgres:15
+      container_name: tr-database
+      restart: always
+      environment:
+          POSTGRES_DB: ${DB_NAME}
+          POSTGRES_USER: ${DB_USER}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+      volumes:
+          - ./postgres_data:/var/lib/postgresql/data/
+      networks:
+          - tr-network
+      ports:
+          - 5432:5432
+
+networks:
+  tr-network:
+    name: tr-network
