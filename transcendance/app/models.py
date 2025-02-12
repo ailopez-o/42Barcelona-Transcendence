@@ -24,14 +24,6 @@ class User(AbstractUser):
         return self.username
 
 class Game(models.Model):
-
-    STATUS_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('en_curso', 'En curso'),
-        ('finalizado', 'Finalizado'),
-        ('cancelado', 'Cancelado'),
-    ]
-
     player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_player1')
     player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_player2')
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='games_won')
@@ -39,7 +31,6 @@ class Game(models.Model):
     score_player2 = models.PositiveIntegerField(default=0)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
     is_remote = models.BooleanField(default=False)  # Partida en remoto o local
 
     def __str__(self):

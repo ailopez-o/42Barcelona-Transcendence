@@ -21,38 +21,27 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password1', 'password2']
-
 # Vista para registro
 def register_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('profile')
     else:
-        form = CustomUserCreationForm()
+        form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
-
 
 # Vista del perfil del usuario
 @login_required
 def profile_view(request):
     user = request.user
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
-    pending_games = Game.objects.filter(player2=user, status="pendiente")
-
     return render(request, 'profile.html', {
         'user': user,
-        'games': games,
-        'pending_games': pending_games
+        'games': games
     })
-
 
 # Vista para crear una nueva partida
 @login_required
@@ -95,19 +84,3 @@ def new_tournament_view(request):
 def tournament_detail_view(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     return render(request, 'tournament_detail.html', {'tournament': tournament})
-
-
-@login_required
-def accept_game_view(request, game_id):
-    game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
-    game.status = "en_curso"
-    game.save()
-    return redirect('game_detail', game_id=game.id)
-
-
-@login_required
-def reject_game_view(request, game_id):
-    game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
-    game.status = "cancelado"
-    game.save()
-    return redirect('profile')
