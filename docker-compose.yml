@@ -1,13 +1,14 @@
-name: tr
+version: "3.8" 
 
 services:
 
   django:
     container_name: tr-backend
+    restart: always
     build:
       context: ./
       dockerfile: django.dockerfile
-    entrypoint: ./django-entrypoint.sh
+    #entrypoint: ./django-entrypoint.sh
     # depends_on:
     #     - database
     environment:
@@ -30,9 +31,9 @@ services:
       # STATIC_URL: /static/
       # STATIC_ROOT: static
       # MEDIA_URL: /media/
-    expose:
-      - 80
-      - 443
+    ports:
+      - 80:80
+      - 443:443
     image: python:3.12-alpine3.20-django
     networks:
       - tr-network
