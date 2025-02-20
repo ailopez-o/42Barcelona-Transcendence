@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #000;
+  color: white;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+#menuPrincipal, #gameOptions, #playerForm {
+  text-align: center;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+#startButton {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+input {
+  margin: 10px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+#gameCanvas {
+  border: 2px solid white;
+}
+
+
+#playerForm {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+#playerForm input {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  font-size: 18px;
+  border: 2px solid white;
+  background: transparent;
+  color: white;
+  text-align: center;
+}
+
+#playerForm button {
+  background-color: #4CAF50;
+  font-family: 'Share Tech Mono', monospace;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#endGameButtons button {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0 10px;
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+}
+
+#endGameButtons button:hover {
+    background-color: #444;
+    transform: scale(1.05);
+}
+
