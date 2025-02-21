@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
-
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     total_games = models.PositiveIntegerField(default=0)
@@ -9,33 +8,28 @@ class User(AbstractUser):
     total_losses = models.PositiveIntegerField(default=0)
     tournaments_won = models.PositiveIntegerField(default=0)
 
-    groups = models.ManyToManyField(
-        Group,
-        related_name='custom_user_groups',  # Cambiar el nombre de la relación inversa
-        blank=True
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='custom_user_permissions',  # Cambiar el nombre de la relación inversa
-        blank=True
-    )
+    groups = models.ManyToManyField(Group, related_name='custom_user_groups', blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name='custom_user_permissions', blank=True)
 
     def __str__(self):
         return self.username
 
+
 class Game(models.Model):
-    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_player1')
-    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_player2')
-    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='games_won')
-    score_player1 = models.PositiveIntegerField(default=0)
-    score_player2 = models.PositiveIntegerField(default=0)
-    start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(null=True, blank=True)
-    is_remote = models.BooleanField(default=False)  # Partida en remoto o local
+    STATUS_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('en_curso', 'En curso'),
+        ('finalizado', 'Finalizado'),
+        ('cancelado', 'Cancelado'),
+    ]
+
+    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
+    player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Partida {self.id}: {self.player1} vs {self.player2}"
-
+        return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
 
 class GameEvent(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='events')
@@ -61,7 +55,7 @@ class Tournament(models.Model):
 
 class TournamentGame(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='games')
-    game = models.OneToOneField(Game, on_delete=models.CASCADE)
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='tournament_game')
     round_number = models.PositiveIntegerField()
 
     def __str__(self):
@@ -70,14 +64,14 @@ class TournamentGame(models.Model):
 
 class RemoteGameSession(models.Model):
     game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='remote_session')
-    player_connected = models.ManyToManyField(User, related_name='remote_sessions')
+    players_connected = models.ManyToManyField(User, through='GameConnection')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Sesión remota para partida {self.game.id}"
 
 
-
-
-
-
+class GameConnection(models.Model):
+    session = models.ForeignKey(RemoteGameSession, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=[('player1', 'Player 1'), ('player2', 'Player 2')])

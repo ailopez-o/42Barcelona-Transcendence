@@ -11,20 +11,17 @@ python3 -m pip install -r requirements.txt
 python3 ./transcendance/manage.py makemigrations app --noinput
 python3 ./transcendance/manage.py migrate
 
-# Create 'computer' and 'anonymous' users if they don't exist
+# Create 'alba' and 'aitor' superusers if they don't exist
 python3 ./transcendance/manage.py shell <<EOF
-
 from app.models import User
 
-# Create 'alba' user
-user = User.objects.create_superuser(username="alba", password="123456")
-user.save()
+if not User.objects.filter(username="alba").exists():
+    User.objects.create_superuser(username="alba", password="123456", email="alba@example.com")
 
-# Create 'aitor' user
-user = User.objects.create_superuser(username="aitor", password="123456")
-user.save()
-
+if not User.objects.filter(username="aitor").exists():
+    User.objects.create_superuser(username="aitor", password="123456", email="aitor@example.com")
 EOF
+
 
 python3 ./transcendance/manage.py runserver '0.0.0.0:80'
 

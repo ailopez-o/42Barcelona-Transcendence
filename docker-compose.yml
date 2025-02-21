@@ -32,7 +32,7 @@ services:
       # STATIC_ROOT: static
       # MEDIA_URL: /media/
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     image: python:3.12-alpine3.20-django
     networks:
