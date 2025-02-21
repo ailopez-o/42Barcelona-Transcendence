@@ -9,6 +9,11 @@ from django.http import JsonResponse
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password1', 'password2']
+
 # Vista para login
 def login_view(request):
     if request.method == 'POST':
@@ -24,13 +29,13 @@ def login_view(request):
 # Vista para registro
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('profile')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
 # Vista del perfil del usuario
