@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Partida #{{ game.id }}{% endblock %}
+
+{% block content %}
+    <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
+    <p><strong>Estado:</strong> {{ game.status }}</p>
+
+    <!-- Contenedor del juego -->
+    <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+        <canvas id="pongCanvas"></canvas>
+    </div>
+
+    <!-- Mensajes de estado del juego -->
+    <div id="status-message"></div>
+
+    <!-- Cargar el script de juego -->
+    {% load static %}
+    <script src="{% static 'js/game.js' %}"></script>
+{% endblock %}

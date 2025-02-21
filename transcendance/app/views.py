@@ -38,10 +38,14 @@ def register_view(request):
 def profile_view(request):
     user = request.user
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
+    pending_games = Game.objects.filter(player2=user, status="pendiente")
+
     return render(request, 'profile.html', {
         'user': user,
-        'games': games
+        'games': games,
+        'pending_games': pending_games
     })
+
 
 # Vista para crear una nueva partida
 @login_required
@@ -84,3 +88,17 @@ def new_tournament_view(request):
 def tournament_detail_view(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     return render(request, 'tournament_detail.html', {'tournament': tournament})
+
+@login_required
+def accept_game_view(request, game_id):
+    game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
+    game.status = "en_curso"
+    game.save()
+    return redirect('game_detail', game_id=game.id)
+
+@login_required
+def reject_game_view(request, game_id):
+    game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
+    game.status = "cancelado"
+    game.save()
+    return redirect('profile')

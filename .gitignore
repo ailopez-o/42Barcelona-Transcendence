@@ -3,3 +3,6 @@
 *.sqlite3
 node_modules
 venv
+*.pem
+transcendance/app/migrations/
+
