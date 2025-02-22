@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Actualizar el estado del juego con los datos recibidos
         if (data.game_state) {
+            console.log("Actualizando el estado del juego");
             // Actualizar posición de la pelota
             gameState.ball.position.x = data.game_state.ball.x;
             gameState.ball.position.y = data.game_state.ball.y;
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.height = 400;
 
     function drawGame() {
+        console.log("Dibujando el juego");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
