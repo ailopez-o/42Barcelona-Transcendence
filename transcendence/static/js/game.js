@@ -27,54 +27,62 @@ class Paddle {
     }
   }
 
+// Variables globales
+let gameState;
+let socket;
+let currentPlayer;
+
+// Event listener global para las teclas
+document.addEventListener('keydown', (e) => {
+    console.log("Tecla presionada:", e.key); // Debug
+    if (!gameState || !socket) return; // Si el juego no está inicializado, salimos
+
+    let movement = 0;
+
+    switch(e.key) {
+        case 'ArrowUp':
+            console.log("Movimiento arriba");
+            movement = -gameState.paddles.right.maxSpeed;
+            break;
+        case 'ArrowDown':
+            console.log("Movimiento abajo");
+            movement = gameState.paddles.right.maxSpeed;
+            break;
+    }
+
+    // Enviar el movimiento al servidor si hay un movimiento válido
+    if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
+        console.log("Enviando movimiento al servidor");
+        socket.send(JSON.stringify({
+            player: currentPlayer,  // Enviamos 'player1' o 'player2'
+            movement: movement
+        }));
+    }
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     const gameId = document.getElementById("game-container").dataset.gameId;
     const username = document.getElementById("game-container").dataset.username;
     
     // Obtener los datos del jugador del elemento JSON
     const playerData = JSON.parse(document.getElementById("player-data").textContent);
-    const currentPlayer = playerData.current; // Será 'player1' o 'player2'
+    currentPlayer = playerData.current; // Será 'player1' o 'player2'
     
     // Conectar al servidor WebSocket
-    const socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
+    socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
 
     socket.onopen = function(event) {
         console.log("Conectado al WebSocket");
     };
 
     // Crear objeto para el estado del juego
-    const gameState = {
+    gameState = {
         ball: new Ball(400, 200, 10, { x: 0, y: 0 }),
         paddles: {
             left: new Paddle(20, 150, 10, 100, 5),
             right: new Paddle(770, 150, 10, 100, 5)
         }
     };
-
-    // Configurar controles del teclado
-    document.addEventListener('keydown', (e) => {
-        let movement = 0;
-
-        switch(e.key) {
-            case 'ArrowUp':
-                console.log("Movimiento arriba");
-                movement = -gameState.paddles.right.maxSpeed;
-                break;
-            case 'ArrowDown':
-                console.log("Movimiento abajo");
-                movement = gameState.paddles.right.maxSpeed;
-                break;
-        }
-
-        // Enviar el movimiento al servidor si hay un movimiento válido
-        if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
-            console.log("Enviando movimiento al servidor");
-            socket.send(JSON.stringify({
-                player: currentPlayer,  // Enviamos 'player1' o 'player2'
-                movement: movement
-            }));
-        }
-    });
 
     socket.onmessage = function(event) {
         console.log("Mensaje recibido:", event.data);

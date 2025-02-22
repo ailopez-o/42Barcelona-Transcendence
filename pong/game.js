@@ -87,82 +87,82 @@ export class Game {
     this.rightPaddle.position.y = this.canvas.height / 2 - this.rightPaddle.height / 2;
   }
 
-  update() {
-    // Actualizar posición de las paletas
-    this.leftPaddle.position.y += this.leftPaddle.velocity.y;
-    this.rightPaddle.position.y += this.rightPaddle.velocity.y;
+  // update() {
+  //   // Actualizar posición de las paletas
+  //   this.leftPaddle.position.y += this.leftPaddle.velocity.y;
+  //   this.rightPaddle.position.y += this.rightPaddle.velocity.y;
 
-    // Mantener las paletas dentro del canvas
-    this.leftPaddle.position.y = Math.max(0, Math.min(this.canvas.height - this.leftPaddle.height, this.leftPaddle.position.y));
-    this.rightPaddle.position.y = Math.max(0, Math.min(this.canvas.height - this.rightPaddle.height, this.rightPaddle.position.y));
+  //   // Mantener las paletas dentro del canvas
+  //   this.leftPaddle.position.y = Math.max(0, Math.min(this.canvas.height - this.leftPaddle.height, this.leftPaddle.position.y));
+  //   this.rightPaddle.position.y = Math.max(0, Math.min(this.canvas.height - this.rightPaddle.height, this.rightPaddle.position.y));
 
-    // Actualizar posición de la pelota
-    this.ball.position.x += this.ball.velocity.x;
-    this.ball.position.y += this.ball.velocity.y;
+  //   // Actualizar posición de la pelota
+  //   this.ball.position.x += this.ball.velocity.x;
+  //   this.ball.position.y += this.ball.velocity.y;
 
-    // Colisiones con las paredes superior e inferior
-    if (this.ball.position.y <= this.ball.radius || this.ball.position.y >= this.canvas.height - this.ball.radius) {
-      this.ball.velocity.y *= -1;
-    }
+  //   // Colisiones con las paredes superior e inferior
+  //   if (this.ball.position.y <= this.ball.radius || this.ball.position.y >= this.canvas.height - this.ball.radius) {
+  //     this.ball.velocity.y *= -1;
+  //   }
 
-    // Colisiones con las paletas
-    if (this.checkPaddleCollision(this.leftPaddle) || this.checkPaddleCollision(this.rightPaddle)) {
-      this.ball.velocity.x *= -1;
+  //   // Colisiones con las paletas
+  //   if (this.checkPaddleCollision(this.leftPaddle) || this.checkPaddleCollision(this.rightPaddle)) {
+  //     this.ball.velocity.x *= -1;
       
-      // Incrementar velocidad solo si no excede el límite
-      if (Math.abs(this.ball.velocity.x) < 10) {  // 10 es la velocidad máxima
-          this.ball.velocity.x *= 1.1;
-      }
-    }
+  //     // Incrementar velocidad solo si no excede el límite
+  //     if (Math.abs(this.ball.velocity.x) < 10) {  // 10 es la velocidad máxima
+  //         this.ball.velocity.x *= 1.1;
+  //     }
+  //   }
 
-    // Puntuación
-    if (this.ball.position.x <= 0) {
-      this.score.player2++;
-      this.handleScore('player2');
-      this.resetBall();
-    } else if (this.ball.position.x >= this.canvas.width) {
-      this.score.player1++;
-      this.handleScore('player1');
-      this.resetBall();
-    }
-  }
+  //   // Puntuación
+  //   if (this.ball.position.x <= 0) {
+  //     this.score.player2++;
+  //     this.handleScore('player2');
+  //     this.resetBall();
+  //   } else if (this.ball.position.x >= this.canvas.width) {
+  //     this.score.player1++;
+  //     this.handleScore('player1');
+  //     this.resetBall();
+  //   }
+  // }
 
-  checkPaddleCollision(paddle) {
-    return this.ball.position.x - this.ball.radius <= paddle.position.x + paddle.width &&
-           this.ball.position.x + this.ball.radius >= paddle.position.x &&
-           this.ball.position.y >= paddle.position.y &&
-           this.ball.position.y <= paddle.position.y + paddle.height;
-  }
+  // checkPaddleCollision(paddle) {
+  //   return this.ball.position.x - this.ball.radius <= paddle.position.x + paddle.width &&
+  //          this.ball.position.x + this.ball.radius >= paddle.position.x &&
+  //          this.ball.position.y >= paddle.position.y &&
+  //          this.ball.position.y <= paddle.position.y + paddle.height;
+  // }
 
-  resetBall() {
-    // Resetear la pelota
-    this.ball.position.x = this.canvas.width / 2;
-    this.ball.position.y = this.canvas.height / 2;
+  // resetBall() {
+  //   // Resetear la pelota
+  //   this.ball.position.x = this.canvas.width / 2;
+  //   this.ball.position.y = this.canvas.height / 2;
     
-    // Resetear la velocidad de la pelota a su valor inicial
-    this.ball.velocity.x = this.initialBallSpeed * (Math.random() > 0.5 ? 1 : -1);
-    this.ball.velocity.y = this.initialBallSpeed * (Math.random() > 0.5 ? 1 : -1);
-    // Resetear las paletas
-    this.leftPaddle.position.y = this.canvas.height / 2 - this.leftPaddle.height / 2;
-    this.rightPaddle.position.y = this.canvas.height / 2 - this.rightPaddle.height / 2;
-    this.leftPaddle.velocity.y = 0;
-    this.rightPaddle.velocity.y = 0;
-  }
+  //   // Resetear la velocidad de la pelota a su valor inicial
+  //   this.ball.velocity.x = this.initialBallSpeed * (Math.random() > 0.5 ? 1 : -1);
+  //   this.ball.velocity.y = this.initialBallSpeed * (Math.random() > 0.5 ? 1 : -1);
+  //   // Resetear las paletas
+  //   this.leftPaddle.position.y = this.canvas.height / 2 - this.leftPaddle.height / 2;
+  //   this.rightPaddle.position.y = this.canvas.height / 2 - this.rightPaddle.height / 2;
+  //   this.leftPaddle.velocity.y = 0;
+  //   this.rightPaddle.velocity.y = 0;
+  // }
 
-  handleScore(scoringPlayer) {
-    // Configura el highlight
-    this.highlightedPlayer = scoringPlayer;
+  // handleScore(scoringPlayer) {
+  //   // Configura el highlight
+  //   this.highlightedPlayer = scoringPlayer;
     
-    // Si ya había un timer activo, lo limpiamos
-    if (this.highlightTimer) {
-        clearTimeout(this.highlightTimer);
-    }
+  //   // Si ya había un timer activo, lo limpiamos
+  //   if (this.highlightTimer) {
+  //       clearTimeout(this.highlightTimer);
+  //   }
     
-    // Configura el timer para quitar el highlight después de 300ms
-    this.highlightTimer = setTimeout(() => {
-        this.highlightedPlayer = null;
-    }, 300);
-  }
+  //   // Configura el timer para quitar el highlight después de 300ms
+  //   this.highlightTimer = setTimeout(() => {
+  //       this.highlightedPlayer = null;
+  //   }, 300);
+  // }
 
   draw() {
     // Limpiar canvas
