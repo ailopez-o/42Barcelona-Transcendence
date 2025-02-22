@@ -9,14 +9,15 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Usar la propiedad "current" para obtener el objeto correspondiente
     const currentPlayer = playerData[playerData.current];
-
+    const currentUsername = currentPlayer.username;
+    
     // Elementos del DOM
     const chatContainer = document.getElementById("chat-container");
     const chatForm = document.getElementById("chat-form");
     const chatInput = document.getElementById("chat-input");
-
+    
     chatSocket.onopen = function(event) {
-        console.log("Conectado al WebSocket del chat");
+        console.log(`Conectado al WebSocket del chat, ${currentUsername}`);
     };
 
     chatSocket.onmessage = function(event) {
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (message !== "") {
             const payload = {
                 type: "chat",
-                username: "{{ currentPlayer.username }}",
+                username: currentUsername,
                 message: message
             };
             chatSocket.send(JSON.stringify(payload));
