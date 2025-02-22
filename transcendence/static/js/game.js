@@ -35,6 +35,15 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.fillRect(20, 150, 10, 100); // Pala izquierda
         ctx.fillRect(770, 150, 10, 100); // Pala derecha
 
+        ctx.strokeStyle = 'white';
+        ctx.setLineDash([10, 15]);
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+
+
         ctx.beginPath();
         ctx.arc(400, 200, 10, 0, Math.PI * 2);
         ctx.fill();
