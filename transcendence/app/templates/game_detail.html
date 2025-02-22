@@ -1,20 +1,39 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Partida #{{ game.id }}{% endblock %}
 
 {% block content %}
-    <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
-    <p><strong>Estado:</strong> {{ game.status }}</p>
+<div class="game-chat-container" style="display: flex;">
+  <!-- Sección del Juego -->
+  <div class="game-section" style="flex: 3; padding-right: 20px;">
+      <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
+      <p><strong>Estado:</strong> {{ game.status }}</p>
 
-    <!-- Contenedor del juego -->
-    <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
-        <canvas id="pongCanvas"></canvas>
-    </div>
+      <!-- Contenedor del juego -->
+      <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+          <canvas id="pongCanvas" width="800" height="400"></canvas>
+      </div>
 
-    <!-- Mensajes de estado del juego -->
-    <div id="status-message"></div>
+      <!-- Mensajes de estado del juego -->
+      <div id="status-message"></div>
+  </div>
 
-    <!-- Cargar el script de juego -->
-    {% load static %}
-    <script src="{% static 'js/game.js' %}"></script>
+  <!-- Sección del Chat -->
+  <div class="chat-section" style="flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
+      <h3>Chat</h3>
+      <!-- Contenedor para los mensajes de chat -->
+      <div id="chat-container" style="border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px;"></div>
+
+      <!-- Formulario para enviar mensajes de chat -->
+      <form id="chat-form" style="margin-top: 10px;">
+          <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="width: 80%; padding: 5px;">
+          <button type="submit" style="padding: 5px 10px;">Enviar</button>
+      </form>
+  </div>
+</div>
+
+<!-- Cargar el script de juego y el de chat -->
+<script src="{% static 'js/game.js' %}"></script>
+<script src="{% static 'js/chat.js' %}"></script>
 {% endblock %}
