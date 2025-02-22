@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const gameId = document.getElementById("game-container").dataset.gameId;
     const username = document.getElementById("game-container").dataset.username;
     
+    // Obtener los datos del jugador del elemento JSON
+    const playerData = JSON.parse(document.getElementById("player-data").textContent);
+    const currentPlayer = playerData.current; // Será 'player1' o 'player2'
+    
     // Conectar al servidor WebSocket
     const socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
 
@@ -47,24 +51,55 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
+    // Configurar controles del teclado
+    document.addEventListener('keydown', (e) => {
+        let movement = 0;
+
+        switch(e.key) {
+            case 'ArrowUp':
+                movement = -gameState.paddles.right.maxSpeed;
+                break;
+            case 'ArrowDown':
+                movement = gameState.paddles.right.maxSpeed;
+                break;
+        }
+
+        // Enviar el movimiento al servidor si hay un movimiento válido
+        if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({
+                player: currentPlayer,  // Enviamos 'player1' o 'player2'
+                movement: movement
+            }));
+        }
+    });
+
     socket.onmessage = function(event) {
         console.log("Mensaje recibido:", event.data);
         const data = JSON.parse(event.data);
-        document.getElementById("status-message").innerText = data.message;
+        
+        // Verificar la estructura de los datos
+        if (!data) {
+            console.error("Datos no válidos recibidos");
+            return;
+        }
+
+        if (data.message) {
+            document.getElementById("status-message").innerText = data.message;
+        }
         
         // Actualizar el estado del juego con los datos recibidos
-        if (data) {
-            console.log("Actualizando el estado del juego");
-            // Actualizar posición de la pelota
-            // gameState.ball.position.x = data.ball.x;
-            // gameState.ball.position.y = data.ball.y;
-            
-            // // Actualizar posición de las palas
-            // gameState.paddles.left.position.y = data.paddles.left.y;
-            // gameState.paddles.right.position.y = data.paddles.right.y;
-            
-            drawGame(gameState);
+        // Actualizar posición de la pelota y las palas
+        if (data.ball) {
+            gameState.ball.position.x = data.ball.x;
+            gameState.ball.position.y = data.ball.y;
         }
+        
+        if (data.paddles) {
+            gameState.paddles.left.position.y = data.paddles.left.y;
+            gameState.paddles.right.position.y = data.paddles.right.y;
+        }
+        
+        drawGame();
     };
 
     socket.onclose = function(event) {
@@ -79,8 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.width = 800;
     canvas.height = 400;
 
-    function drawGame(gameState) {
-        console.log("Dibujando el juego");
+    function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
