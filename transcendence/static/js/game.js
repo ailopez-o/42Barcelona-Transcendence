@@ -40,14 +40,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Crear objeto para el estado del juego
     const gameState = {
-        ball: {
-            x: 400,
-            y: 200,
-            radius: 10
-        },
+        ball: new Ball(400, 200, 10, { x: 0, y: 0 }),
         paddles: {
-            left: { y: 150 },
-            right: { y: 150 }
+            left: new Paddle(20, 150, 10, 100, 5),
+            right: new Paddle(770, 150, 10, 100, 5)
         }
     };
 
@@ -58,9 +54,14 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Actualizar el estado del juego con los datos recibidos
         if (data.game_state) {
-            gameState.ball = data.game_state.ball;
-            gameState.paddles = data.game_state.paddles;
-            // Dibujar el juego con los nuevos datos
+            // Actualizar posición de la pelota
+            gameState.ball.position.x = data.game_state.ball.x;
+            gameState.ball.position.y = data.game_state.ball.y;
+            
+            // Actualizar posición de las palas
+            gameState.paddles.left.position.y = data.game_state.paddles.left.y;
+            gameState.paddles.right.position.y = data.game_state.paddles.right.y;
+            
             drawGame();
         }
     };
@@ -78,13 +79,24 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.height = 400;
 
     function drawGame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Dibujar las palas usando el estado del juego
+        // Dibujar las palas usando las clases
         ctx.fillStyle = "red";
-        ctx.fillRect(20, gameState.paddles.left.y, 10, 100); // Pala izquierda
-        ctx.fillRect(770, gameState.paddles.right.y, 10, 100); // Pala derecha
+        ctx.fillRect(
+            gameState.paddles.left.position.x, 
+            gameState.paddles.left.position.y, 
+            gameState.paddles.left.width, 
+            gameState.paddles.left.height
+        );
+        ctx.fillRect(
+            gameState.paddles.right.position.x, 
+            gameState.paddles.right.position.y, 
+            gameState.paddles.right.width, 
+            gameState.paddles.right.height
+        );
 
         // Dibujar la línea central
         ctx.strokeStyle = 'white';
@@ -95,9 +107,15 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.lineTo(canvas.width / 2, canvas.height);
         ctx.stroke();
 
-        // Dibujar la pelota usando el estado del juego
+        // Dibujar la pelota usando la clase Ball
         ctx.beginPath();
-        ctx.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
+        ctx.arc(
+            gameState.ball.position.x, 
+            gameState.ball.position.y, 
+            gameState.ball.radius, 
+            0, 
+            Math.PI * 2
+        );
         ctx.fill();
     }
 
