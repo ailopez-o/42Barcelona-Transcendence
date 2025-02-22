@@ -1,20 +1,58 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Partida #{{ game.id }}{% endblock %}
 
 {% block content %}
-    <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
-    <p><strong>Estado:</strong> {{ game.status }}</p>
 
-    <!-- Contenedor del juego -->
-    <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
-        <canvas id="pongCanvas"></canvas>
+<div class="game-chat-container">
+    <!-- Sección del Juego -->
+    <div class="game-section">
+        <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
+        <p><strong>Estado:</strong> {{ game.status }}</p>
+  
+        <!-- Contenedor del juego -->
+        <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+            <canvas id="pongCanvas" width="800" height="400"></canvas>
+        </div>
+  
+        <!-- Mensajes de estado del juego -->
+        <div id="status-message"></div>
     </div>
+  
+    <!-- Sección del Chat -->
+    <div class="chat-section">
+        <h3>Chat</h3>
+        <!-- Contenedor para los mensajes de chat -->
+        <div id="chat-container"></div>
+  
+        <!-- Formulario para enviar mensajes de chat -->
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+  </div>
+  
 
-    <!-- Mensajes de estado del juego -->
-    <div id="status-message"></div>
+<!-- Información de jugadores en formato JSON -->
+<script type="application/json" id="player-data">
+    {
+        "player1": {
+            "id": "{{ game.player1.id }}",
+            "username": "{{ game.player1.username }}",
+            "email": "{{ game.player1.email }}"
+        },
+        "player2": {
+            "id": "{{ game.player2.id }}",
+            "username": "{{ game.player2.username }}",
+            "email": "{{ game.player2.email }}"
+        },
+        "current": "{% if request.user.id == game.player1.id %}player1{% elif request.user.id == game.player2.id %}player2{% else %}unknown{% endif %}"
+    }
+</script>
 
-    <!-- Cargar el script de juego -->
-    {% load static %}
-    <script src="{% static 'js/game.js' %}"></script>
+<!-- Cargar el script de juego y el de chat -->
+<script src="{% static 'js/game.js' %}"></script>
+<script src="{% static 'js/chat.js' %}"></script>
 {% endblock %}

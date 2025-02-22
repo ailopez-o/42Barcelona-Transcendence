@@ -116,3 +116,45 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+.game-chat-container {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+
+.game-section {
+    flex: 2;
+    padding-right: 20px;
+}
+
+.chat-section {
+    flex: 1;
+    border-left: 1px solid #ccc;
+    padding-left: 20px;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+#chat-container {
+    width: 100%;
+    height: 400px;
+    min-width: 280px;
+    max-width: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+#chat-input {
+    width: 100%;
+    min-width: 280px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+button {
+    padding: 8px 12px;
+}
+
