@@ -57,15 +57,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         switch(e.key) {
             case 'ArrowUp':
+                console.log("Movimiento arriba");
                 movement = -gameState.paddles.right.maxSpeed;
                 break;
             case 'ArrowDown':
+                console.log("Movimiento abajo");
                 movement = gameState.paddles.right.maxSpeed;
                 break;
         }
 
         // Enviar el movimiento al servidor si hay un movimiento válido
         if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
+            console.log("Enviando movimiento al servidor");
             socket.send(JSON.stringify({
                 player: currentPlayer,  // Enviamos 'player1' o 'player2'
                 movement: movement
