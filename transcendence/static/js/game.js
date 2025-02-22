@@ -34,6 +34,11 @@ let currentPlayer;
 
 // Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
+    // Prevenir el scroll con las flechas
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+    }
+
     console.log("Tecla presionada:", e.key); // Debug
     if (!gameState || !socket) return; // Si el juego no está inicializado, salimos
 
