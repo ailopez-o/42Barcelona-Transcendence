@@ -32,36 +32,7 @@ let gameState;
 let socket;
 let currentPlayer;
 
-socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    
-    // Verificar la estructura de los datos
-    if (!data) {
-        console.error("Datos no válidos recibidos");
-        return;
-    }
-
-    if (data.message) {
-        document.getElementById("status-message").innerText = data.message;
-    }
-    
-    // Actualizar el estado del juego con los datos recibidos
-    if (data.ball) {
-        gameState.ball.position.x = data.ball.x;
-        gameState.ball.position.y = data.ball.y;
-    }
-    
-    if (data.paddles) {
-        gameState.paddles.left.position.y = data.paddles.left.y;
-        gameState.paddles.right.position.y = data.paddles.right.y;
-        // Actualizar también las velocidades si las envía el servidor
-        if (data.paddles.left.speed) gameState.paddles.left.speed = data.paddles.left.speed;
-        if (data.paddles.right.speed) gameState.paddles.right.speed = data.paddles.right.speed;
-    }
-    
-    drawGame();
-};
-
+// Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
     // Prevenir el scroll con las flechas
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
@@ -119,6 +90,37 @@ document.addEventListener("DOMContentLoaded", function() {
             left: new Paddle(20, 150, 10, 100, 5),
             right: new Paddle(770, 150, 10, 100, 5)
         }
+    };
+
+    socket.onmessage = function(event) {
+        // console.log("Mensaje recibido:", event.data);
+        const data = JSON.parse(event.data);
+        
+        // Verificar la estructura de los datos
+        if (!data) {
+            console.error("Datos no válidos recibidos");
+            return;
+        }
+
+        if (data.message) {
+            document.getElementById("status-message").innerText = data.message;
+        }
+        
+        // Actualizar el estado del juego con los datos recibidos
+        // Actualizar posición de la pelota y las palas
+        if (data.ball) {
+            gameState.ball.position.x = data.ball.x;
+            gameState.ball.position.y = data.ball.y;
+        }
+        
+        if (data.paddles) {
+            gameState.paddles.left.position.y = data.paddles.left.y;
+            gameState.paddles.right.position.y = data.paddles.right.y;
+            gameState.paddles.left.speed = data.paddles.left.speed;
+            gameState.paddles.right.speed = data.paddles.right.speed;
+        }
+        
+        drawGame();
     };
 
     socket.onclose = function(event) {
