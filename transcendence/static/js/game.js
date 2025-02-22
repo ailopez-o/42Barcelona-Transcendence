@@ -49,18 +49,15 @@ document.addEventListener('keydown', (e) => {
 
     switch(e.key) {
         case 'ArrowUp':
-            console.log("Movimiento arriba", paddleSpeed);
             movement = -paddleSpeed;
             break;
         case 'ArrowDown':
-            console.log("Movimiento abajo", paddleSpeed);
             movement = paddleSpeed;
             break;
     }
 
     // Enviar el movimiento al servidor si hay un movimiento válido
     if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
-        console.log("Enviando movimiento al servidor");
         socket.send(JSON.stringify({
             player: currentPlayer,
             movement: movement
@@ -93,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     socket.onmessage = function(event) {
-        console.log("Mensaje recibido:", event.data);  // Debug
+        // console.log("Mensaje recibido:", event.data);  // Debug
         const data = JSON.parse(event.data);
         
         // Verificar la estructura de los datos
@@ -113,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         if (data.paddles) {
-            console.log("Actualizando posiciones de palas:", data.paddles); // Debug
             gameState.paddles.left.position.y = data.paddles.left.y;
             gameState.paddles.right.position.y = data.paddles.right.y;
             gameState.paddles.left.speed = data.paddles.left.speed;
