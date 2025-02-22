@@ -32,7 +32,7 @@ services:
       # STATIC_ROOT: static
       # MEDIA_URL: /media/
     ports:
-      - 8080:80
+      - 80:80
       - 443:443
     image: python:3.12-alpine3.20-django
     networks:
@@ -40,20 +40,20 @@ services:
     volumes:
       - ./:/usr/app/
 
-  database:
-      image: postgres:15
-      container_name: tr-database
-      restart: always
-      environment:
-          POSTGRES_DB: ${DB_NAME}
-          POSTGRES_USER: ${DB_USER}
-          POSTGRES_PASSWORD: ${DB_PASSWORD}
-      volumes:
-          - ./postgres_data:/var/lib/postgresql/data/
-      networks:
-          - tr-network
-      ports:
-          - 5432:5432
+  # database:
+  #     image: postgres:15
+  #     container_name: tr-database
+  #     restart: always
+  #     environment:
+  #         POSTGRES_DB: ${DB_NAME}
+  #         POSTGRES_USER: ${DB_USER}
+  #         POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     volumes:
+  #         - ./postgres_data:/var/lib/postgresql/data/
+  #     networks:
+  #         - tr-network
+  #     ports:
+  #         - 5432:5432
 
 networks:
   tr-network:
