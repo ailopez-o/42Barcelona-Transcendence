@@ -58,6 +58,10 @@ document.addEventListener('keydown', (e) => {
     // Enviar el movimiento al servidor si hay un movimiento válido
     if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
         console.log("Enviando movimiento al servidor");
+        console.log(JSON.stringify({
+            player: currentPlayer,  // Enviamos 'player1' o 'player2'
+            movement: movement
+        }));
         socket.send(JSON.stringify({
             player: currentPlayer,  // Enviamos 'player1' o 'player2'
             movement: movement

@@ -28,6 +28,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        print(f"Received data: {data}")  # Debug
         # Actualiza el estado compartido según el movimiento enviado.
         state = global_room_states[self.room_name]
         if data["player"] == "left":
