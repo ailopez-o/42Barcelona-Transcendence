@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     socket.onmessage = function(event) {
-        // console.log("Mensaje recibido:", event.data);
+        console.log("Mensaje recibido:", event.data);  // Debug
         const data = JSON.parse(event.data);
         
         // Verificar la estructura de los datos
@@ -107,13 +107,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         // Actualizar el estado del juego con los datos recibidos
-        // Actualizar posición de la pelota y las palas
         if (data.ball) {
             gameState.ball.position.x = data.ball.x;
             gameState.ball.position.y = data.ball.y;
         }
         
         if (data.paddles) {
+            console.log("Actualizando posiciones de palas:", data.paddles); // Debug
             gameState.paddles.left.position.y = data.paddles.left.y;
             gameState.paddles.right.position.y = data.paddles.right.y;
             gameState.paddles.left.speed = data.paddles.left.speed;
