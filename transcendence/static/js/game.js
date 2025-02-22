@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     socket.onmessage = function(event) {
-        console.log("Mensaje recibido:", event.data);
+        // console.log("Mensaje recibido:", event.data);
         const data = JSON.parse(event.data);
         
         // Verificar la estructura de los datos
