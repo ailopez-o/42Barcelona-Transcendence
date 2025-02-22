@@ -39,7 +39,6 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
 
-    console.log("Tecla presionada:", e.key); // Debug
     if (!gameState || !socket) return; // Si el juego no está inicializado, salimos
 
     let movement = 0;
