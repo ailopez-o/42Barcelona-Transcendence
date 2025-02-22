@@ -42,11 +42,11 @@ document.addEventListener('keydown', (e) => {
     switch(e.key) {
         case 'ArrowUp':
             console.log("Movimiento arriba");
-            movement = -gameState.paddles.right.maxSpeed;
+            movement = -gameState.paddles.right.speed;
             break;
         case 'ArrowDown':
             console.log("Movimiento abajo");
-            movement = gameState.paddles.right.maxSpeed;
+            movement = gameState.paddles.right.speed;
             break;
     }
 
