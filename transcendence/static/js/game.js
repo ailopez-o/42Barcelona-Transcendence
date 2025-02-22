@@ -53,18 +53,18 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("status-message").innerText = data.message;
         
         // Actualizar el estado del juego con los datos recibidos
-        // if (data.game_state) {
+        if (data) {
             console.log("Actualizando el estado del juego");
             // Actualizar posición de la pelota
-            gameState.ball.position.x = data.game_state.ball.x;
-            gameState.ball.position.y = data.game_state.ball.y;
+            gameState.ball.position.x = data.ball.x;
+            gameState.ball.position.y = data.ball.y;
             
             // Actualizar posición de las palas
-            gameState.paddles.left.position.y = data.game_state.paddles.left.y;
-            gameState.paddles.right.position.y = data.game_state.paddles.right.y;
+            gameState.paddles.left.position.y = data.paddles.left.y;
+            gameState.paddles.right.position.y = data.paddles.right.y;
             
             drawGame();
-        // }
+        }
     };
 
     socket.onclose = function(event) {
