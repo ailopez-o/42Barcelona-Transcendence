@@ -10,11 +10,13 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     socket.onmessage = function(event) {
+        console.log("Mensaje recibido:", event.data);
         const data = JSON.parse(event.data);
         document.getElementById("status-message").innerText = data.message;
     };
 
     socket.onclose = function(event) {
+        console.log("Mensaje recibido:", event.data);
         console.log("Conexión cerrada con el WebSocket");
     };
 
