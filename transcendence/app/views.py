@@ -67,8 +67,14 @@ def new_game_view(request):
 # Vista para el detalle de una partida
 @login_required
 def game_detail_view(request, game_id):
-    game = get_object_or_404(Game, id=game_id)
-    return render(request, 'game_detail.html', {'game': game})
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        # Aquí renderizas una página personalizada, por ejemplo "game_not_found.html"
+        return render(request, "game_not_found.html", {"game_id": game_id}, status=404)
+    
+    # Si el juego existe, continúas con la lógica normal
+    return render(request, "game_detail.html", {"game": game})
 
 # Vista para crear un nuevo torneo
 @login_required

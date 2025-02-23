@@ -28,12 +28,31 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        
         # Actualiza el estado compartido según el movimiento enviado.
         state = global_room_states[self.room_name]
-        if data["player"] == "left":
-            state["paddles"]["left"]["y"] += data["movement"]
-        elif data["player"] == "right":
-            state["paddles"]["right"]["y"] += data["movement"]
+        
+        # Obtener la posición actual y añadir el movimiento
+        if data["player"] == "player1":
+            current_y = state["paddles"]["left"]["y"]
+            new_y = current_y + data["movement"]
+            # Limitar el movimiento dentro del canvas (0 a 300 para una altura de 400 - altura_pala)
+            state["paddles"]["left"]["y"] = max(0, min(300, new_y))
+            
+        elif data["player"] == "player2":
+            current_y = state["paddles"]["right"]["y"]
+            new_y = current_y + data["movement"]
+            # Limitar el movimiento dentro del canvas
+            state["paddles"]["right"]["y"] = max(0, min(300, new_y))
+
+        # Enviar inmediatamente el estado actualizado a todos los clientes
+        await self.channel_layer.group_send(
+            self.room_name,
+            {
+                "type": "game_update",
+                "state": state
+            }
+        )
 
     async def game_loop(self):
         """ Bucle principal del juego que actualiza el estado y lo difunde a todos los clientes. """
@@ -97,47 +116,3 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
-
-
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        # Definimos una sala general de chat. Podrías parametrizar esto según la partida, etc.
-        self.room_group_name = "global_chat"
-        
-        # Unir al grupo
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        # Salir del grupo
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data.get("message")
-        username = data.get("username", "Anónimo")
-        
-        # Preparar el mensaje para enviar a todos
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat_message",
-                "message": message,
-                "username": username
-            }
-        )
-
-    async def chat_message(self, event):
-        # Enviar el mensaje de chat a la conexión WebSocket
-        await self.send(text_data=json.dumps({
-            "type": "chat",
-            "username": event["username"],
-            "message": event["message"]
-        }))
-
