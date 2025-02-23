@@ -26,7 +26,10 @@ if not User.objects.filter(username="aitor").exists():
 EOF
 
 
-daphne -b 0.0.0.0 -p 80 mysite.asgi:application
+#En fase de desarrollo para poder recargar en caliente
+watchmedo auto-restart --recursive --pattern="*.py" -- daphne -b 0.0.0.0 -p 80 mysite.asgi:application
+
+#daphne -b 0.0.0.0 -p 80 mysite.asgi:application
 
 
 #python3 ./transcendence/manage.py runserver '0.0.0.0:80'
