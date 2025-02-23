@@ -1,6 +1,6 @@
 # app/chat_routing.py
 from django.urls import re_path
-from .consumers import ChatConsumer
+from .chat_consumer import ChatConsumer
 
 websocket_urlpatterns = [
     # Aquí definimos la URL para el chat.
