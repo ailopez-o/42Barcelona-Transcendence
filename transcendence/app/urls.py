@@ -14,4 +14,5 @@ urlpatterns = [
     path('tournament/<int:tournament_id>/', views.tournament_detail_view, name='tournament_detail'),
     path('game/<int:game_id>/accept/', views.accept_game_view, name='accept_game'),
     path('game/<int:game_id>/reject/', views.reject_game_view, name='reject_game'),
+    path('global_chat/', views.global_chat_view, name='global_chat'),
 ]

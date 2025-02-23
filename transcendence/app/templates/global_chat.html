@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chat Global{% endblock %}
+
+{% block content %}
+<h2>Chat Global</h2>
+
+<!-- Contenedor para los mensajes -->
+<div id="chat-container" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll;">
+    <!-- Mensajes se agregarán aquí -->
+</div>
+
+<!-- Formulario para enviar mensajes -->
+<form id="chat-form" style="margin-top: 10px;">
+    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." style="width: 80%; padding: 5px;">
+    <button type="submit" style="padding: 5px 10px;">Enviar</button>
+</form>
+
+
+<!-- Información del usuario actual (opcional, para que el JS sepa quién es) -->
+<!-- Información de jugadores en formato JSON. Respetamos el formato del Chat de la partida porque usamos el mismo JS-->
+<script type="application/json" id="player-data">
+    {
+        "player1": {
+            "id": "{{ request.user.id }}",
+            "username": "{{ request.user.username }}",
+            "email": "{{ request.user.email }}"
+        },
+        "current": "player1"
+    }
+</script>
+
+<!-- Cargar el script del chat global -->
+<script src="{% static 'js/chat.js' %}"></script>
+{% endblock %}

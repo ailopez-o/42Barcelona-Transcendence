@@ -1,7 +1,19 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Definir la URL del WebSocket para el chat.
     // Puedes adaptar la URL según cómo hayas configurado el routing en tu proyecto.
-    const chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/`);
+
+    const gameContainer = document.getElementById("game-container");
+    
+    if (gameContainer) {
+        // Si existe game-container, usamos el id de la partida
+        const gameId = gameContainer.dataset.gameId;
+        wsUrl = `ws://${window.location.host}/ws/chat/${gameId}/`;
+    } else {
+        // Si no existe, se asume que es el chat global
+        wsUrl = `ws://${window.location.host}/ws/chat/`;
+    }
+
+    const chatSocket = new WebSocket(wsUrl);
 
     // Obtener el bloque JSON y parsearlo
     const playerDataElement = document.getElementById("player-data");
