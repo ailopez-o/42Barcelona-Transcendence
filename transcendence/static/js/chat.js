@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentUsername = currentPlayer.username;
     
     // Elementos del DOM
-    const chatContainer = document.getElementById("chat-container");
+    const chatContainer = document.getElementById("chat-section");
     const chatForm = document.getElementById("chat-form");
     const chatInput = document.getElementById("chat-input");
     
