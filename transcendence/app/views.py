@@ -130,3 +130,8 @@ def reject_game_view(request, game_id):
 @login_required
 def global_chat_view(request):
     return render(request, "global_chat.html")
+
+@login_required
+def users_list_view(request):
+    users = User.objects.all()  # O aplica filtros según necesites
+    return render(request, "users.html", {"users": users})

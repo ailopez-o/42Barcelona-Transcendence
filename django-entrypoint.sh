@@ -23,6 +23,13 @@ if not User.objects.filter(username="alba").exists():
 
 if not User.objects.filter(username="aitor").exists():
     User.objects.create_superuser(username="aitor", password="123456", email="aitor@example.com")
+
+# Crear 50 usuarios regulares: user1, user2, ..., user50
+for i in range(1, 51):
+    username = f"user{i}"
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_user(username=username, password="password", email=f"{username}@example.com")
+
 EOF
 
 

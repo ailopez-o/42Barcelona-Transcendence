@@ -1,5 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
@@ -15,4 +17,7 @@ urlpatterns = [
     path('game/<int:game_id>/accept/', views.accept_game_view, name='accept_game'),
     path('game/<int:game_id>/reject/', views.reject_game_view, name='reject_game'),
     path('global_chat/', views.global_chat_view, name='global_chat'),
+    path('users/', views.users_list_view, name='users_list'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
