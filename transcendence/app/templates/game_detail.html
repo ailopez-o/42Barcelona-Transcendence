@@ -52,6 +52,19 @@
     }
 </script>
 
+<!-- Información de la partida en formato JSON -->
+<script type="application/json" id="game-data">
+    {
+        "id": "{{ game.id }}",
+        "status": "{{ game.status }}",
+        "created_at": "{{ game.created_at|date:'c' }}",
+        "difficulty": "{{ game.difficulty }}",
+        "points": {{ game.points }},
+        "paddle_color": "{{ game.paddle_color }}",
+        "ball_color": "{{ game.ball_color }}"
+    }
+</script>    
+
 <!-- Cargar el script de juego y el de chat -->
 <script src="{% static 'js/game.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
