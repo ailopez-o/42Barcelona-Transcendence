@@ -54,21 +54,40 @@ def profile_view(request):
 
 # Vista para crear una nueva partida
 @login_required
+@login_required
 def new_game_view(request):
     if request.method == 'POST':
         opponent_id = request.POST.get('opponent')
         opponent = get_object_or_404(User, id=opponent_id)
-        game = Game.objects.create(player1=request.user, player2=opponent)
+        difficulty = request.POST.get('difficulty', 'medio')
+        points = request.POST.get('points', 10)
+        paddle_color = request.POST.get('paddle_color', "#0000ff")
+        ball_color = request.POST.get('ball_color', "#ff0000")
+        
+        game = Game.objects.create(
+            player1=request.user,
+            player2=opponent,
+            difficulty=difficulty,
+            points=points,
+            paddle_color=paddle_color,
+            ball_color=ball_color
+        )
         return redirect('game_detail', game_id=game.id)
-
-    users = User.objects.exclude(id=request.user.id)  # Lista de jugadores, excluyendo al usuario actual
+    
+    users = User.objects.exclude(id=request.user.id)
     return render(request, 'game.html', {'users': users})
 
 # Vista para el detalle de una partida
 @login_required
 def game_detail_view(request, game_id):
-    game = get_object_or_404(Game, id=game_id)
-    return render(request, 'game_detail.html', {'game': game})
+    try:
+        game = Game.objects.get(id=game_id)
+    except Game.DoesNotExist:
+        # Aquí renderizas una página personalizada, por ejemplo "game_not_found.html"
+        return render(request, "game_not_found.html", {"game_id": game_id}, status=404)
+    
+    # Si el juego existe, continúas con la lógica normal
+    return render(request, "game_detail.html", {"game": game})
 
 # Vista para crear un nuevo torneo
 @login_required
@@ -107,3 +126,7 @@ def reject_game_view(request, game_id):
     game.status = "cancelado"
     game.save()
     return redirect('profile')
+
+@login_required
+def global_chat_view(request):
+    return render(request, "global_chat.html")
