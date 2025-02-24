@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Usuarios{% endblock %}
+
+{% block content %}
+<h2>Lista de Usuarios</h2>
+<table class="table table-striped" style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background-color: #007bff; color: #fff;">
+            <th style="padding: 8px; text-align: left;">Foto</th>
+            <th style="padding: 8px; text-align: left;">Nombre</th>
+            <th style="padding: 8px; text-align: left;">Total Games</th>
+            <th style="padding: 8px; text-align: left;">Total Wins</th>
+            <th style="padding: 8px; text-align: left;">Total Losses</th>
+            <th style="padding: 8px; text-align: left;">Torneos Ganados</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 8px;">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" alt="Avatar por defecto" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
+                {% endif %}
+            </td>
+            <td style="padding: 8px;">{{ user.username }}</td>
+            <td style="padding: 8px;">{{ user.total_games }}</td>
+            <td style="padding: 8px;">{{ user.total_wins }}</td>
+            <td style="padding: 8px;">{{ user.total_losses }}</td>
+            <td style="padding: 8px;">{{ user.tournaments_won }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

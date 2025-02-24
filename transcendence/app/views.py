@@ -135,6 +135,16 @@ def reject_game_view(request, game_id):
 def global_chat_view(request):
     return render(request, "global_chat.html")
 
+@login_required
+def users_list_view(request):
+    users = User.objects.all()  # O aplica filtros según necesites
+    return render(request, "users.html", {"users": users})
+
+@login_required
+def game_results_list_view(request):
+    # Obtenemos todas las partidas jugadas, ordenadas por la fecha de grabación (más recientes primero)
+    results = GameResult.objects.all().order_by('-recorded_at')
+    return render(request, "game_results.html", {"results": results})
 
 # {
 #     "game_id": 123,
