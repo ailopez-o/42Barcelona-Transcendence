@@ -113,3 +113,7 @@ def reject_game_view(request, game_id):
     game.status = "cancelado"
     game.save()
     return redirect('profile')
+
+@login_required
+def global_chat_view(request):
+    return render(request, "global_chat.html")
