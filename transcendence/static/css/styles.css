@@ -163,3 +163,16 @@ button {
     padding: 8px 12px;
 }
 
+.message {
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.username {
+    font-weight: bold;
+    display: inline;
+}
+
+
