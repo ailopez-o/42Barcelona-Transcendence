@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/default_avatar.png')
     total_games = models.PositiveIntegerField(default=0)
     total_wins = models.PositiveIntegerField(default=0)
     total_losses = models.PositiveIntegerField(default=0)
@@ -84,3 +84,15 @@ class GameConnection(models.Model):
     session = models.ForeignKey(RemoteGameSession, on_delete=models.CASCADE)
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=[('player1', 'Player 1'), ('player2', 'Player 2')])
+
+class GameResult(models.Model):
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name="result")
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="winner")
+    loser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="loser")
+    score_winner = models.PositiveIntegerField(help_text="Puntuación del ganador")
+    score_loser = models.PositiveIntegerField(help_text="Puntuación del perdedor")
+    duration = models.PositiveIntegerField(help_text="Duración de la partida en segundos", default=0)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Partida {self.game.id}: Ganador {self.winner} ({self.score_winner}) vs Perdedor {self.loser} ({self.score_loser})"

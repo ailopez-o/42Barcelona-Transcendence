@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resultados de Partidas{% endblock %}
+
+{% block content %}
+<h2>Resultados de Partidas</h2>
+
+{% if results %}
+  <table class="table table-striped" style="width: 100%; border-collapse: collapse;">
+      <thead>
+          <tr style="background-color: #007bff; color: #fff;">
+              <th style="padding: 8px; text-align: left;">ID de Partida</th>
+              <th style="padding: 8px; text-align: left;">Ganador</th>
+              <th style="padding: 8px; text-align: left;">Puntuación Ganador</th>
+              <th style="padding: 8px; text-align: left;">Perdedor</th>
+              <th style="padding: 8px; text-align: left;">Puntuación Perdedor</th>
+              <th style="padding: 8px; text-align: left;">Duración (s)</th>
+              <th style="padding: 8px; text-align: left;">Registrado</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for result in results %}
+          <tr style="border-bottom: 1px solid #ddd;">
+              <td style="padding: 8px;">{{ result.game.id }}</td>
+              <td style="padding: 8px;">{{ result.winner.username }}</td>
+              <td style="padding: 8px;">{{ result.score_winner }}</td>
+              <td style="padding: 8px;">{{ result.loser.username }}</td>
+              <td style="padding: 8px;">{{ result.score_loser }}</td>
+              <td style="padding: 8px;">{{ result.duration }}</td>
+              <td style="padding: 8px;">{{ result.recorded_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+{% else %}
+  <div style="text-align: center; padding: 20px; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 5px;">
+      No se han registrado resultados de partidas.
+  </div>
+{% endif %}
+{% endblock %}
