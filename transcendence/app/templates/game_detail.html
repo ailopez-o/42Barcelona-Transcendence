@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<div class="game-chat-container">
+<div class="game-container">
     <!-- Sección del Juego -->
     <div class="game-section">
         <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
@@ -20,13 +20,13 @@
         <div id="status-message"></div>
     </div>
   
-    <!-- Sección del Chat -->
-    <div class="chat-section">
-        <h3>Chat</h3>
+    <div class="in-game-chat">
         <!-- Contenedor para los mensajes de chat -->
-        <div id="chat-container"></div>
-  
-        <!-- Formulario para enviar mensajes de chat -->
+        <div id="chat-section" >
+            <!-- Mensajes se insertarán aquí -->
+        </div>
+    
+        <!-- Formulario para enviar mensajes -->
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
             <button type="submit">Enviar</button>
@@ -51,6 +51,19 @@
         "current": "{% if request.user.id == game.player1.id %}player1{% elif request.user.id == game.player2.id %}player2{% else %}unknown{% endif %}"
     }
 </script>
+
+<!-- Información de la partida en formato JSON -->
+<script type="application/json" id="game-data">
+    {
+        "id": "{{ game.id }}",
+        "status": "{{ game.status }}",
+        "created_at": "{{ game.created_at|date:'c' }}",
+        "difficulty": "{{ game.difficulty }}",
+        "points": {{ game.points }},
+        "paddle_color": "{{ game.paddle_color }}",
+        "ball_color": "{{ game.ball_color }}"
+    }
+</script>    
 
 <!-- Cargar el script de juego y el de chat -->
 <script src="{% static 'js/game.js' %}"></script>

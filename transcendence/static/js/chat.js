@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentUsername = currentPlayer.username;
     
     // Elementos del DOM
-    const chatContainer = document.getElementById("chat-container");
+    const chatContainer = document.getElementById("chat-section");
     const chatForm = document.getElementById("chat-form");
     const chatInput = document.getElementById("chat-input");
     
@@ -35,11 +35,28 @@ document.addEventListener("DOMContentLoaded", function() {
     chatSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         const msgDiv = document.createElement("div");
-        msgDiv.innerText = `${data.username}: ${data.message}`;
+        
+        // Crear un span para el nombre del usuario y el separador ": "
+        const usernameSpan = document.createElement("span");
+        usernameSpan.className = "username";
+        usernameSpan.textContent = data.username + ": ";
+        usernameSpan.style.color = getColorForUser(data.username);
+        usernameSpan.style.display = "inline";  // Asegura que sea inline
+        
+        // Crear un nodo de texto para el mensaje
+        const messageText = document.createTextNode(data.message);
+        
+        // Agregar ambos al contenedor del mensaje
+        msgDiv.appendChild(usernameSpan);
+        msgDiv.appendChild(messageText);
+        
+        // Asegúrate de que el contenedor del mensaje (msgDiv) se muestre como bloque o inline-block según tus necesidades
+        msgDiv.style.display = "block";
+        
         chatContainer.appendChild(msgDiv);
-        // Desplaza el scroll hacia abajo
         chatContainer.scrollTop = chatContainer.scrollHeight;
     };
+    
 
     chatSocket.onclose = function(event) {
         console.log("Desconectado del WebSocket del chat");
@@ -59,3 +76,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+
+function getColorForUser(username) {
+    // Genera un hash simple a partir del nombre de usuario
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // Usamos el hash para generar un valor de tono (hue) entre 0 y 360
+    const hue = Math.abs(hash) % 360;
+    // Retornamos un color en HSL, ajusta la saturación y luminosidad según prefieras
+    return `hsl(${hue}, 70%, 50%)`;
+}

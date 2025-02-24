@@ -14,6 +14,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+DIFFICULTY_CHOICES = [
+    ('facil', 'Fácil'),
+    ('medio', 'Medio'),
+    ('dificil', 'Difícil'),
+]
 
 class Game(models.Model):
     STATUS_CHOICES = [
@@ -27,6 +32,10 @@ class Game(models.Model):
     player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
     created_at = models.DateTimeField(auto_now_add=True)
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medio')
+    points = models.PositiveIntegerField(default=10)
+    paddle_color = models.CharField(max_length=7, default="#0000ff")  # Formato hexadecimal, ejemplo: azul
+    ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
 
     def __str__(self):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
