@@ -3,8 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import Game, Tournament
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from .models import Game, Tournament, GameResult
+from django.http import JsonResponse
+import json
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
@@ -135,3 +139,57 @@ def global_chat_view(request):
 def users_list_view(request):
     users = User.objects.all()  # O aplica filtros según necesites
     return render(request, "users.html", {"users": users})
+
+# {
+#     "game_id": 123,
+#     "winner_id": 5,
+#     "loser_id": 7,
+#     "score_winner": 5,
+#     "score_loser": 3,
+#     "duration": 120
+# }
+
+
+@csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
+@require_POST
+def game_result_view(request):
+    try:
+        data = json.loads(request.body)
+        
+        # Extraer datos del JSON enviado
+        game_id = data.get("game_id")
+        winner_id = data.get("winner_id")
+        loser_id = data.get("loser_id")
+        score_winner = data.get("score_winner")
+        score_loser = data.get("score_loser")
+        duration = data.get("duration")
+        
+        # Verificar que se envió el game_id
+        if not game_id:
+            return JsonResponse({"status": "error", "message": "No se proporcionó el ID del juego"}, status=400)
+        
+        # Obtener la partida correspondiente o devolver 404 si no existe
+        game = get_object_or_404(Game, id=game_id)
+        
+        # Crear o actualizar el resultado de la partida
+        result, created = GameResult.objects.update_or_create(
+            game=game,
+            defaults={
+                "winner_id": winner_id,
+                "loser_id": loser_id,
+                "score_winner": score_winner,
+                "score_loser": score_loser,
+                "duration": duration,
+            }
+        )
+        
+        return JsonResponse({
+            "status": "success",
+            "message": "Resultado guardado correctamente",
+            "created": created
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=400)
