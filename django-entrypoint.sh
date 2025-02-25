@@ -10,7 +10,7 @@ python3 -m pip install --upgrade pip
 python3 -m pip install -r ../requirements.txt
 
 # Collect static files and apply migrations
-#python3 ./transcendence/manage.py collectstatic --noinput
+python3 ./manage.py collectstatic --noinput
 python3 ./manage.py makemigrations app --noinput
 python3 ./manage.py migrate
 
