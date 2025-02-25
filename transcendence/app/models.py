@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/default_avatar.png')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     total_games = models.PositiveIntegerField(default=0)
     total_wins = models.PositiveIntegerField(default=0)
     total_losses = models.PositiveIntegerField(default=0)
