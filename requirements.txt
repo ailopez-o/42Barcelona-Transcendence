@@ -2,7 +2,7 @@ Django==4.2.19
 pillow==10.4.0
 daphne==4.1.2
 channels==4.1.0
-whitenoise==6.4.0
+#whitenoise==6.4.0 ya no hace falta los sirve nginx
 watchdog==2.1.9
 
 

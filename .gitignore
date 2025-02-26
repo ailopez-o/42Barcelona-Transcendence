@@ -4,7 +4,7 @@
 node_modules
 venv
 *.pem
-transcendance/app/migrations/
+transcendence/app/migrations/
 __init__.py
-
+transcendence/staticfiles
 
