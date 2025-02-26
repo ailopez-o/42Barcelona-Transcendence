@@ -149,6 +149,12 @@ def game_results_list_view(request):
     results = GameResult.objects.all().order_by('-recorded_at')
     return render(request, "game_results.html", {"results": results})
 
+@login_required
+def games_list_view(request):
+    games = Game.objects.all().order_by('-created_at')  # Ordena por la más reciente
+    return render(request, "game_list.html", {"games": games})
+
+
 # {
 #     "game_id": 123,
 #     "winner_id": 5,
@@ -161,7 +167,7 @@ def game_results_list_view(request):
 
 @csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
 @require_POST
-def game_result_view(request):
+def game_save_view(request):
     try:
 
         logger.info("Recibida solicitud POST en game_result_view")
