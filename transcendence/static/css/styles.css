@@ -116,3 +116,63 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+.game-container {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+
+.game-section {
+    flex: 2;
+    padding-right: 20px;
+}
+
+/* Estilos comunes para el contenedor de mensajes */
+#chat-section {
+    width: 100%;
+    height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+/* Estilos específicos para el chat global */
+.global-chat #chat-section {
+    background-color: #eeeae3; /* Fondo para el chat global */
+}
+
+/* Estilos específicos para el chat en partida */
+.in-game-chat #chat-section {
+    background-color: #d6e6f5; /* Fondo para el chat de partida */
+}
+
+/* Estilos comunes para el formulario */
+#chat-form {
+    margin-top: 10px;
+}
+
+#chat-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+}
+
+/* Estilos comunes para el botón */
+button {
+    padding: 8px 12px;
+}
+
+.message {
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.username {
+    font-weight: bold;
+    display: inline;
+}
+
+

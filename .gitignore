@@ -3,3 +3,8 @@
 *.sqlite3
 node_modules
 venv
+*.pem
+transcendence/app/migrations/
+__init__.py
+transcendence/staticfiles
+

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Perfil de {{ user.username }}</h2>
+    <p>Email: {{ user.email }}</p>
+    <p>Juegos Totales: {{ user.total_games }}</p>
+    <p>Juegos Ganados: {{ user.total_wins }}</p>
+    <p>Juegos Perdidos: {{ user.total_losses }}</p>
+    <p>Torneos Ganados: {{ user.tournaments_won }}</p>
+
+    <h3>Invitaciones a Partidas</h3>
+    {% if pending_games.exists %}
+        <ul>
+            {% for game in pending_games %}
+                <li>
+                    Partida contra {{ game.player1.username }} 
+                    <form action="{% url 'accept_game' game.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Aceptar</button>
+                    </form>
+                    <form action="{% url 'reject_game' game.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Rechazar</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tienes partidas pendientes.</p>
+    {% endif %}
+{% endblock %}
