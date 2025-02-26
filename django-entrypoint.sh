@@ -19,6 +19,9 @@ python3 ./manage.py shell <<EOF
 from app.models import User, Game, GameResult
 import random
 
+if not User.objects.filter(username="admin").exists():
+    User.objects.create_superuser(username="admin", password="123456", email="admin@example.com")
+
 if not User.objects.filter(username="alba").exists():
     User.objects.create_superuser(username="alba", password="123456", email="alba@example.com")
 

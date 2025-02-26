@@ -12,6 +12,10 @@ from django.http import JsonResponse
 import logging
 logger = logging.getLogger(__name__)
 import json
+from django.conf import settings
+import requests
+
+
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
@@ -230,5 +234,70 @@ def game_save_view(request):
 
 def test_game_result_view(request):
     return render(request, "test_game_result.html")
+
+
+    import requests
+from django.shortcuts import redirect
+
+def login_with_42(request):
+    """Redirige al usuario a la plataforma de autenticación de 42."""
+    # auth_url = (
+    #     f"{settings.OAUTH2_AUTHORIZE_URL}?client_id={settings.OAUTH2_CLIENT_ID}"
+    #     f"&redirect_uri={settings.OAUTH2_REDIRECT_URI}&response_type=code"
+    # )
+    auth_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c62081503ec6eb847f749deea0aca084a6e30f04aeefc91d4cbc53e87ac80887&redirect_uri=http%3A%2F%2F192.168.66.3%2Foauth%2Fcallback%2F&response_type=code"
+    return redirect(auth_url)
+
+
+def oauth_callback(request):
+    """Maneja la respuesta de 42 e intercambia el código por un token de acceso."""
+    code = request.GET.get("code")
+    if not code:
+        return render(request, "error.html", {"message": "No se recibió el código de autorización"})
+
+    # Petición para intercambiar el código por un token
+    token_data = {
+        "grant_type": "authorization_code",
+        "client_id": settings.OAUTH2_CLIENT_ID,
+        "client_secret": settings.OAUTH2_CLIENT_SECRET,
+        "code": code,
+        "redirect_uri": settings.OAUTH2_REDIRECT_URI,
+    }
+
+    print(token_data)
+    
+    response = requests.post(settings.OAUTH2_TOKEN_URL, json=token_data)
+
+    token_json = response.json()
+    print(token_json)
+
+    if "access_token" not in token_json:
+        return render(request, "error.html", {"message": "Error obteniendo el token de acceso"})
+
+    access_token = token_json["access_token"]
+
+    # Obtener información del usuario autenticado
+    headers = {"Authorization": f"Bearer {access_token}"}
+    user_response = requests.get(settings.OAUTH2_USER_INFO_URL, headers=headers)
+    user_data = user_response.json()
+
+    if "id" not in user_data:
+        return render(request, "error.html", {"message": "Error obteniendo la información del usuario"})
+
+    # Crear o actualizar el usuario en la base de datos
+    user, _ = User.objects.update_or_create(
+        username=user_data["login"],  # Ajusta según la API
+        defaults={
+            "email": user_data.get("email", ""),
+            "avatar": user_data.get("image_url", ""),  # Ajusta si la API devuelve una URL de imagen
+        }
+    )
+
+    # Autenticar al usuario en Django
+    login(request, user)
+
+    return redirect("profile")  # Redirigir al perfil o página principal
+
+
 
 

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+    <h2>Ha ocurrido un error</h2>
+    <p>{{ message }}</p>
+    <a href="{% url 'login_42' %}" class="btn btn-primary">Volver a intentar</a>
+{% endblock %}
