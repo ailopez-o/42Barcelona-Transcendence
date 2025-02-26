@@ -16,7 +16,8 @@ python3 ./manage.py migrate
 
 # Create 'alba' and 'aitor' superusers if they don't exist
 python3 ./manage.py shell <<EOF
-from app.models import User
+from app.models import User, Game, GameResult
+import random
 
 if not User.objects.filter(username="alba").exists():
     User.objects.create_superuser(username="alba", password="123456", email="alba@example.com")
@@ -31,6 +32,9 @@ for i in range(1, 51):
         User.objects.create_user(username=username, password="password", email=f"{username}@example.com")
 
         # Crear al menos 10 partidas aleatorias si no existen
+
+# Obtener lista de usuarios
+users = list(User.objects.all())
 
 if Game.objects.count() < 10:
     for _ in range(10 - Game.objects.count()):
