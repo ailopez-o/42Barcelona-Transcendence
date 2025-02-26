@@ -20,6 +20,7 @@ urlpatterns = [
     path('global_chat/', views.global_chat_view, name='global_chat'),
     path('users/', views.users_list_view, name='users'),
     path('game_results/', views.game_results_list_view, name='game_results'),
+	path('test/', views.test_game_result_view, name='test_game_result'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
