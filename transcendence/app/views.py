@@ -158,44 +158,61 @@ def game_results_list_view(request):
 
 @csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
 @require_POST
-def game_result_view(request):
+def game_result_save_view(request):
     try:
         data = json.loads(request.body)
-        
-        # Extraer datos del JSON enviado
+
+        # Extraer datos
         game_id = data.get("game_id")
         winner_id = data.get("winner_id")
         loser_id = data.get("loser_id")
         score_winner = data.get("score_winner")
         score_loser = data.get("score_loser")
         duration = data.get("duration")
-        
-        # Verificar que se envió el game_id
-        if not game_id:
-            return JsonResponse({"status": "error", "message": "No se proporcionó el ID del juego"}, status=400)
-        
-        # Obtener la partida correspondiente o devolver 404 si no existe
-        game = get_object_or_404(Game, id=game_id)
-        
+
+        # Validar que no falten datos
+        if not all([game_id, winner_id, loser_id, score_winner, score_loser, duration]):
+            return JsonResponse({"status": "error", "message": "Faltan datos en la solicitud"}, status=400)
+
+        # Obtener el juego manualmente para evitar que `get_object_or_404` devuelva HTML
+        try:
+            game = Game.objects.get(id=game_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el juego con id {game_id}"}, status=404)
+
+        # Obtener los usuarios manualmente
+        try:
+            winner = User.objects.get(id=winner_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el usuario ganador con id {winner_id}"}, status=404)
+
+        try:
+            loser = User.objects.get(id=loser_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el usuario perdedor con id {loser_id}"}, status=404)
+
         # Crear o actualizar el resultado de la partida
         result, created = GameResult.objects.update_or_create(
             game=game,
             defaults={
-                "winner_id": winner_id,
-                "loser_id": loser_id,
+                "winner": winner,
+                "loser": loser,
                 "score_winner": score_winner,
                 "score_loser": score_loser,
                 "duration": duration,
             }
         )
-        
+
         return JsonResponse({
             "status": "success",
             "message": "Resultado guardado correctamente",
             "created": created
-        })
+        }, status=201 if created else 200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Formato JSON inválido"}, status=400)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e)
-        }, status=400)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+
