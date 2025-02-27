@@ -57,11 +57,13 @@ def profile_view(request):
     user = request.user
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
     pending_games = Game.objects.filter(player2=user, status="pendiente")
-
+    avatar_url = request.build_absolute_uri(user.avatar.url) if user.avatar else None
+    
     return render(request, 'profile.html', {
         'user': user,
         'games': games,
-        'pending_games': pending_games
+        'pending_games': pending_games,
+        "avatar_url": avatar_url
     })
 
 
@@ -300,10 +302,10 @@ def oauth_callback(request):
     # Crear o actualizar el usuario en la base de datos
     user, _ = User.objects.update_or_create(
         username=user_data["login"],  # Ajusta según la API
-        defaults={
-            "email": user_data.get("email", ""),
-            "avatar": user_data.get("image_url", ""),  # Ajusta si la API devuelve una URL de imagen
-        }
+        display_name=user_data.get("displayname"),
+        intra_url=user_data.get("url"),
+        avatar=user_data.get("image", {}).get("versions", {}).get("medium"),
+        email=user_data.get("email"),
     )
 
     # Autenticar al usuario en Django

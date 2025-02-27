@@ -7,12 +7,16 @@ class User(AbstractUser):
     total_wins = models.PositiveIntegerField(default=0)
     total_losses = models.PositiveIntegerField(default=0)
     tournaments_won = models.PositiveIntegerField(default=0)
+    display_name = models.CharField(max_length=150, unique=True)
+    intra_url = models.URLField(max_length=500, blank=True, null=True)
 
     groups = models.ManyToManyField(Group, related_name='custom_user_groups', blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_permissions', blank=True)
 
     def __str__(self):
         return self.username
+
+
 
 DIFFICULTY_CHOICES = [
     ('facil', 'Fácil'),

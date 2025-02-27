@@ -20,19 +20,19 @@ from app.models import User, Game, GameResult
 import random
 
 if not User.objects.filter(username="admin").exists():
-    User.objects.create_superuser(username="admin", password="123456", email="admin@example.com")
+    User.objects.create_superuser(username="admin", password="123456", email="admin@example.com", display_name="Admin")
 
 if not User.objects.filter(username="alba").exists():
-    User.objects.create_superuser(username="alba", password="123456", email="alba@example.com")
+    User.objects.create_superuser(username="alba", password="123456", email="alba@example.com", display_name="Alba")
 
 if not User.objects.filter(username="aitor").exists():
-    User.objects.create_superuser(username="aitor", password="123456", email="aitor@example.com")
+    User.objects.create_superuser(username="aitor", password="123456", email="aitor@example.com", display_name="Aitor")
 
 # Crear 50 usuarios regulares: user1, user2, ..., user50
 for i in range(1, 51):
     username = f"user{i}"
     if not User.objects.filter(username=username).exists():
-        User.objects.create_user(username=username, password="password", email=f"{username}@example.com")
+        User.objects.create_user(username=username, password="password", email=f"{username}@example.com", display_name=f"User_{i}")
 
         # Crear al menos 10 partidas aleatorias si no existen
 
