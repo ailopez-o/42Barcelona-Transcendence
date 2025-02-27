@@ -1,31 +1,67 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Perfil de {{ user.username }}{% endblock %}
 
 {% block content %}
-    <h2>Perfil de {{ user.username }}</h2>
-    <p>Email: {{ user.email }}</p>
-    <p>Juegos Totales: {{ user.total_games }}</p>
-    <p>Juegos Ganados: {{ user.total_wins }}</p>
-    <p>Juegos Perdidos: {{ user.total_losses }}</p>
-    <p>Torneos Ganados: {{ user.tournaments_won }}</p>
+<div class="profile-container" style="display: flex; align-items: center; gap: 20px; padding: 20px; background: #f4f4f4; border-radius: 8px;">
+    <!-- Avatar -->
+    <div class="avatar-container">
+        <img src="{{ avatar_url  }}" alt="{{ user.username }}" class="avatar"
+             style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #007bff;">
+    </div>
 
+    <!-- Información del usuario -->
+    <div class="user-info">
+        <h2>{{ user.username }}</h2>
+        <h2>{{ user.display_name }}</h2>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <table class="user-stats" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <tr>
+                <th style="background-color: #007bff; color: white; padding: 8px;">Total Juegos</th>
+                <th style="background-color: #007bff; color: white; padding: 8px;">Ganados</th>
+                <th style="background-color: #007bff; color: white; padding: 8px;">Perdidos</th>
+                <th style="background-color: #007bff; color: white; padding: 8px;">Torneos Ganados</th>
+            </tr>
+            <tr style="background-color: white; text-align: center;">
+                <td style="padding: 8px;">{{ user.total_games }}</td>
+                <td style="padding: 8px;">{{ user.total_wins }}</td>
+                <td style="padding: 8px;">{{ user.total_losses }}</td>
+                <td style="padding: 8px;">{{ user.tournaments_won }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- Invitaciones a Partidas -->
+<div class="game-invitations" style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
     <h3>Invitaciones a Partidas</h3>
+    
     {% if pending_games.exists %}
-        <ul>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th style="background-color: #28a745; color: white; padding: 8px;">Oponente</th>
+                <th style="background-color: #28a745; color: white; padding: 8px;">Acciones</th>
+            </tr>
             {% for game in pending_games %}
-                <li>
-                    Partida contra {{ game.player1.username }} 
-                    <form action="{% url 'accept_game' game.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit">Aceptar</button>
-                    </form>
-                    <form action="{% url 'reject_game' game.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit">Rechazar</button>
-                    </form>
-                </li>
+                <tr style="background-color: #f9f9f9; text-align: center;">
+                    <td style="padding: 8px;">{{ game.player1.username }}</td>
+                    <td style="padding: 8px;">
+                        <form action="{% url 'accept_game' game.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px;">Aceptar</button>
+                        </form>
+                        <form action="{% url 'reject_game' game.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 5px;">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
             {% endfor %}
-        </ul>
+        </table>
     {% else %}
-        <p>No tienes partidas pendientes.</p>
+        <p style="color: #777;">No tienes partidas pendientes.</p>
     {% endif %}
+</div>
+
 {% endblock %}

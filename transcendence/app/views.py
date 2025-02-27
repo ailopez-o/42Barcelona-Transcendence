@@ -57,11 +57,13 @@ def profile_view(request):
     user = request.user
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
     pending_games = Game.objects.filter(player2=user, status="pendiente")
-
+    avatar_url = request.build_absolute_uri(user.avatar.url) if user.avatar else None
+    
     return render(request, 'profile.html', {
         'user': user,
         'games': games,
-        'pending_games': pending_games
+        'pending_games': pending_games,
+        "avatar_url": avatar_url
     })
 
 
@@ -254,11 +256,6 @@ def login_with_42(request):
     # Construir la URL correctamente codificada
     auth_url = f"{settings.OAUTH2_AUTHORIZE_URL}?{urllib.parse.urlencode(params)}"
 
-    # auth_url = (
-    #     f"{settings.OAUTH2_AUTHORIZE_URL}?client_id={settings.OAUTH2_CLIENT_ID}"
-    #     f"&redirect_uri={settings.OAUTH2_REDIRECT_URI}&response_type=code"
-    # )
-    #auth_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c62081503ec6eb847f749deea0aca084a6e30f04aeefc91d4cbc53e87ac80887&redirect_uri=http%3A%2F%2F192.168.66.3%2Foauth%2Fcallback%2F&response_type=code"
     return redirect(auth_url)
 
 
@@ -276,13 +273,10 @@ def oauth_callback(request):
         "code": code,
         "redirect_uri": settings.OAUTH2_REDIRECT_URI,
     }
-
-    print(token_data)
     
     response = requests.post(settings.OAUTH2_TOKEN_URL, json=token_data)
 
     token_json = response.json()
-    print(token_json)
 
     if "access_token" not in token_json:
         return render(request, "error.html", {"message": "Error obteniendo el token de acceso"})
@@ -300,10 +294,10 @@ def oauth_callback(request):
     # Crear o actualizar el usuario en la base de datos
     user, _ = User.objects.update_or_create(
         username=user_data["login"],  # Ajusta según la API
-        defaults={
-            "email": user_data.get("email", ""),
-            "avatar": user_data.get("image_url", ""),  # Ajusta si la API devuelve una URL de imagen
-        }
+        display_name=user_data.get("displayname"),
+        intra_url=user_data.get("url"),
+        avatar=user_data.get("image", {}).get("versions", {}).get("medium"),
+        email=user_data.get("email"),
     )
 
     # Autenticar al usuario en Django
