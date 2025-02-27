@@ -61,8 +61,6 @@ if Game.objects.count() < 10:
 
 EOF
 
-EOF
-
 
 #En fase de desarrollo para poder recargar en caliente
 watchmedo auto-restart --recursive --pattern="*.py" -- daphne -b 0.0.0.0 -p 80 mysite.asgi:application

@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 import json
 from django.conf import settings
 import requests
+import urllib.parse
+from django.conf import settings
 
 
 
@@ -241,11 +243,22 @@ from django.shortcuts import redirect
 
 def login_with_42(request):
     """Redirige al usuario a la plataforma de autenticación de 42."""
+
+    # Definir los parámetros de la URL
+    params = {
+        "client_id": settings.OAUTH2_CLIENT_ID,
+        "redirect_uri": settings.OAUTH2_REDIRECT_URI,
+        "response_type": "code",
+    }
+
+    # Construir la URL correctamente codificada
+    auth_url = f"{settings.OAUTH2_AUTHORIZE_URL}?{urllib.parse.urlencode(params)}"
+
     # auth_url = (
     #     f"{settings.OAUTH2_AUTHORIZE_URL}?client_id={settings.OAUTH2_CLIENT_ID}"
     #     f"&redirect_uri={settings.OAUTH2_REDIRECT_URI}&response_type=code"
     # )
-    auth_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c62081503ec6eb847f749deea0aca084a6e30f04aeefc91d4cbc53e87ac80887&redirect_uri=http%3A%2F%2F192.168.66.3%2Foauth%2Fcallback%2F&response_type=code"
+    #auth_url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c62081503ec6eb847f749deea0aca084a6e30f04aeefc91d4cbc53e87ac80887&redirect_uri=http%3A%2F%2F192.168.66.3%2Foauth%2Fcallback%2F&response_type=code"
     return redirect(auth_url)
 
 
