@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import urllib.parse
 
 AUTH_USER_MODEL = 'app.User'
 
@@ -55,16 +56,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Configuración de OAuth para la escuela
-OAUTH2_CLIENT_ID = "u-s4t2ud-c62081503ec6eb847f749deea0aca084a6e30f04aeefc91d4cbc53e87ac80887"
-OAUTH2_CLIENT_SECRET = "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"
-OAUTH2_AUTHORIZE_URL = "https://api.intra.42.fr/oauth/authorize"
-OAUTH2_TOKEN_URL = "https://api.intra.42.fr/oauth/token"
-OAUTH2_REDIRECT_URI = "http://192.168.66.3/oauth/callback/"  # Debe coincidir con la configurada en la plataforma
-# API URL para obtener información del usuario autenticado
-OAUTH2_USER_INFO_URL = "https://api.intra.42.fr/v2/me"
+# API 42
+API_42_ENDPOINT = os.environ.get("API_42_ENDPOINT")
+DOMAIN_URL = os.environ.get("DOMAIN_URL")
+OAUTH2_CLIENT_ID = os.environ.get("API_42_UID")
+OAUTH2_CLIENT_SECRET = os.environ.get("API_42_SECRET")
 
-
+OAUTH2_AUTHORIZE_URL = urllib.parse.urljoin(API_42_ENDPOINT, "/oauth/authorize")
+OAUTH2_TOKEN_URL = urllib.parse.urljoin(API_42_ENDPOINT, "/oauth/token")
+OAUTH2_USER_INFO_URL = urllib.parse.urljoin(API_42_ENDPOINT, "/v2/me")
+OAUTH2_REDIRECT_URI = urllib.parse.urljoin(DOMAIN_URL, "/oauth/callback/")
 
 ROOT_URLCONF = 'mysite.urls'
 
