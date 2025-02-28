@@ -8,32 +8,52 @@
 <div class="game-container">
     <!-- Sección del Juego -->
     <div class="game-section">
-        <h2>Partida entre {{ game.player1.username }} y {{ game.player2.username }}</h2>
+        <h2 class="game-header">
+            <div class="player">
+                {% if game.player1.avatar %}
+                    <img src="{{ game.player1.avatar }}" alt="{{ game.player1.username }}" class="avatar">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player1.username }}" class="avatar">
+                {% endif %}
+                <span class="username">{{ game.player1.username }}</span>
+            </div>
+
+            <span class="vs-text">VS</span>
+
+            <div class="player">
+                <span class="username">{{ game.player2.username }}</span>
+                {% if game.player2.avatar %}
+                    <img src="{{ game.player2.avatar.url }}" alt="{{ game.player2.username }}" class="avatar">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player2.username }}" class="avatar">
+                {% endif %}
+            </div>
+        </h2>
+        
         <p><strong>Estado:</strong> {{ game.status }}</p>
-  
+
         <!-- Contenedor del juego -->
         <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
             <canvas id="pongCanvas" width="800" height="400"></canvas>
         </div>
-  
+
         <!-- Mensajes de estado del juego -->
         <div id="status-message"></div>
     </div>
-  
+
     <div class="in-game-chat">
         <!-- Contenedor para los mensajes de chat -->
-        <div id="chat-section" >
+        <div id="chat-section">
             <!-- Mensajes se insertarán aquí -->
         </div>
-    
+
         <!-- Formulario para enviar mensajes -->
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
             <button type="submit">Enviar</button>
         </form>
     </div>
-  </div>
-  
+</div>
 
 <!-- Información de jugadores en formato JSON -->
 <script type="application/json" id="player-data">
@@ -68,4 +88,39 @@
 <!-- Cargar el script de juego y el de chat -->
 <script src="{% static 'js/game.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
+
+<style>
+    .game-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px; /* Espacio entre los elementos */
+        text-align: center;
+    }
+
+    .player {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid #007bff;
+    }
+
+    .username {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .vs-text {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #555;
+    }
+</style>
+
 {% endblock %}
