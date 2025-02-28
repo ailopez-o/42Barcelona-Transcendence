@@ -31,37 +31,24 @@ class Paddle {
 let gameState;
 let socket;
 let currentPlayer;
+let playerReady = false;
+let gameStarted = false;
 
 // Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
-    // Prevenir el scroll con las flechas
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    // Prevenir el scroll con las flechas y el espacio
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === ' ') {
         e.preventDefault();
     }
 
-    if (!gameState || !socket) return; // Si el juego no está inicializado, salimos
+    if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    let movement = 0;
-    let paddleSpeed = currentPlayer === 'player1' ? 
-        gameState.paddles.left.speed : 
-        gameState.paddles.right.speed;
-
-    switch(e.key) {
-        case 'ArrowUp':
-            movement = -paddleSpeed;
-            break;
-        case 'ArrowDown':
-            movement = paddleSpeed;
-            break;
-    }
-
-    // Enviar el movimiento al servidor si hay un movimiento válido
-    if (movement !== 0 && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-            player: currentPlayer,
-            movement: movement
-        }));
-    }
+    // Enviar la tecla pulsada al servidor en lugar de calcular el movimiento en el cliente
+    // El servidor decidirá qué hacer según la tecla y la dificultad
+    socket.send(JSON.stringify({
+        player: currentPlayer,
+        key: e.key
+    }));
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -89,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     socket.onmessage = function(event) {
-        // console.log("Mensaje recibido:", event.data);  // Debug
         const data = JSON.parse(event.data);
         
         // Verificar la estructura de los datos
@@ -98,8 +84,19 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // Actualizar el mensaje de estado
         if (data.message) {
             document.getElementById("status-message").innerText = data.message;
+        }
+        
+        // Verificar si el juego ha comenzado
+        if (data.game_started !== undefined) {
+            gameStarted = data.game_started;
+        }
+
+        // Actualizar estado del jugador
+        if (data.player_ready !== undefined && data.player_ready === currentPlayer) {
+            playerReady = true;
         }
         
         // Actualizar el estado del juego con los datos recibidos
@@ -111,15 +108,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.paddles) {
             gameState.paddles.left.position.y = data.paddles.left.y;
             gameState.paddles.right.position.y = data.paddles.right.y;
-            gameState.paddles.left.speed = data.paddles.left.speed;
-            gameState.paddles.right.speed = data.paddles.right.speed;
         }
         
         drawGame();
     };
 
     socket.onclose = function(event) {
-        console.log("Mensaje recibido:", event.data);
         console.log("Conexión cerrada con el WebSocket");
     };
 
@@ -169,6 +163,14 @@ document.addEventListener("DOMContentLoaded", function() {
             Math.PI * 2
         );
         ctx.fill();
+        
+        // Si el juego no ha comenzado y el jugador no está listo, mostrar instrucción
+        if (!playerReady) {
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("Pulsa ESPACIO para indicar que estás listo", canvas.width / 2, 30);
+        }
     }
 
     drawGame();
