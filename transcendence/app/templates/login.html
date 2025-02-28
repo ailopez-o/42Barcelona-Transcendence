@@ -4,10 +4,42 @@
 
 {% block content %}
 <h2>Iniciar Sesión</h2>
-<form method="post">
+
+<!-- Selector para elegir el método de login -->
+<label>
+    <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
+    Ingresar con usuario y contraseña
+</label>
+<label>
+    <input type="radio" name="login_method" value="42" onclick="toggleLoginMethod('42')">
+    Ingresar con 42
+</label>
+
+<!-- Formulario de login con usuario y contraseña -->
+<form id="login_form" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Ingresar</button>
 </form>
+
+<!-- Botón para login con 42 -->
+<div id="login_42" style="display: none;">
+    <a href="{% url 'login_42' %}">
+        <button type="button">Ingresar con 42</button>
+    </a>
+</div>
+
+<script>
+    function toggleLoginMethod(method) {
+        if (method === 'credentials') {
+            document.getElementById('login_form').style.display = 'block';
+            document.getElementById('login_42').style.display = 'none';
+        } else {
+            document.getElementById('login_form').style.display = 'none';
+            document.getElementById('login_42').style.display = 'block';
+        }
+    }
+</script>
+
 {% endblock %}
 

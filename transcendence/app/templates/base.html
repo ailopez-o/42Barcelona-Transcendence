@@ -20,7 +20,14 @@
                     <li><a href="{% url 'game_results' %}">Resultados</a></li>
                     <li><a href="{% url 'game_list' %}">Partidas</a></li>
                     <li><a href="{% url 'global_chat' %}">Chat Global</a></li>
-                    <li><a href="{% url 'logout' %}">Salir</a></li>
+                    
+                    <!-- Formulario para cerrar sesión de manera segura -->
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: none; color: blue; cursor: pointer;">Salir</button>
+                        </form>
+                    </li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Ingresar</a></li>
                     <li><a href="{% url 'register' %}">Registrarse</a></li>
@@ -33,7 +40,8 @@
         {% endblock %}
     </main>
     <footer>
-        <p>&copy; 2023 Ping Pong App</p>
+        <p>&copy; 2025 Ping Pong App</p>
     </footer>
 </body>
 </html>
+

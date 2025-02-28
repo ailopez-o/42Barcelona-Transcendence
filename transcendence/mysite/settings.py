@@ -71,6 +71,8 @@ ROOT_URLCONF = 'mysite.urls'
 
 LOGIN_URL = '/login/'
 
+LOGOUT_REDIRECT_URL = '/'
+
 # URL donde se redirigirá al usuario después de iniciar sesión
 LOGIN_REDIRECT_URL = "/profile/"
 LOGOUT_REDIRECT_URL = "/"
