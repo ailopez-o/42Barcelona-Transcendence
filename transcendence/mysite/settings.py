@@ -77,6 +77,16 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = "/profile/"
 LOGOUT_REDIRECT_URL = "/"
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost",
+    "http://localhost",
+    "https://127.0.0.1",
+    "http://127.0.0.1",
+    #"https://tu-dominio.com",  # Agrega tu dominio si usas uno
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
