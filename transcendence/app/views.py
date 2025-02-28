@@ -57,13 +57,12 @@ def profile_view(request):
     user = request.user
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
     pending_games = Game.objects.filter(player2=user, status="pendiente")
-    avatar_url = request.build_absolute_uri(user.avatar.url) if user.avatar else None
     
     return render(request, 'profile.html', {
         'user': user,
         'games': games,
         'pending_games': pending_games,
-        "avatar_url": avatar_url
+        "avatar_url": user.avatar
     })
 
 
