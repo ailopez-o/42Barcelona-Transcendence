@@ -7,6 +7,7 @@ import random
 global_room_states = {}
 running_game_loops = {}
 player_ready_status = {}  # Diccionario para el estado de "listo" de los jugadores
+game_difficulty = {}  # Almacenar la dificultad de cada juego
 
 class PongGameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -18,17 +19,22 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         if self.room_name not in global_room_states:
             # Obtener la dificultad del juego (esto debería venir de la base de datos)
             # Por ahora usamos un valor por defecto
-            difficulty_multiplier = 1.0  # Factor de velocidad según dificultad
+            game_difficulty[self.room_name] = 1.0  # Factor de velocidad según dificultad
             
             global_room_states[self.room_name] = {
-                "ball": {"x": 400, "y": 200, "dx": random.choice([-5, 5]) * difficulty_multiplier, "dy": random.choice([-5, 5]) * difficulty_multiplier},
+                "ball": {"x": 400, "y": 200, "dx": 0, "dy": 0},  # La bola inmóvil inicialmente
                 "paddles": {
-                    "left": {"y": 150, "speed": 10 * difficulty_multiplier},
-                    "right": {"y": 150, "speed": 10 * difficulty_multiplier}
+                    "left": {"y": 150, "speed": 10 * game_difficulty[self.room_name]},
+                    "right": {"y": 150, "speed": 10 * game_difficulty[self.room_name]}
                 },
                 "scores": {"left": 0, "right": 0},
-                "game_started": False  # Nuevo campo para saber si el juego ha comenzado
+                "game_started": False,  # Controla si el juego ha comenzado
+                "ready_status": {        # Estado de "listo" de ambos jugadores
+                    "player1": False,
+                    "player2": False
+                }
             }
+            
             # Inicializamos el estado de "listo" de los jugadores
             player_ready_status[self.room_name] = {
                 "player1": False,
@@ -52,18 +58,19 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             key = data["key"]
             
             # Procesar tecla de espacio para marcar como listo
-            if key == " " and not player_ready_status[self.room_name][data["player"]]:
+            if key == " " and not state["ready_status"][data["player"]]:
+                # Marcar al jugador como listo
+                state["ready_status"][data["player"]] = True
                 player_ready_status[self.room_name][data["player"]] = True
                 
-                # Notificar al cliente que está listo
-                await self.send(text_data=json.dumps({
-                    "player_ready": data["player"],
-                    "message": f"Estás listo. Esperando al otro jugador..."
-                }))
-                
                 # Comprobar si ambos jugadores están listos
-                if player_ready_status[self.room_name]["player1"] and player_ready_status[self.room_name]["player2"]:
+                if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
                     state["game_started"] = True
+                    
+                    # Iniciar la bola con velocidad según la dificultad
+                    state["ball"]["dx"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
+                    state["ball"]["dy"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
+                    
                     # Solo iniciamos el bucle del juego cuando ambos están listos
                     if self.room_name not in running_game_loops or running_game_loops[self.room_name].done():
                         running_game_loops[self.room_name] = asyncio.create_task(self.game_loop())
@@ -104,7 +111,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     new_y = current_y + paddle_speed
                     # Limitar el movimiento dentro del canvas (0 a 300 para una altura de 400 - altura_pala)
                     state["paddles"][paddle_side]["y"] = max(0, min(300, new_y))
-                    
+                
                 # También podríamos implementar otras teclas para pausar, reiniciar, etc.
                 
                 # Enviar inmediatamente el estado actualizado a todos los clientes
@@ -125,7 +132,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             if state["game_started"]:
                 self.update_ball(state)
                 
-            # Enviar el estado actualizado a todos los clientes conectados a esta sala.
+            # Enviar el estado actualizado a todos los clientes conectados a esta sala
             await self.channel_layer.group_send(
                 self.room_name,
                 {
@@ -137,6 +144,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     def update_ball(self, state):
         """ Actualiza la posición de la bola y maneja colisiones y puntuaciones. """
+        # Si el juego no ha comenzado, la bola no se mueve
+        if not state["game_started"]:
+            return
+            
         state["ball"]["x"] += state["ball"]["dx"]
         state["ball"]["y"] += state["ball"]["dy"]
 
@@ -171,13 +182,18 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     def reset_ball(self, state):
         """ Reinicia la bola en el centro y asigna nuevas direcciones aleatorias. """
-        # Obtener la velocidad de la dificultad actual
-        ball_speed = abs(state["ball"]["dx"])
-        
         state["ball"]["x"] = 400
         state["ball"]["y"] = 200
-        state["ball"]["dx"] = random.choice([-1, 1]) * ball_speed
-        state["ball"]["dy"] = random.choice([-1, 1]) * ball_speed
+        
+        # Si el juego está en curso, damos velocidad según la dificultad
+        if state["game_started"]:
+            speed = 5 * game_difficulty[self.room_name]
+            state["ball"]["dx"] = random.choice([-1, 1]) * speed
+            state["ball"]["dy"] = random.choice([-1, 1]) * speed
+        else:
+            # Si el juego no ha comenzado, la bola queda inmóvil
+            state["ball"]["dx"] = 0
+            state["ball"]["dy"] = 0
 
     async def game_update(self, event):
         """ Envía el estado del juego actualizado al cliente. """

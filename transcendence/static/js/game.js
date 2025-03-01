@@ -31,7 +31,6 @@ class Paddle {
 let gameState;
 let socket;
 let currentPlayer;
-let playerReady = false;
 let gameStarted = false;
 
 // Event listener global para las teclas
@@ -43,8 +42,7 @@ document.addEventListener('keydown', (e) => {
 
     if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    // Enviar la tecla pulsada al servidor en lugar de calcular el movimiento en el cliente
-    // El servidor decidirá qué hacer según la tecla y la dificultad
+    // Enviar la tecla pulsada al servidor
     socket.send(JSON.stringify({
         player: currentPlayer,
         key: e.key
@@ -72,6 +70,10 @@ document.addEventListener("DOMContentLoaded", function() {
         paddles: {
             left: new Paddle(20, 150, 10, 100, 5),
             right: new Paddle(770, 150, 10, 100, 5)
+        },
+        ready_status: {
+            player1: false,
+            player2: false
         }
     };
 
@@ -93,21 +95,34 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.game_started !== undefined) {
             gameStarted = data.game_started;
         }
-
-        // Actualizar estado del jugador
-        if (data.player_ready !== undefined && data.player_ready === currentPlayer) {
-            playerReady = true;
+        
+        // Actualizar el estado de "ready" de los jugadores
+        if (data.ready_status) {
+            gameState.ready_status = data.ready_status;
         }
         
         // Actualizar el estado del juego con los datos recibidos
         if (data.ball) {
             gameState.ball.position.x = data.ball.x;
             gameState.ball.position.y = data.ball.y;
+            gameState.ball.velocity.x = data.ball.dx;
+            gameState.ball.velocity.y = data.ball.dy;
         }
         
         if (data.paddles) {
             gameState.paddles.left.position.y = data.paddles.left.y;
             gameState.paddles.right.position.y = data.paddles.right.y;
+        }
+        
+        // Actualizar puntuaciones si existen
+        if (data.scores) {
+            const leftScoreElement = document.getElementById("left-score");
+            const rightScoreElement = document.getElementById("right-score");
+            
+            if (leftScoreElement && rightScoreElement) {
+                leftScoreElement.textContent = data.scores.left;
+                rightScoreElement.textContent = data.scores.right;
+            }
         }
         
         drawGame();
@@ -129,14 +144,20 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Dibujar las palas usando las clases
-        ctx.fillStyle = "red";
+        // Dibujar indicadores de "ready" para cada jugador
+        drawReadyStatus();
+        
+        // Dibujar las palas
+        // El color depende de si el jugador está listo
+        ctx.fillStyle = gameState.ready_status.player1 ? "green" : "red";
         ctx.fillRect(
             gameState.paddles.left.position.x, 
             gameState.paddles.left.position.y, 
             gameState.paddles.left.width, 
             gameState.paddles.left.height
         );
+        
+        ctx.fillStyle = gameState.ready_status.player2 ? "green" : "red";
         ctx.fillRect(
             gameState.paddles.right.position.x, 
             gameState.paddles.right.position.y, 
@@ -153,7 +174,8 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.lineTo(canvas.width / 2, canvas.height);
         ctx.stroke();
 
-        // Dibujar la pelota usando la clase Ball
+        // Dibujar la pelota
+        ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.arc(
             gameState.ball.position.x, 
@@ -164,13 +186,35 @@ document.addEventListener("DOMContentLoaded", function() {
         );
         ctx.fill();
         
-        // Si el juego no ha comenzado y el jugador no está listo, mostrar instrucción
-        if (!playerReady) {
+        // Mostrar mensaje para indicar que pulse espacio si no está listo
+        if (!gameState.ready_status[currentPlayer]) {
             ctx.fillStyle = "white";
             ctx.font = "20px Arial";
             ctx.textAlign = "center";
             ctx.fillText("Pulsa ESPACIO para indicar que estás listo", canvas.width / 2, 30);
         }
+    }
+    
+    function drawReadyStatus() {
+        // Dibujar indicadores de "ready" en la parte superior
+        ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        
+        // Jugador 1 (izquierda)
+        ctx.fillStyle = gameState.ready_status.player1 ? "green" : "red";
+        ctx.fillText(
+            gameState.ready_status.player1 ? "Jugador 1: LISTO" : "Jugador 1: NO LISTO", 
+            150, 
+            20
+        );
+        
+        // Jugador 2 (derecha)
+        ctx.fillStyle = gameState.ready_status.player2 ? "green" : "red";
+        ctx.fillText(
+            gameState.ready_status.player2 ? "Jugador 2: LISTO" : "Jugador 2: NO LISTO", 
+            650, 
+            20
+        );
     }
 
     drawGame();
