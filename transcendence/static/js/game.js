@@ -288,6 +288,11 @@ document.addEventListener("DOMContentLoaded", function() {
             statusElement.innerText = "¡El juego ha comenzado!";
             statusElement.className = "alert alert-success text-center";
         }
+
+        if (gameEnded) {
+            statusElement.innerText = "¡Juego terminado!";
+            statusElement.className = "alert alert-success text-center";
+        }
     }
 
     socket.onclose = function(event) {
