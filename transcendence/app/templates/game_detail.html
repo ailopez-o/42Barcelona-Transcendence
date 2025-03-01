@@ -7,7 +7,7 @@
 {% block main %}
 <main class="d-flex container main-chat">
 
-    <div class="container" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+    <div class="game-container" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
         <h2>Partida de Pong #{{ game.id }}</h2>
         
         <div class="game-info">
@@ -45,7 +45,7 @@
         </div>
         <!-- Sección de chat -->
     </div>
-    <div class="in-game-chat container">
+    <div class="in-game-chat">
         <!-- Contenedor para los mensajes de chat -->
         <div id="chat-section">
             <!-- Mensajes se insertarán aquí -->
