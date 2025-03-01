@@ -15,17 +15,17 @@
 </head>
 <body>
     <header>
-        <h1>Ping Pong App</h1>
-        <nav>
+        <h1 class="">PONG</h1>
+        <nav class="bg-dark">
             <ul>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'profile' %}">Perfil</a></li>
-                    <li><a href="{% url 'new_game' %}">Nueva Partida</a></li>
-                    <li><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
-                    <li><a href="{% url 'users' %}">Usuarios</a></li>
-                    <li><a href="{% url 'game_results' %}">Resultados</a></li>
-                    <li><a href="{% url 'game_list' %}">Partidas</a></li>
-                    <li><a href="{% url 'global_chat' %}">Chat Global</a></li>
+                    <li class="text-white"><a href="{% url 'profile' %}">Perfil</a></li>
+                    <li class="text-white"><a href="{% url 'new_game' %}">Nueva Partida</a></li>
+                    <li class="text-white"><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
+                    <li class="text-white"><a href="{% url 'users' %}">Usuarios</a></li>
+                    <li class="text-white"><a href="{% url 'game_results' %}">Resultados</a></li>
+                    <li class="text-white"><a href="{% url 'game_list' %}">Partidas</a></li>
+                    <li class="text-white"><a href="{% url 'global_chat' %}">Chat Global</a></li>
                     
                     <!-- Formulario para cerrar sesión de manera segura -->
                     <li>

@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Dibujar las palas
         // El color depende de si el jugador está listo
-        ctx.fillStyle = gameState.ready_status.player1 ? "green" : "red";
+        ctx.fillStyle = gameState.ready_status.player1 ? gameData.paddle_color : "white";
         ctx.fillRect(
             gameState.paddles.left.position.x, 
             gameState.paddles.left.position.y, 
@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function() {
             gameState.paddles.left.height
         );
         
-        ctx.fillStyle = gameState.ready_status.player2 ? "green" : "red";
+        ctx.fillStyle = gameState.ready_status.player2 ? gameData.paddle_color  : "white";
         ctx.fillRect(
             gameState.paddles.right.position.x, 
             gameState.paddles.right.position.y, 
@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.stroke();
 
         // Dibujar la pelota
-        ctx.fillStyle = "white";
+        ctx.fillStyle = gameData.ball_color;
         ctx.beginPath();
         ctx.arc(
             gameState.ball.position.x, 
