@@ -48,6 +48,12 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         state = global_room_states[self.room_name]
         
+        # Comprobar si el evento viene de uno de los jugadores válidos
+        if "player" not in data or data["player"] not in ["player1", "player2"]:
+            # Si no es un jugador válido, ignoramos el evento
+            print(f"Evento ignorado: no proviene de un jugador válido: {data}")
+            return
+        
         # Ahora recibimos la tecla directamente en lugar del movimiento
         if "key" in data:
             # Mapear player1/player2 a left/right para las paletas
