@@ -33,6 +33,8 @@ let socket;
 let currentPlayer;
 let gameStarted = false;
 let prevReadyStatus = { player1: false, player2: false };
+let gameStartTime = null;
+let gameEnded = false;
 
 // Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
@@ -52,6 +54,8 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener("DOMContentLoaded", function() {
     const gameId = document.getElementById("game-container").dataset.gameId;
+    const gameData = JSON.parse(document.getElementById("game-data").textContent);
+    const gameTargetScore = parseInt(gameData.points);
     const username = document.getElementById("game-container").dataset.username;
     
     // Obtener los datos del jugador del elemento JSON
@@ -95,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Verificar si el juego ha comenzado
         if (data.game_started !== undefined) {
+            if (data.game_started && !gameStarted) {
+                // El juego acaba de comenzar, registrar el tiempo de inicio
+                gameStartTime = new Date();
+            }
             gameStarted = data.game_started;
         }
         
@@ -131,10 +139,103 @@ document.addEventListener("DOMContentLoaded", function() {
                 leftScoreElement.textContent = data.scores.left;
                 rightScoreElement.textContent = data.scores.right;
             }
+            
+            // Verificar si algún jugador ha alcanzado la puntuación objetivo
+            if (!gameEnded && (data.scores.left >= gameTargetScore || data.scores.right >= gameTargetScore)) {
+                gameEnded = true;
+                
+                // Determinar ganador y perdedor
+                const isLeftWinner = data.scores.left >= gameTargetScore;
+                const winnerId = isLeftWinner ? playerData.player1.id : playerData.player2.id;
+                const loserId = isLeftWinner ? playerData.player2.id : playerData.player1.id;
+                
+                // Calcular duración del juego en segundos
+                const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
+                
+                // Enviar resultados al endpoint
+                sendGameResults({
+                    game_id: gameId,
+                    winner_id: winnerId,
+                    loser_id: loserId,
+                    score_winner: isLeftWinner ? data.scores.left : data.scores.right,
+                    score_loser: isLeftWinner ? data.scores.right : data.scores.left,
+                    duration: gameDuration
+                });
+                
+                // Mostrar mensaje de fin de juego
+                const statusElement = document.getElementById("status-message");
+                if (statusElement) {
+                    const winnerName = isLeftWinner ? playerData.player1.username : playerData.player2.username;
+                    statusElement.innerText = `¡Juego terminado! ${winnerName} ha ganado la partida.`;
+                    statusElement.className = "alert alert-success text-center";
+                }
+            }
         }
         
         drawGame();
     };
+    
+    /**
+     * Envía los resultados del juego al endpoint
+     */
+    function sendGameResults(results) {
+        console.log('Enviando resultados:', results);
+        
+        fetch('game/save/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
+            },
+            body: JSON.stringify(results)
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error HTTP:', response.status, response.statusText);
+                throw new Error(`Error al enviar resultados: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Resultados guardados correctamente:', data);
+            // Puedes mostrar un mensaje de éxito aquí si lo deseas
+            if (data.status === 'success') {
+                // Opcional: Mostrar alguna notificación o actualizar la UI
+                const statusElement = document.getElementById("status-message");
+                if (statusElement) {
+                    const actionText = data.created ? "registrado" : "actualizado";
+                    statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error al guardar resultados:', error);
+            // Opcional: Mostrar un mensaje de error al usuario
+            const statusElement = document.getElementById("status-message");
+            if (statusElement) {
+                statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
+            }
+        });
+    }
+    
+    /**
+     * Obtiene el token CSRF de las cookies
+     */
+    // function getCsrfToken() {
+    //     const name = 'csrftoken';
+    //     let cookieValue = null;
+    //     if (document.cookie && document.cookie !== '') {
+    //         const cookies = document.cookie.split(';');
+    //         for (let i = 0; i < cookies.length; i++) {
+    //             const cookie = cookies[i].trim();
+    //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+    //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return cookieValue;
+    // }
     
     // Función para actualizar la visualización del estado READY/PENDING en el HTML
     function updateReadyStatusDisplay() {
