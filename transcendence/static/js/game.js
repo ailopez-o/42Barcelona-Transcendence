@@ -38,7 +38,13 @@ let gameEnded = false;
 
 // Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
-    // Prevenir el scroll con las flechas y el espacio
+    // Verificar si el foco está en un campo de texto (como el chat)
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        // Si estamos escribiendo en un campo de texto, permitir el comportamiento normal
+        return;
+    }
+    
+    // Prevenir el scroll con las flechas y el espacio solo si no estamos en un campo de texto
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === ' ') {
         e.preventDefault();
     }
@@ -261,6 +267,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const statusElement = document.getElementById("status-message");
         if (!statusElement) return;
         
+        // Verificar primero si el juego ha terminado
+        if (gameEnded) {
+            statusElement.innerText = "¡Juego terminado!";
+            statusElement.className = "alert alert-success text-center";
+            return;
+        }
+        
         // Si el juego ha comenzado
         if (gameStarted) {
             statusElement.innerText = "¡El juego ha comenzado!";
@@ -286,11 +299,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Si ambos están listos (no debería llegar aquí normalmente, pero por si acaso)
         if (gameState.ready_status.player1 && gameState.ready_status.player2) {
             statusElement.innerText = "¡El juego ha comenzado!";
-            statusElement.className = "alert alert-success text-center";
-        }
-
-        if (gameEnded) {
-            statusElement.innerText = "¡Juego terminado!";
             statusElement.className = "alert alert-success text-center";
         }
     }
