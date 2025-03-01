@@ -14,12 +14,10 @@
     {% block styles %}{% endblock %}
 </head>
 <body>
-    <header>
-        <div class="bg-dark">
-            <h1 class="font-weight-bold">PONG</h1>
-        </div>
-        <nav class="bg-dark m-0">
-            <ul class="d-flex justify-content-center align-items-center">
+    <header class="p-0">
+        <nav class="bg-dark m-0 d-flex align-items-center justify-content-between">
+            <h1 class="font-weight-bold ">PONG</h1>
+            <ul class=" align-self-end">
                 {% if user.is_authenticated %}
                     <li class="text-white"><a href="{% url 'profile' %}">Perfil</a></li>
                     <li class="text-white"><a href="{% url 'new_game' %}">Nueva Partida</a></li>
@@ -30,10 +28,10 @@
                     <li class="text-white"><a href="{% url 'global_chat' %}">Chat Global</a></li>
                     
                     <!-- Formulario para cerrar sesión de manera segura -->
-                    <li>
+                    <li class="text-white align-self-end">
                         <form action="{% url 'logout' %}" method="post" style="display: inline;">
                             {% csrf_token %}
-                            <button type="submit" style="background: none; border: none; color: blue; cursor: pointer;">Salir</button>
+                            <button type="submit" class="btn btn-outline-light">Salir</button>
                         </form>
                     </li>
                 {% else %}
