@@ -4,6 +4,7 @@
 {% block title %}Partida de Pong{% endblock %}
 
 {% block content %}
+{% block main %}
 <main class="d-flex container main-chat">
 
     <div class="container" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
@@ -57,6 +58,7 @@
         </form>
     </div>
 </main>
+{% endblock %}
     <!-- Datos del jugador para JS -->
 <!-- Información de jugadores en formato JSON -->
 <script type="application/json" id="player-data">

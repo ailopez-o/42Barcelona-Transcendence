@@ -40,10 +40,12 @@
             {% endif %}
         </nav>
     </header>
+    {% block main %}
     <main>
         {% block content %}
         {% endblock %}
     </main>
+    {% endblock %}
     <footer class="bg-dark text-white text-center py-3 fixed-bottom">
         <p class="mb-0">&copy; 2025 Ping Pong App</p>
     </footer>
