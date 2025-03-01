@@ -31,13 +31,20 @@ header h1 {
 nav {
     box-shadow: 0px 4px 6px rgba(249, 249, 249, 0.1);
 }
+.button-logout {
+    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #8f1a4f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
 nav ul {
     list-style: none;
     padding: 0;
     margin: 10px 0 0;
     /* display: flex;
     justify-content: center; */
-    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #e3968f 100%);
+    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #f67b71 60%, #e3968f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -115,17 +122,7 @@ table tr:nth-child(even) {
     background: #f9f9f9;
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    padding: 10px;
-    background: #333;
-    color: #fff;
-    margin-top: 20px;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
+
 
 .game-container {
     display: flex;
