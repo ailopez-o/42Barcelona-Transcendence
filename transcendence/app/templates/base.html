@@ -15,9 +15,9 @@
 </head>
 <body>
     <header>
-        <h1 class="">PONG</h1>
-        <nav class="bg-dark">
-            <ul>
+        <h1 class="bg-dark">PONG</h1>
+        <nav class="bg-dark m-0">
+            <ul class="d-flex justify-content-center align-items-center">
                 {% if user.is_authenticated %}
                     <li class="text-white"><a href="{% url 'profile' %}">Perfil</a></li>
                     <li class="text-white"><a href="{% url 'new_game' %}">Nueva Partida</a></li>
