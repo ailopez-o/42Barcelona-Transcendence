@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log('INFO', data);
+        // console.log('INFO', data);
         
         // Verificar la estructura de los datos
         if (!data) {
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function sendGameResults(results) {
         console.log('Enviando resultados:', results);
         
-        fetch('game/save/', {
+        fetch('/game/save/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -217,25 +217,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-    
-    /**
-     * Obtiene el token CSRF de las cookies
-     */
-    // function getCsrfToken() {
-    //     const name = 'csrftoken';
-    //     let cookieValue = null;
-    //     if (document.cookie && document.cookie !== '') {
-    //         const cookies = document.cookie.split(';');
-    //         for (let i = 0; i < cookies.length; i++) {
-    //             const cookie = cookies[i].trim();
-    //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-    //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return cookieValue;
-    // }
     
     // Función para actualizar la visualización del estado READY/PENDING en el HTML
     function updateReadyStatusDisplay() {
