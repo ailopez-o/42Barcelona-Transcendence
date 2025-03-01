@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        
+        console.log('INFO', data);
         // Verificar la estructura de los datos
         if (!data) {
             console.error("Datos no válidos recibidos");
