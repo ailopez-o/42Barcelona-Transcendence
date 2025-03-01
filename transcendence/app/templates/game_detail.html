@@ -4,8 +4,8 @@
 {% block title %}Partida de Pong{% endblock %}
 
 {% block content %}
-{% block main %}
-<main class=" main-chat">
+<!-- {% block main %}
+<main class=" main-chat"> -->
 
     <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
         <h2>Partida de Pong #{{ game.id }}</h2>
@@ -57,8 +57,8 @@
             <button type="submit">Enviar</button>
         </form>
     </div>
-</main>
-{% endblock %}
+<!-- </main>
+{% endblock %} -->
     <!-- Datos del jugador para JS -->
 <!-- Información de jugadores en formato JSON -->
 <script type="application/json" id="player-data">
