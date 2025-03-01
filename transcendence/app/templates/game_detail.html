@@ -5,9 +5,9 @@
 
 {% block content %}
 {% block main %}
-<main class="d-flex container main-chat">
+<main class=" main-chat">
 
-    <div class="game-container" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+    <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
         <h2>Partida de Pong #{{ game.id }}</h2>
         
         <div class="game-info">
