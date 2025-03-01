@@ -41,11 +41,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 "player2": False
             }
             
-        # Enviamos un mensaje inicial con el estado actual
-        await self.send(text_data=json.dumps({
-            **global_room_states[self.room_name],
-            "message": "Pulsa ESPACIO para indicar que estás listo"
-        }))
+        # Enviamos un mensaje inicial SOLO con el estado actual, sin mensaje adicional
+        await self.send(text_data=json.dumps(global_room_states[self.room_name]))
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -74,26 +71,16 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     # Solo iniciamos el bucle del juego cuando ambos están listos
                     if self.room_name not in running_game_loops or running_game_loops[self.room_name].done():
                         running_game_loops[self.room_name] = asyncio.create_task(self.game_loop())
-                    
-                    # Notificar a todos que el juego ha comenzado
-                    await self.channel_layer.group_send(
-                        self.room_name,
-                        {
-                            "type": "game_update",
-                            "state": state,
-                            "message": "¡El juego ha comenzado!"
-                        }
-                    )
-                else:
-                    # Notificar que este jugador está listo pero falta el otro
-                    await self.channel_layer.group_send(
-                        self.room_name,
-                        {
-                            "type": "game_update",
-                            "state": state,
-                            "message": f"{data['player']} está listo. Esperando al otro jugador..."
-                        }
-                    )
+                
+                # Enviar inmediatamente el estado actualizado a todos los clientes
+                # Sin mensajes de texto adicionales
+                await self.channel_layer.group_send(
+                    self.room_name,
+                    {
+                        "type": "game_update",
+                        "state": state
+                    }
+                )
                 return
             
             # Procesar movimiento solo si el juego ha comenzado
@@ -111,8 +98,6 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     new_y = current_y + paddle_speed
                     # Limitar el movimiento dentro del canvas (0 a 300 para una altura de 400 - altura_pala)
                     state["paddles"][paddle_side]["y"] = max(0, min(300, new_y))
-                
-                # También podríamos implementar otras teclas para pausar, reiniciar, etc.
                 
                 # Enviar inmediatamente el estado actualizado a todos los clientes
                 await self.channel_layer.group_send(
@@ -196,13 +181,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             state["ball"]["dy"] = 0
 
     async def game_update(self, event):
-        """ Envía el estado del juego actualizado al cliente. """
-        # Incluimos cualquier mensaje si existe
-        response = event["state"]
-        if "message" in event:
-            response["message"] = event["message"]
-            
-        await self.send(text_data=json.dumps(response))
+        """ Envía el estado del juego actualizado al cliente. Sin mensajes adicionales. """
+        await self.send(text_data=json.dumps(event["state"]))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_name, self.channel_name)

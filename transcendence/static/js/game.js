@@ -32,6 +32,7 @@ let gameState;
 let socket;
 let currentPlayer;
 let gameStarted = false;
+let prevReadyStatus = { player1: false, player2: false };
 
 // Event listener global para las teclas
 document.addEventListener('keydown', (e) => {
@@ -80,15 +81,16 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log('INFO', data);
+        
         // Verificar la estructura de los datos
         if (!data) {
             console.error("Datos no válidos recibidos");
             return;
         }
-
-        // Actualizar el mensaje de estado
-        if (data.message) {
-            document.getElementById("status-message").innerText = data.message;
+        
+        // Guardar el estado anterior de ready antes de actualizarlo
+        if (gameState && gameState.ready_status) {
+            prevReadyStatus = {...gameState.ready_status};
         }
         
         // Verificar si el juego ha comenzado
@@ -99,6 +101,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Actualizar el estado de "ready" de los jugadores
         if (data.ready_status) {
             gameState.ready_status = data.ready_status;
+            
+            // Generar mensajes basados en el estado de "ready"
+            updateStatusMessage();
         }
         
         // Actualizar el estado del juego con los datos recibidos
@@ -127,6 +132,36 @@ document.addEventListener("DOMContentLoaded", function() {
         
         drawGame();
     };
+    
+    // Función para generar y actualizar mensajes de estado basados en el estado del juego
+    function updateStatusMessage() {
+        const statusElement = document.getElementById("status-message");
+        if (!statusElement) return;
+        
+        // Si el juego ha comenzado
+        if (gameStarted) {
+            statusElement.innerText = "¡El juego ha comenzado!";
+            return;
+        }
+        
+        // Si el jugador actual no está listo
+        if (!gameState.ready_status[currentPlayer]) {
+            statusElement.innerText = "Pulsa ESPACIO para indicar que estás listo";
+            return;
+        }
+        
+        // Si el jugador actual está listo pero el otro no
+        const otherPlayer = currentPlayer === "player1" ? "player2" : "player1";
+        if (gameState.ready_status[currentPlayer] && !gameState.ready_status[otherPlayer]) {
+            statusElement.innerText = "Estás listo. Esperando al otro jugador...";
+            return;
+        }
+        
+        // Si ambos están listos (no debería llegar aquí normalmente, pero por si acaso)
+        if (gameState.ready_status.player1 && gameState.ready_status.player2) {
+            statusElement.innerText = "¡El juego ha comenzado!";
+        }
+    }
 
     socket.onclose = function(event) {
         console.log("Conexión cerrada con el WebSocket");
@@ -217,5 +252,9 @@ document.addEventListener("DOMContentLoaded", function() {
         );
     }
 
+    // Inicializar el mensaje de estado al cargar
+    updateStatusMessage();
+    
+    // Dibujar el juego por primera vez
     drawGame();
 });
