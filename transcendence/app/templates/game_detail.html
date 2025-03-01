@@ -5,7 +5,6 @@
 
 {% block content %}
 <div>
-
     <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
         <h2>Partida de Pong #{{ game.id }}</h2>
         
@@ -95,3 +94,4 @@
 <!-- Cargar el script de juego y el de chat -->
 <script src="{% static 'js/game.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
+{% endblock %}
