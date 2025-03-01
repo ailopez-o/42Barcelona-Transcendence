@@ -4,72 +4,99 @@
 {% block title %}Partida de Pong{% endblock %}
 
 {% block content %}
-<div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
-    <h2>Partida de Pong #{{ game.id }}</h2>
-    
-    <div class="game-info">
-        <p><strong>Dificultad:</strong> {{ game.difficulty }}</p>
-        <p><strong>Puntos objetivo:</strong> {{ game.points }}</p>
-    </div>
-    
-    <!-- Mensaje de estado del juego -->
-    <div id="status-message" class="alert alert-info text-center">
-        Esperando a que los jugadores estén listos...
-    </div>
-    
-    <!-- Estado de los jugadores -->
-    <div class="game-players d-flex justify-content-between mb-3">
-        <div class="player-info text-center">
-            <h3 id="player1-username">{{ game.player1.username }}</h3>
-            <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
+<div>
+
+    <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+        <h2>Partida de Pong #{{ game.id }}</h2>
+        
+        <div class="game-info">
+            <p><strong>Dificultad:</strong> {{ game.difficulty }}</p>
+            <p><strong>Puntos objetivo:</strong> {{ game.points }}</p>
         </div>
         
-        <div class="player-info text-center">
-            <h3 id="player2-username">{{ game.player2.username }}</h3>
-            <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
+        <!-- Mensaje de estado del juego -->
+        <div id="status-message" class="alert alert-info text-center">
+            Esperando a que los jugadores estén listos...
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-9">
-            <canvas id="pongCanvas" width="800" height="400" style="border:1px solid white; margin: 20px auto; display: block;"></canvas>
-            
-            <div class="game-controls text-center mt-3">
-                <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa las teclas <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
+        
+        <!-- Estado de los jugadores -->
+        <div class="game-players d-flex justify-content-between mb-3">
+            <div class="player-info text-center">
+                <h3 id="player1-username">{{ game.player1.username }}</h3>
+                <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
             </div>
             
-            <div class="game-scores text-center mt-3">
-                <h3>Puntuación</h3>
-                <p class="fs-2"><span id="left-score">0</span> - <span id="right-score">0</span></p>
+            <div class="player-info text-center">
+                <h3 id="player2-username">{{ game.player2.username }}</h3>
+                <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
             </div>
         </div>
         
-        <!-- Sección de chat -->
-        <div class="col-md-3">
-            <div class="chat-container" style="border: 1px solid #ccc; border-radius: 5px; height: 400px; margin-top: 20px;">
-                <div class="chat-header bg-dark text-white p-2">
-                    <h4 class="m-0">Chat</h4>
+        <div class="row">
+            <div class="col-md-9">
+                <canvas id="pongCanvas" width="800" height="400" style="border:1px solid white; margin: 20px auto; display: block;"></canvas>
+                
+                <div class="game-controls text-center mt-3">
+                    <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa las teclas <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
                 </div>
-                <div id="chat-messages" style="height: 300px; overflow-y: auto; padding: 10px;"></div>
-                <div class="chat-input-container p-2 border-top">
-                    <div class="input-group">
-                        <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje...">
-                        <button id="send-message" class="btn btn-primary">Enviar</button>
-                    </div>
+                
+                <div class="game-scores text-center mt-3">
+                    <h3>Puntuación</h3>
+                    <p class="fs-2"><span id="left-score">0</span> - <span id="right-score">0</span></p>
+                </div>
+            </div>
+            
+            <!-- Sección de chat -->
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="chat-container" style="border: 1px solid #ccc; border-radius: 5px; height: 400px; margin-top: 20px;">
+            <div class="chat-header bg-dark text-white p-2">
+                <h4 class="m-0">Chat</h4>
+            </div>
+            <div id="chat-messages" style="height: 300px; overflow-y: auto; padding: 10px;"></div>
+            <div class="chat-input-container p-2 border-top">
+                <div class="input-group">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje...">
+                    <button id="send-message" class="btn btn-primary">Enviar</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Datos del jugador para JS -->
-<script id="player-data" type="application/json">
+    
+    <!-- Datos del jugador para JS -->
+<!-- Información de jugadores en formato JSON -->
+<script type="application/json" id="player-data">
     {
-        "current": "{% if request.user == game.player1 %}player1{% else %}player2{% endif %}"
+        "player1": {
+            "id": "{{ game.player1.id }}",
+            "username": "{{ game.player1.username }}",
+            "email": "{{ game.player1.email }}"
+        },
+        "player2": {
+            "id": "{{ game.player2.id }}",
+            "username": "{{ game.player2.username }}",
+            "email": "{{ game.player2.email }}"
+        },
+        "current": "{% if request.user.id == game.player1.id %}player1{% elif request.user.id == game.player2.id %}player2{% else %}unknown{% endif %}"
     }
 </script>
-{% endblock %}
 
+<!-- Información de la partida en formato JSON -->
+<script type="application/json" id="game-data">
+    {
+        "id": "{{ game.id }}",
+        "status": "{{ game.status }}",
+        "created_at": "{{ game.created_at|date:'c' }}",
+        "difficulty": "{{ game.difficulty }}",
+        "points": {{ game.points }},
+        "paddle_color": "{{ game.paddle_color }}",
+        "ball_color": "{{ game.ball_color }}"
+    }
+</script>   
+    {% endblock %}
+    
 {% block scripts %}
 <script src="{% static 'js/game.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
