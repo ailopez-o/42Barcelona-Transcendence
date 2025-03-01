@@ -33,6 +33,14 @@
         <p><strong>Estado:</strong> {{ game.status }}</p>
 
         <!-- Contenedor del juego -->
+        <div class="game-players">
+            <h1 id="player1-username">{{ game.player1.username }}</h1>
+            <div id="player1-ready-status">READY</div>
+            <h1 id="player2-username">{{ game.player2.username }}</h1>
+            <div id="player2-ready-status">READY</div>
+        </div>
+
+
         <div id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
             <canvas id="pongCanvas" width="800" height="400"></canvas>
         </div>
