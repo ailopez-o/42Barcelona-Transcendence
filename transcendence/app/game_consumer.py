@@ -59,10 +59,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         if "init_game" in data and "difficulty" in data:
             # Convertir la dificultad textual a un factor numérico
             difficulty_factor = {
-                'facil': 0.7,
-                'medio': 1.0,
-                'dificil': 1.3
-            }.get(data["difficulty"], 1.0)  # Valor predeterminado 1.0 si hay algún problema
+                'facil': 1,
+                'medio': 1.5,
+                'dificil': 2
+            }.get(data["difficulty"], 1.5)  # Valor predeterminado 1.0 si hay algún problema
             
             game_difficulty[self.room_name] = difficulty_factor
             
@@ -80,6 +80,9 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             # Detener el movimiento de la pelota estableciendo las velocidades a 0
             state["ball"]["dx"] = 0
             state["ball"]["dy"] = 0
+            # Colocar la bola en el centro de la pantalla
+            state["ball"]["x"] = 400
+            state["ball"]["y"] = 200
             
             # Informar a todos los clientes que el juego ha terminado
             await self.channel_layer.group_send(
