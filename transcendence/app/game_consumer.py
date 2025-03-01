@@ -17,9 +17,9 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
         # Si aún no existe estado para esta sala, créalo
         if self.room_name not in global_room_states:
-            # Obtener la dificultad del juego (esto debería venir de la base de datos)
-            # Por ahora usamos un valor por defecto
-            game_difficulty[self.room_name] = 1.0  # Factor de velocidad según dificultad
+            # Usaremos un valor predeterminado para la dificultad, que se actualizará 
+            # cuando recibamos el primer mensaje del cliente
+            game_difficulty[self.room_name] = 1.0  # Valor predeterminado medio
             
             global_room_states[self.room_name] = {
                 "ball": {"x": 400, "y": 200, "dx": 0, "dy": 0},  # La bola inmóvil inicialmente
@@ -29,6 +29,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 },
                 "scores": {"left": 0, "right": 0},
                 "game_started": False,  # Controla si el juego ha comenzado
+                "game_over": False,     # Controla si el juego ha terminado
                 "ready_status": {        # Estado de "listo" de ambos jugadores
                     "player1": False,
                     "player2": False
@@ -54,6 +55,42 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             print(f"Evento ignorado: no proviene de un jugador válido: {data}")
             return
         
+        # Manejar mensaje de inicialización con dificultad
+        if "init_game" in data and "difficulty" in data:
+            # Convertir la dificultad textual a un factor numérico
+            difficulty_factor = {
+                'facil': 0.7,
+                'medio': 1.0,
+                'dificil': 1.3
+            }.get(data["difficulty"], 1.0)  # Valor predeterminado 1.0 si hay algún problema
+            
+            game_difficulty[self.room_name] = difficulty_factor
+            
+            # Actualizar las velocidades de las paletas con la nueva dificultad
+            state["paddles"]["left"]["speed"] = 10 * difficulty_factor
+            state["paddles"]["right"]["speed"] = 10 * difficulty_factor
+            
+            print(f"Dificultad del juego establecida: {data['difficulty']} (factor: {difficulty_factor})")
+            return
+        
+        # Procesar mensaje de fin de juego
+        if "game_over" in data and data["game_over"]:
+            # Marcar el juego como terminado
+            state["game_over"] = True
+            # Detener el movimiento de la pelota estableciendo las velocidades a 0
+            state["ball"]["dx"] = 0
+            state["ball"]["dy"] = 0
+            
+            # Informar a todos los clientes que el juego ha terminado
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": "game_update",
+                    "state": state
+                }
+            )
+            return
+            
         # Ahora recibimos la tecla directamente en lugar del movimiento
         if "key" in data:
             # Mapear player1/player2 a left/right para las paletas
@@ -89,8 +126,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 )
                 return
             
-            # Procesar movimiento solo si el juego ha comenzado
-            if state["game_started"]:
+            # Procesar movimiento solo si el juego ha comenzado y no ha terminado
+            if state["game_started"] and not state["game_over"]:
                 # Obtener la posición actual de la pala
                 current_y = state["paddles"][paddle_side]["y"]
                 paddle_speed = state["paddles"][paddle_side]["speed"]
@@ -119,8 +156,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         while True:
             state = global_room_states[self.room_name]
             
-            # Solo actualizamos la pelota si el juego ha comenzado
-            if state["game_started"]:
+            # Solo actualizamos la pelota si el juego ha comenzado y no ha terminado
+            if state["game_started"] and not state["game_over"]:
                 self.update_ball(state)
                 
             # Enviar el estado actualizado a todos los clientes conectados a esta sala
@@ -135,8 +172,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     def update_ball(self, state):
         """ Actualiza la posición de la bola y maneja colisiones y puntuaciones. """
-        # Si el juego no ha comenzado, la bola no se mueve
-        if not state["game_started"]:
+        # Si el juego no ha comenzado o ya terminó, la bola no se mueve
+        if not state["game_started"] or state["game_over"]:
             return
             
         state["ball"]["x"] += state["ball"]["dx"]
@@ -176,13 +213,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         state["ball"]["x"] = 400
         state["ball"]["y"] = 200
         
-        # Si el juego está en curso, damos velocidad según la dificultad
-        if state["game_started"]:
+        # Si el juego está en curso y no ha terminado, damos velocidad según la dificultad
+        if state["game_started"] and not state["game_over"]:
             speed = 5 * game_difficulty[self.room_name]
             state["ball"]["dx"] = random.choice([-1, 1]) * speed
             state["ball"]["dy"] = random.choice([-1, 1]) * speed
         else:
-            # Si el juego no ha comenzado, la bola queda inmóvil
+            # Si el juego no ha comenzado o ya terminó, la bola queda inmóvil
             state["ball"]["dx"] = 0
             state["ball"]["dy"] = 0
 

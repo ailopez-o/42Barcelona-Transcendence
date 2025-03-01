@@ -67,6 +67,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.onopen = function(event) {
         console.log("Conectado al WebSocket");
+        // Enviar la dificultad del juego al servidor inmediatamente después de conectar
+        socket.send(JSON.stringify({
+            player: currentPlayer,
+            init_game: true,
+            difficulty: gameData.difficulty
+        }));
     };
 
     // Crear objeto para el estado del juego
@@ -151,6 +157,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // Calcular duración del juego en segundos
                 const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
+                
+                // Informar al backend que el juego ha terminado
+                socket.send(JSON.stringify({
+                    player: currentPlayer,
+                    game_over: true
+                }));
                 
                 // Enviar resultados al endpoint
                 sendGameResults({
