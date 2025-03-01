@@ -49,20 +49,17 @@
             <!-- Sección de chat -->
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="chat-container" style="border: 1px solid #ccc; border-radius: 5px; height: 400px; margin-top: 20px;">
-            <div class="chat-header bg-dark text-white p-2">
-                <h4 class="m-0">Chat</h4>
-            </div>
-            <div id="chat-messages" style="height: 300px; overflow-y: auto; padding: 10px;"></div>
-            <div class="chat-input-container p-2 border-top">
-                <div class="input-group">
-                    <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje...">
-                    <button id="send-message" class="btn btn-primary">Enviar</button>
-                </div>
-            </div>
+    <div class="in-game-chat">
+        <!-- Contenedor para los mensajes de chat -->
+        <div id="chat-section">
+            <!-- Mensajes se insertarán aquí -->
         </div>
-    </div>
+
+        <!-- Formulario para enviar mensajes -->
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
+            <button type="submit">Enviar</button>
+        </form>
 </div>
     
     <!-- Datos del jugador para JS -->
