@@ -102,6 +102,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.ready_status) {
             gameState.ready_status = data.ready_status;
             
+            // Actualizar el HTML para mostrar el estado READY/PENDING
+            updateReadyStatusDisplay();
+            
             // Generar mensajes basados en el estado de "ready"
             updateStatusMessage();
         }
@@ -133,6 +136,32 @@ document.addEventListener("DOMContentLoaded", function() {
         drawGame();
     };
     
+    // Función para actualizar la visualización del estado READY/PENDING en el HTML
+    function updateReadyStatusDisplay() {
+        const player1StatusElement = document.getElementById("player1-ready-status");
+        const player2StatusElement = document.getElementById("player2-ready-status");
+        
+        if (player1StatusElement) {
+            if (gameState.ready_status.player1) {
+                player1StatusElement.textContent = "READY";
+                player1StatusElement.className = "badge bg-success";
+            } else {
+                player1StatusElement.textContent = "PENDING";
+                player1StatusElement.className = "badge bg-warning";
+            }
+        }
+        
+        if (player2StatusElement) {
+            if (gameState.ready_status.player2) {
+                player2StatusElement.textContent = "READY";
+                player2StatusElement.className = "badge bg-success";
+            } else {
+                player2StatusElement.textContent = "PENDING";
+                player2StatusElement.className = "badge bg-warning";
+            }
+        }
+    }
+    
     // Función para generar y actualizar mensajes de estado basados en el estado del juego
     function updateStatusMessage() {
         const statusElement = document.getElementById("status-message");
@@ -141,12 +170,14 @@ document.addEventListener("DOMContentLoaded", function() {
         // Si el juego ha comenzado
         if (gameStarted) {
             statusElement.innerText = "¡El juego ha comenzado!";
+            statusElement.className = "alert alert-success text-center";
             return;
         }
         
         // Si el jugador actual no está listo
         if (!gameState.ready_status[currentPlayer]) {
             statusElement.innerText = "Pulsa ESPACIO para indicar que estás listo";
+            statusElement.className = "alert alert-info text-center";
             return;
         }
         
@@ -154,12 +185,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const otherPlayer = currentPlayer === "player1" ? "player2" : "player1";
         if (gameState.ready_status[currentPlayer] && !gameState.ready_status[otherPlayer]) {
             statusElement.innerText = "Estás listo. Esperando al otro jugador...";
+            statusElement.className = "alert alert-warning text-center";
             return;
         }
         
         // Si ambos están listos (no debería llegar aquí normalmente, pero por si acaso)
         if (gameState.ready_status.player1 && gameState.ready_status.player2) {
             statusElement.innerText = "¡El juego ha comenzado!";
+            statusElement.className = "alert alert-success text-center";
         }
     }
 
@@ -178,9 +211,6 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Dibujar indicadores de "ready" para cada jugador
-        drawReadyStatus();
         
         // Dibujar las palas
         // El color depende de si el jugador está listo
@@ -220,40 +250,11 @@ document.addEventListener("DOMContentLoaded", function() {
             Math.PI * 2
         );
         ctx.fill();
-        
-        // Mostrar mensaje para indicar que pulse espacio si no está listo
-        if (!gameState.ready_status[currentPlayer]) {
-            ctx.fillStyle = "white";
-            ctx.font = "20px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("Pulsa ESPACIO para indicar que estás listo", canvas.width / 2, 30);
-        }
-    }
-    
-    function drawReadyStatus() {
-        // Dibujar indicadores de "ready" en la parte superior
-        ctx.font = "16px Arial";
-        ctx.textAlign = "center";
-        
-        // Jugador 1 (izquierda)
-        ctx.fillStyle = gameState.ready_status.player1 ? "green" : "red";
-        ctx.fillText(
-            gameState.ready_status.player1 ? "Jugador 1: LISTO" : "Jugador 1: NO LISTO", 
-            150, 
-            20
-        );
-        
-        // Jugador 2 (derecha)
-        ctx.fillStyle = gameState.ready_status.player2 ? "green" : "red";
-        ctx.fillText(
-            gameState.ready_status.player2 ? "Jugador 2: LISTO" : "Jugador 2: NO LISTO", 
-            650, 
-            20
-        );
     }
 
-    // Inicializar el mensaje de estado al cargar
+    // Inicializar el mensaje de estado y los indicadores READY/PENDING al cargar
     updateStatusMessage();
+    updateReadyStatusDisplay();
     
     // Dibujar el juego por primera vez
     drawGame();
