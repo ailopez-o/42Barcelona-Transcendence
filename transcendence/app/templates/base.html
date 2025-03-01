@@ -28,19 +28,18 @@
                     <li class="text-white"><a href="{% url 'game_list' %}">Partidas</a></li>
                     <li class="text-white"><a href="{% url 'global_chat' %}">Chat Global</a></li>
                 </div>
-                    
-                    <!-- Formulario para cerrar sesión de manera segura -->
-                    <li class="text-white align-self-end">
-                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-light">Salir</button>
-                        </form>
-                    </li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Ingresar</a></li>
-                    <li><a href="{% url 'register' %}">Registrarse</a></li>
+                <li><a href="{% url 'login' %}">Ingresar</a></li>
+                <li><a href="{% url 'register' %}">Registrarse</a></li>
                 {% endif %}
             </ul>
+            {% if user.is_authenticated %}
+            <!-- Formulario para cerrar sesión de manera segura -->
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light">Salir</button>
+            </form>
+            {% endif %}
         </nav>
     </header>
     <main>

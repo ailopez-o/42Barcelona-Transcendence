@@ -35,6 +35,11 @@ nav ul {
     margin: 10px 0 0;
     /* display: flex;
     justify-content: center; */
+    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #3a061d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     gap: 15px;
 }
 
