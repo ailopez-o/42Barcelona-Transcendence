@@ -21,21 +21,23 @@ header {
 
 header h1 {
     margin: 0;
-    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #3a061d 100%);
+    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #8f1a4f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent; /* Fallback para navegadores no-webkit */
     font-weight: 900;
 }
-
+nav {
+    box-shadow: 0px 4px 6px rgba(249, 249, 249, 0.1);
+}
 nav ul {
     list-style: none;
     padding: 0;
     margin: 10px 0 0;
     /* display: flex;
     justify-content: center; */
-    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #3a061d 100%);
+    background: linear-gradient(to right, #e3968f 0%, #f67b71 40%, #d31166 60%, #e3968f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -69,7 +71,6 @@ main {
 
 /* Forms */
 form {
-    margin: 20px 0;
     display: flex;
     flex-direction: column;
     gap: 10px;

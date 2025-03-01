@@ -13,13 +13,12 @@
     <!-- Tus estilos CSS personalizados -->
     {% block styles %}{% endblock %}
 </head>
-<body>
+<body class="min-vh-100 bg-dark">
     <header class="p-0">
         <nav class="bg-dark m-0 d-flex align-items-center justify-content-between">
             <h1 class="font-weight-bold ">PONG</h1>
-            <ul class="  d-flex gap-3">
+            <ul class="gap-6">
                 {% if user.is_authenticated %}
-                <div class="align-self-start">
                     <li class="text-white"><a href="{% url 'profile' %}">Perfil</a></li>
                     <li class="text-white"><a href="{% url 'new_game' %}">Nueva Partida</a></li>
                     <li class="text-white"><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
@@ -35,7 +34,7 @@
             </ul>
             {% if user.is_authenticated %}
             <!-- Formulario para cerrar sesión de manera segura -->
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-light">Salir</button>
             </form>
