@@ -3,19 +3,19 @@
 {% block title %}Iniciar Sesión{% endblock %}
 
 {% block content %}
-<h2>Iniciar Sesión</h2>
-
-<!-- Botón para alternar entre métodos de login -->
-<button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
-    Ingresar con 42
-</button>
+<div class="d-flex align-items-center justify-content-around">
+    <h2>Iniciar Sesión</h2>
+        <!-- Botón para alternar entre métodos de login -->
+    <button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
+        Ingresar con 42
+    </button>
+</div>
 
 <!-- Formulario de login con usuario y contraseña -->
 <div id="credentials_login" style="display: block;">
     <form id="login_form" method="post">
         {% csrf_token %}
-        
-        <div class="form-group">
+        <div class="form-group d-flex flex-column align-items-center justify-content-center">
             <label for="{{ form.username.id_for_label }}">Usuario:</label>
             {{ form.username }}
             {% if form.username.errors %}
@@ -23,7 +23,7 @@
             {% endif %}
         </div>
         
-        <div class="form-group">
+        <div class="form-group d-flex flex-column align-items-center justify-content-center">
             <label for="{{ form.password.id_for_label }}">Contraseña:</label>
             {{ form.password }}
             {% if form.password.errors %}
@@ -36,7 +36,6 @@
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-        
         <button class="btn btn-outline-dark" type="submit">Ingresar</button>
     </form>
 </div>
