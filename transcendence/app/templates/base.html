@@ -20,18 +20,19 @@
                 <h1 class="font-weight-bold ">PONG</h1>
                 {% if user.is_authenticated %}
                 <div class="d-flex align-items-center gap-2">
-                    {% if user.avatar %}
-                    <img src="{{ avatar_url  }}" alt="{{ user.username }}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #f67b71;">
-                    {% else %}
-                    <img src="{% static 'images/default_avatar.png' %}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #f67b71;">
-                    {% endif %}
-                    <p class="text-white text-capitalize"> {{ user.username }}</p>
+                    <a href="{% url 'profile' %}">
+                        {% if user.avatar %}
+                        <img src="{{ avatar_url  }}" alt="{{ user.username }}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #8f1a4f;">
+                        {% else %}
+                        <img src="{% static 'images/default_avatar.png' %}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #8f1a4f;">
+                        {% endif %}
+                        <div class="text-white text-capitalize"> {{ user.username }}</div>
+                    </a>
                 </div>
                 {% endif %}
             </div>
             <ul class="d-flex gap-3">
                 {% if user.is_authenticated %}
-                    <li class="fw-bold"><a href="{% url 'profile' %}">Perfil</a></li>
                     <li class="fw-bold"><a href="{% url 'new_game' %}">Nueva Partida</a></li>
                     <li class="fw-bold"><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
                     <li class="fw-bold"><a href="{% url 'users' %}">Usuarios</a></li>
