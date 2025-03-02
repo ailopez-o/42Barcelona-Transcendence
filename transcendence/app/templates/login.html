@@ -7,7 +7,11 @@
 
 <!-- Selector para elegir el método de login -->
 <label>
-    <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
+    <div class="input-group-prepend">
+        <div class="input-group-text">
+            <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
+        </div>
+    </div>
     Ingresar con usuario y contraseña
 </label>
 <label>
