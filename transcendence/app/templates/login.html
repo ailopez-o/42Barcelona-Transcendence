@@ -5,44 +5,65 @@
 {% block content %}
 <h2>Iniciar Sesión</h2>
 
-<!-- Selector para elegir el método de login -->
- <div class="form-check">
-    <input class="form-check-input"  id="login_credentials" type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
-    <label class="form-check-label" for="login_credentials">
-        Ingresar con usuario y contraseña
-    </label>
-</div>
-<div class="form-check">
-    <input class="form-check-input"  id="login_42" type="radio" name="login_method" value="42" onclick="toggleLoginMethod('42')">
-    <label class="form-check-label" for="login_42">
-        Ingresar con 42
-    </label>
-</div>
-
-</label>
+<!-- Botón para alternar entre métodos de login -->
+<button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
+    Ingresar con 42
+</button>
 
 <!-- Formulario de login con usuario y contraseña -->
-<form id="login_form" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-outline-dark" type="submit">Ingresar</button>
-</form>
+<div id="credentials_login" style="display: block;">
+    <form id="login_form" method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Usuario:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="form-error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">Contraseña:</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <div class="form-error">{{ form.password.errors }}</div>
+            {% endif %}
+        </div>
+        
+        {% if form.non_field_errors %}
+            <div class="non-field-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <button class="btn btn-outline-dark" type="submit">Ingresar</button>
+    </form>
+</div>
 
 <!-- Botón para login con 42 -->
-<div id="login_42">
+<div id="intra_login" style="display: none;">
     <a href="{% url 'login_42' %}">
-        <button  class="btn btn-outline-dark" type="button">Ingresar con 42</button>
+        <button class="btn btn-outline-dark" type="button">Ingresar con 42</button>
     </a>
 </div>
 
 <script>
-    function toggleLoginMethod(method) {
-        if (method === 'credentials') {
-            document.getElementById('login_form').style.display = 'block';
-            document.getElementById('login_42').style.display = 'none';
+    let currentMethod = 'credentials';
+    
+    function toggleLoginMethod() {
+        if (currentMethod === 'credentials') {
+            // Cambiar a login con 42
+            document.getElementById('credentials_login').style.display = 'none';
+            document.getElementById('intra_login').style.display = 'block';
+            document.getElementById('toggle_login_btn').textContent = 'Ingresar con usuario y contraseña';
+            currentMethod = '42';
         } else {
-            document.getElementById('login_form').style.display = 'none';
-            document.getElementById('login_42').style.display = 'block';
+            // Cambiar a login con credenciales
+            document.getElementById('credentials_login').style.display = 'block';
+            document.getElementById('intra_login').style.display = 'none';
+            document.getElementById('toggle_login_btn').textContent = 'Ingresar con 42';
+            currentMethod = 'credentials';
         }
     }
 </script>
