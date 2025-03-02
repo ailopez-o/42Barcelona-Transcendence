@@ -7,11 +7,7 @@
 
 <!-- Selector para elegir el método de login -->
 <label>
-    <div class="input-group-prepend">
-        <div class="input-group-text">
-            <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
-        </div>
-    </div>
+    <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
     Ingresar con usuario y contraseña
 </label>
 <label>
@@ -23,7 +19,7 @@
 <form id="login_form" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Ingresar</button>
+    <button class="btn btn-outline-dark" type="submit">Ingresar</button>
 </form>
 
 <!-- Botón para login con 42 -->
