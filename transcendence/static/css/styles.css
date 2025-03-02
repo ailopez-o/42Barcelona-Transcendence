@@ -69,7 +69,7 @@ nav ul li a:hover {
 /* Main Content */
 main {
     margin: 20px auto;
-    margin-bottom: 56px;
+    margin-bottom: 56 px;
     padding: 20px;
     max-width: 800px;
     background: #fff;
@@ -193,3 +193,31 @@ button {
 }
 
 
+/* LOGIN */
+#login_form input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d31166;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* Estilo para las etiquetas */
+#login_form label {
+    color: white;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Estilo para el botón */
+#login_form button {
+    background: linear-gradient(to right, #e3968f, #d31166);
+    padding: 12px 20px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
