@@ -49,41 +49,8 @@
 </div>
 
 <script>
-    // Limpieza de almacenamiento del navegador que podría causar conflictos
-    document.addEventListener('DOMContentLoaded', function() {
-        // Intentar limpiar localStorage y sessionStorage
-        try {
-            // Conservar keys importantes que no queremos perder (si hay alguna)
-            // const importantKeys = ['theme', 'preferences'];
-            // const savedValues = {};
-            
-            // importantKeys.forEach(key => {
-            //     if (localStorage.getItem(key)) {
-            //         savedValues[key] = localStorage.getItem(key);
-            //     }
-            // });
-            
-            // Limpiar todo el almacenamiento
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            // Restaurar valores importantes
-            // Object.keys(savedValues).forEach(key => {
-            //     localStorage.setItem(key, savedValues[key]);
-            // });
-            
-            console.log('Almacenamiento del navegador limpiado para prevenir conflictos de sesión');
-        } catch (e) {
-            console.error('Error al limpiar almacenamiento:', e);
-        }
-    });
-
     let currentMethod = 'credentials';
     
-    // Variable para verificar si la página se está bloqueando
-    let isSubmitting = false;
-    
-    // Función para alternar entre métodos de login
     function toggleLoginMethod() {
         if (currentMethod === 'credentials') {
             // Cambiar a login con 42
@@ -99,39 +66,6 @@
             currentMethod = 'credentials';
         }
     }
-    
-    // Manejar el envío del formulario para prevenir bloqueos
-    document.addEventListener('DOMContentLoaded', function() {
-        const loginForm = document.getElementById('login_form');
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(e) {
-                // Evitar múltiples envíos
-                if (isSubmitting) {
-                    e.preventDefault();
-                    return;
-                }
-                
-                isSubmitting = true;
-                
-                // Añadir clase de carga para indicar proceso
-                document.body.classList.add('logging-in');
-                
-                // Configurar un timeout para detectar si el proceso se bloquea
-                setTimeout(function() {
-                    if (document.body.classList.contains('logging-in')) {
-                        // Si aún tiene la clase después de 5 segundos, probablemente esté bloqueado
-                        console.log('Posible bloqueo en el proceso de login. Intentando recuperar...');
-                        document.body.classList.remove('logging-in');
-                        isSubmitting = false;
-                        
-                        // Opcional: Mostrar mensaje al usuario
-                        alert('El proceso de login está tomando más tiempo de lo normal. Por favor, inténtelo de nuevo.');
-                    }
-                }, 5000);
-            });
-        }
-    });
 </script>
 
 {% endblock %}
