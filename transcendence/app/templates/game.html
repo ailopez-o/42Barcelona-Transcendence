@@ -8,21 +8,29 @@
     {% csrf_token %}
     
     <!-- Seleccionar oponente -->
-    <label for="opponent">Selecciona un oponente:</label>
-    <select name="opponent" id="opponent">
-        {% for user in users %}
-            <option value="{{ user.id }}">{{ user.username }}</option>
-        {% endfor %}
-    </select>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="opponent">Oponente:</label>
+        </div>
+        <select class="custom-select" id="opponent">
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+      </div>
     <br><br>
     
     <!-- Seleccionar dificultad -->
-    <label for="difficulty">Dificultad:</label>
-    <select name="difficulty" id="difficulty">
-        <option value="facil">Fácil</option>
-        <option value="medio">Medio</option>
-        <option value="dificil">Difícil</option>
-    </select>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="difficulty">Dificultad:</label>
+        </div>
+        <select class="custom-select" id="difficulty">
+          <option selected>Fácil</option>
+          <option value="1">Medio</option>
+          <option value="2">Difícil</option>
+        </select>
+      </div>
     <br><br>
     
     <!-- Puntaje objetivo -->
