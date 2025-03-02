@@ -6,13 +6,19 @@
 <h2>Iniciar Sesión</h2>
 
 <!-- Selector para elegir el método de login -->
-<label>
-    <input type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
-    Ingresar con usuario y contraseña
-</label>
-<label>
-    <input type="radio" name="login_method" value="42" onclick="toggleLoginMethod('42')">
-    Ingresar con 42
+ <div class="form-check">
+    <input class="form-check-input"  id="login_credentials" type="radio" name="login_method" value="credentials" checked onclick="toggleLoginMethod('credentials')">
+    <label class="form-check-label" for="login_credentials">
+        Ingresar con usuario y contraseña
+    </label>
+</div>
+<div class="form-check">
+    <input class="form-check-input"  id="login_42" type="radio" name="login_method" value="42" onclick="toggleLoginMethod('42')">
+    <label class="form-check-label" for="login_42">
+        Ingresar con 42
+    </label>
+</div>
+
 </label>
 
 <!-- Formulario de login con usuario y contraseña -->
@@ -23,9 +29,9 @@
 </form>
 
 <!-- Botón para login con 42 -->
-<div id="login_42" style="display: none;">
+<div id="login_42">
     <a href="{% url 'login_42' %}">
-        <button type="button">Ingresar con 42</button>
+        <button  class="btn btn-outline-dark" type="button">Ingresar con 42</button>
     </a>
 </div>
 
