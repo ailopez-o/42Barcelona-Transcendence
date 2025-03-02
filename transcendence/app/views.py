@@ -34,7 +34,20 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('profile')
+            
+            # Crear respuesta con cabeceras para prevenir problemas de caché
+            response = redirect('profile')
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            
+            # Añadir mensaje de éxito
+            print("Login exitoso para el usuario:", user.username)
+            
+            return response
+        else:
+            # Añadir mensaje de error para depuración
+            print("Error en formulario de login:", form.errors)
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
