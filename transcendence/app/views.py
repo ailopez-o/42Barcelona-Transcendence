@@ -16,6 +16,7 @@ from django.conf import settings
 import requests
 import urllib.parse
 from django.conf import settings
+import datetime
 
 
 
@@ -32,6 +33,11 @@ def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
+            # Limpiar cualquier sesión previa para evitar conflictos
+            if hasattr(request, 'session'):
+                request.session.flush()
+                
+            # Proceder con el login normal
             user = form.get_user()
             login(request, user)
             
@@ -41,12 +47,27 @@ def login_view(request):
             response['Pragma'] = 'no-cache'
             response['Expires'] = '0'
             
-            # Añadir mensaje de éxito
-            print("Login exitoso para el usuario:", user.username)
+            # Establecer una cookie de sesión nueva con un path explícito
+            max_age = 365 * 24 * 60 * 60  # 1 año en segundos
+            expires = datetime.datetime.strftime(
+                datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
+                "%a, %d-%b-%Y %H:%M:%S GMT"
+            )
+            response.set_cookie(
+                settings.SESSION_COOKIE_NAME,
+                request.session.session_key,
+                max_age=max_age,
+                expires=expires,
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path=settings.SESSION_COOKIE_PATH,
+                secure=settings.SESSION_COOKIE_SECURE or None,
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None,
+                samesite=settings.SESSION_COOKIE_SAMESITE,
+            )
             
+            print("Login exitoso para el usuario:", user.username)
             return response
         else:
-            # Añadir mensaje de error para depuración
             print("Error en formulario de login:", form.errors)
     else:
         form = AuthenticationForm()
