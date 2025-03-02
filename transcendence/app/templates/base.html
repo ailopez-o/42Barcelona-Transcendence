@@ -17,6 +17,12 @@
     <header class="p-0">
         <nav class="bg-dark m-0 d-flex align-items-center justify-content-between">
             <h1 class="font-weight-bold ">PONG</h1>
+            {% if user.is_authenticated %}
+            <div>
+                <img src="{{ user.profile.image.url }}" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px;">
+                <p class="text-white"> {{ user.username }}</p>
+            </div>
+            {% endif %}
             <ul class="d-flex gap-3">
                 {% if user.is_authenticated %}
                     <li class="fw-bold"><a href="{% url 'profile' %}">Perfil</a></li>
