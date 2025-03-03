@@ -68,7 +68,6 @@ def profile_view(request):
 
 # Vista para crear una nueva partida
 @login_required
-@login_required
 def new_game_view(request):
     if request.method == 'POST':
         opponent_id = request.POST.get('opponent')
