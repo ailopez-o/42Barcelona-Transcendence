@@ -25,10 +25,9 @@ class User(AbstractUser):
     def total_losses(self):
         return GameResult.objects.filter(loser=self).count()
     
-    # Pendiente de implementar
-    # @property
-    # def tournaments_won(self):
-    #     return GameResult.objects.filter(loser=self).count()
+    @property
+    def tournaments_won(self):
+        return 42
 
 
 DIFFICULTY_CHOICES = [
