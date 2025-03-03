@@ -52,7 +52,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         # Comprobar si el evento viene de uno de los jugadores válidos
         if "player" not in data or data["player"] not in ["player1", "player2"]:
             # Si no es un jugador válido, ignoramos el evento
-            print(f"Evento ignorado: no proviene de un jugador válido: {data}")
+            #print(f"Evento ignorado: no proviene de un jugador válido: {data}")
             return
         
         # Manejar mensaje de inicialización con dificultad
@@ -70,7 +70,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             state["paddles"]["left"]["speed"] = 10 * difficulty_factor
             state["paddles"]["right"]["speed"] = 10 * difficulty_factor
             
-            print(f"Dificultad del juego establecida: {data['difficulty']} (factor: {difficulty_factor})")
+            #print(f"Dificultad del juego establecida: {data['difficulty']} (factor: {difficulty_factor})")
             return
         
         # Procesar mensaje de fin de juego

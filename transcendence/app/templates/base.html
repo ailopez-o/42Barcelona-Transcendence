@@ -21,7 +21,7 @@
                 {% if user.is_authenticated %}
                 <a class="d-flex align-items-center gap-2 text-decoration-none" href="{% url 'profile' %}">
                     {% if user.avatar %}
-                    <img src="{{ avatar_url  }}" alt="{{ user.username }}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #8f1a4f;">
+                    <img src="{{ user.avatar }}" alt="{{ user.username }}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #8f1a4f;">
                     {% else %}
                     <img src="{% static 'images/default_avatar.png' %}" class="avatar" style="width: 30px; height: 30px; border-radius: 50%; border: 3px solid #8f1a4f;">
                     {% endif %}
