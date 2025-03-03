@@ -1,12 +1,10 @@
-{% extends "base.html" %}
-
-{% block title %}Registro{% endblock %}
-
-{% block content %}
 <h2>Registrarse</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrarse</button>
-</form>
-{% endblock %}
+
+<div id="register-container">
+    <form method="post" hx-post="{% url 'register' %}" hx-target="#register-container" hx-swap="outerHTML">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrarse</button>
+    </form>
+</div>
+

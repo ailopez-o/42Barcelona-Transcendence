@@ -1,9 +1,5 @@
-{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Chat Global{% endblock %}
-
-{% block content %}
 <h2>Chat Global</h2>
 
 <div class="global-chat">
@@ -19,9 +15,7 @@
     </form>
 </div>
 
-
-<!-- Información del usuario actual (opcional, para que el JS sepa quién es) -->
-<!-- Información de jugadores en formato JSON. Respetamos el formato del Chat de la partida porque usamos el mismo JS-->
+<!-- Información del usuario actual -->
 <script type="application/json" id="player-data">
     {
         "player1": {
@@ -35,4 +29,3 @@
 
 <!-- Cargar el script del chat global -->
 <script src="{% static 'js/chat.js' %}"></script>
-{% endblock %}

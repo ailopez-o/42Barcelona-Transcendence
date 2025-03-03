@@ -1,9 +1,5 @@
-{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Resultados de Partidas{% endblock %}
-
-{% block content %}
 <h2>Resultados de Partidas</h2>
 
 {% if results %}
@@ -22,7 +18,15 @@
       <tbody>
           {% for result in results %}
           <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px;">{{ result.game.id }}</td>
+              <td style="padding: 8px;">
+                  <a href="{% url 'game_detail' result.game.id %}"
+                     hx-get="{% url 'game_detail' result.game.id %}"
+                     hx-target="#main-content"
+                     hx-push-url="true"
+                     style="color: #007bff; text-decoration: none;">
+                      {{ result.game.id }}
+                  </a>
+              </td>
               <td style="padding: 8px;">{{ result.winner.username }}</td>
               <td style="padding: 8px;">{{ result.score_winner }}</td>
               <td style="padding: 8px;">{{ result.loser.username }}</td>
@@ -38,4 +42,3 @@
       No se han registrado resultados de partidas.
   </div>
 {% endif %}
-{% endblock %}
