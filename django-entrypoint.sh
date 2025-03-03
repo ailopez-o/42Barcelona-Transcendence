@@ -44,20 +44,20 @@ if Game.objects.count() < 10:
         player1, player2 = random.sample(users, 2)  # Selecciona 2 usuarios aleatorios
         game = Game.objects.create(player1=player1, player2=player2, status="finalizado")
 
-        # Generar resultado aleatorio
-        # winner, loser = (player1, player2) if random.choice([True, False]) else (player2, player1)
-        # score_winner = random.randint(5, 10)  # Puntuación aleatoria
-        # score_loser = random.randint(0, score_winner - 1)
-        # duration = random.randint(60, 600)  # Duración entre 1 y 10 minutos
+        #Generar resultado aleatorio
+        winner, loser = (player1, player2) if random.choice([True, False]) else (player2, player1)
+        score_winner = random.randint(5, 10)  # Puntuación aleatoria
+        score_loser = random.randint(0, score_winner - 1)
+        duration = random.randint(60, 600)  # Duración entre 1 y 10 minutos
 
-        # GameResult.objects.create(
-        #     game=game,
-        #     winner=winner,
-        #     loser=loser,
-        #     score_winner=score_winner,
-        #     score_loser=score_loser,
-        #     duration=duration
-        # )
+        GameResult.objects.create(
+            game=game,
+            winner=winner,
+            loser=loser,
+            score_winner=score_winner,
+            score_loser=score_loser,
+            duration=duration
+        )
 
 EOF
 
