@@ -5,43 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ping Pong App{% endblock %}</title>
     {% load static %}
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    {% block styles %}{% endblock %}
 </head>
-<body>
-    <header>
-        <h1>Ping Pong App</h1>
-        <nav>
-            <ul>
+<body class="min-vh-100 bg-dark" hx-boost="true">
+    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">PONG</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'new_game' %}" hx-get="{% url 'new_game' %}" hx-target="#main-content" hx-push-url="true">Nueva Partida</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'new_tournament' %}" hx-get="{% url 'new_tournament' %}" hx-target="#main-content" hx-push-url="true">Nuevo Torneo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'users' %}" hx-get="{% url 'users' %}" hx-target="#main-content" hx-push-url="true">Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'game_results' %}" hx-get="{% url 'game_results' %}" hx-target="#main-content" hx-push-url="true">Resultados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'game_list' %}" hx-get="{% url 'game_list' %}" hx-target="#main-content" hx-push-url="true">Partidas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'global_chat' %}" hx-get="{% url 'global_chat' %}" hx-target="#main-content" hx-push-url="true">Chat Global</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}" hx-get="{% url 'login' %}" hx-target="#main-content" hx-push-url="true">Ingresar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}" hx-get="{% url 'register' %}" hx-target="#main-content" hx-push-url="true">Registrarse</a></li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Perfil y Logout -->
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'profile' %}">Perfil</a></li>
-                    <li><a href="{% url 'new_game' %}">Nueva Partida</a></li>
-                    <li><a href="{% url 'new_tournament' %}">Nuevo Torneo</a></li>
-                    <li><a href="{% url 'users' %}">Usuarios</a></li>
-                    <li><a href="{% url 'game_results' %}">Resultados</a></li>
-                    <li><a href="{% url 'game_list' %}">Partidas</a></li>
-                    <li><a href="{% url 'global_chat' %}">Chat Global</a></li>
-                    
-                    <!-- Formulario para cerrar sesión de manera segura -->
-                    <li>
-                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" style="background: none; border: none; color: blue; cursor: pointer;">Salir</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li><a href="{% url 'login' %}">Ingresar</a></li>
-                    <li><a href="{% url 'register' %}">Registrarse</a></li>
+                <div class="d-flex align-items-center">
+                    <a class="nav-link d-flex align-items-center gap-2 text-white text-decoration-none" 
+                       href="{% url 'profile' %}" 
+                       hx-get="{% url 'profile' %}" hx-target="#main-content" hx-push-url="true">
+                         {% if user.avatar %}
+                             <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle border border-3" style="width: 30px; height: 30px;">
+                         {% else %}
+                             <img src="{% static 'images/default_avatar.png' %}" alt="Avatar por defecto" class="rounded-circle border border-3" style="width: 30px; height: 30px;">
+                         {% endif %}
+                        <span class="text-capitalize">{{ user.username }}</span>
+                    </a>
+                    <form action="{% url 'logout' %}" method="post" class="ms-3"
+                          hx-post="{% url 'logout' %}" hx-target="body" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light btn-sm">Salir</button>
+                    </form>
+                </div>
                 {% endif %}
-            </ul>
-        </nav>
-    </header>
-    <main>
+            </div>
+        </div>
+    </nav>
+
+    {% if user.is_authenticated %}
+    <!-- Contenedor de Notificaciones (Solo para usuarios logueados) -->
+    <div id="notifications-container" 
+         class="container-fluid bg-white py-2 border-bottom shadow-sm"
+         hx-get="{% url 'notifications' %}" 
+         hx-trigger="every 5s" 
+         hx-target="#notifications-container" 
+         hx-swap="outerHTML">
+        <!-- Las notificaciones se cargarán aquí dinámicamente -->
+    </div>
+    {% endif %}
+
+
+    <!-- Contenido principal -->
+    <main id="main-content" class="container mt-3">
         {% block content %}
+            {% if content_template %}
+                {% include content_template %}
+            {% endif %}
         {% endblock %}
     </main>
-    <footer>
-        <p>&copy; 2025 Ping Pong App</p>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3 fixed-bottom">
+        <p class="mb-0">&copy; 2025 Ping Pong App</p>
     </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>
-

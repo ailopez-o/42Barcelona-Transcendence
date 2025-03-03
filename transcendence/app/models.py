@@ -1,12 +1,9 @@
 from django.db import models
+from django.db.models import Count, Q
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    total_games = models.PositiveIntegerField(default=0)
-    total_wins = models.PositiveIntegerField(default=0)
-    total_losses = models.PositiveIntegerField(default=0)
-    tournaments_won = models.PositiveIntegerField(default=0)
     display_name = models.CharField(max_length=150, unique=True)
     intra_url = models.URLField(max_length=500, blank=True, null=True)
 
@@ -16,6 +13,21 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    @property
+    def total_games(self):
+        return GameResult.objects.filter(Q(winner=self) | Q(loser=self)).count()
+
+    @property
+    def total_wins(self):
+        return GameResult.objects.filter(winner=self).count()
+
+    @property
+    def total_losses(self):
+        return GameResult.objects.filter(loser=self).count()
+    
+    @property
+    def tournaments_won(self):
+        return 42
 
 
 DIFFICULTY_CHOICES = [
@@ -44,16 +56,6 @@ class Game(models.Model):
     def __str__(self):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
 
-class GameEvent(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='events')
-    timestamp = models.DateTimeField(auto_now_add=True)
-    event_type = models.CharField(max_length=50)  # Ejemplo: "goal", "pause", "disconnect"
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Evento {self.event_type} en partida {self.game.id}"
-
-
 class Tournament(models.Model):
     name = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_tournaments')
@@ -65,7 +67,6 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name
 
-
 class TournamentGame(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='games')
     game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='tournament_game')
@@ -74,20 +75,6 @@ class TournamentGame(models.Model):
     def __str__(self):
         return f"Juego de torneo {self.tournament.name}, Ronda {self.round_number}"
 
-
-class RemoteGameSession(models.Model):
-    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='remote_session')
-    players_connected = models.ManyToManyField(User, through='GameConnection')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Sesión remota para partida {self.game.id}"
-
-
-class GameConnection(models.Model):
-    session = models.ForeignKey(RemoteGameSession, on_delete=models.CASCADE)
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=[('player1', 'Player 1'), ('player2', 'Player 2')])
 
 class GameResult(models.Model):
     game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name="result")
@@ -100,3 +87,13 @@ class GameResult(models.Model):
 
     def __str__(self):
         return f"Partida {self.game.id}: Ganador {self.winner} ({self.score_winner}) vs Perdedor {self.loser} ({self.score_loser})"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notificación para {self.user.username}: {self.message}"
