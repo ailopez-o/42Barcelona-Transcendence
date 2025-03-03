@@ -184,17 +184,21 @@ def new_tournament_view(request):
 #     tournament = get_object_or_404(Tournament, id=tournament_id)
 #     return render(request, 'tournament_detail.html', {'tournament': tournament})
 
-@csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
+@csrf_exempt  # En producción, usa CSRF correctamente
 @login_required
 def accept_game_view(request, game_id):
+    """El usuario acepta la partida y es redirigido a la partida en curso."""
     game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
     game.status = "en_curso"
     game.save()
 
-    if request.headers.get("HX-Request"):  # Si la petición es de HTMX
-        return HttpResponse("")  # HTMX eliminará la fila de la tabla en el front
-    else:
-        return redirect("game_detail", game_id=game.id)  # Redirección normal
+    if request.headers.get("HX-Request"):  # Si la solicitud es HTMX
+        response = HttpResponse()
+        response["HX-Redirect"] = f"/game/{game.id}/"  # Redirigir a la vista de la partida
+        return response
+
+    return redirect("game_detail", game_id=game.id)  # Redirección normal para peticiones tradicionales
+
 
 @csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
 @login_required

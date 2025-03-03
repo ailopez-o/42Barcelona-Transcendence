@@ -1,62 +1,80 @@
 {% load static %}
 
-<h2>Partida de Pong #{{ game.id }}</h2>
+<h2 class="text-center">Partida de Pong #{{ game.id }}</h2>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-9" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+        <!-- Sección del juego -->
+        <div class="col-md-8" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
             
-            <div class="game-info">
-                <p><strong>Dificultad:</strong> {{ game.difficulty }}</p>
-                <p><strong>Puntos objetivo:</strong> {{ game.points }}</p>
-            </div>
-            
-            <!-- Mensaje de estado del juego -->
-            <div id="status-message" class="alert alert-info text-center">
-                Esperando a que los jugadores estén listos...
-            </div>
-            
-            <!-- Estado de los jugadores -->
-            <div class="game-players d-flex justify-content-between mb-3">
-                <div class="player-info text-center">
-                    <h3 id="player1-username">{{ game.player1.username }}</h3>
-                    <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
-                </div>
-                
-                <div class="player-info text-center">
-                    <h3 id="player2-username">{{ game.player2.username }}</h3>
-                    <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-9">
-                    <canvas id="pongCanvas" width="800" height="400" style="border:1px solid white; margin: 20px auto; display: block;"></canvas>
-                    
-                    <div class="game-controls text-center mt-3">
-                        <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa las teclas <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
+            <!-- Información del juego y jugadores -->
+            <div class="game-header bg-light p-3 rounded shadow-sm text-center mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Jugador 1 -->
+                    <div class="player-info d-flex align-items-center">
+                        {% if game.player1.avatar %}
+                             <img src="{{ game.player1.avatar }}" alt="{{ game.player1.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
+                         {% else %}
+                             <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player1.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
+                         {% endif %}
+                        <div>
+                            <h5 class="mb-0">{{ game.player1.username }}</h5>
+                            <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
+                        </div>
                     </div>
-                    
-                    <div class="game-scores text-center mt-3">
-                        <h3>Puntuación</h3>
-                        <p class="fs-2"><span id="left-score">0</span> - <span id="right-score">0</span></p>
+
+                    <!-- Puntuación -->
+                    <div class="game-score text-center">
+                        <h3 class="mb-0"><span id="left-score">0</span> - <span id="right-score">0</span></h3>
+                        <small class="text-muted">Puntuación</small>
+                    </div>
+
+                    <!-- Jugador 2 -->
+                    <div class="player-info d-flex align-items-center">
+                        <div class="text-end">
+                            <h5 class="mb-0">{{ game.player2.username }}</h5>
+                            <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
+                        </div>
+                        {% if game.player2.avatar %}
+                        <img src="{{ game.player2.avatar }}" alt="{{ game.player2.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
+                        {% else %}
+                        <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player2.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
+                         {% endif %} 
                     </div>
                 </div>
-                
             </div>
-            <!-- Sección de chat -->
+
+            <!-- Canvas del juego -->
+            <div class="text-center">
+                <canvas id="pongCanvas" width="800" height="400" 
+                        class="border border-dark rounded shadow" 
+                        style="display: block; margin: auto;">
+                </canvas>
+            </div>
+
+            <!-- Controles del juego -->
+            <div class="game-controls text-center mt-3">
+                <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
+            </div>
         </div>
-        <div class="in-game-chat col-md-3">
-            <!-- Contenedor para los mensajes de chat -->
-            <div id="chat-section">
-                <!-- Mensajes se insertarán aquí -->
+
+        <!-- Sección del chat -->
+        <div class="col-md-4">
+            <div class="chat-container bg-light p-3 rounded shadow-sm">
+                <h4 class="text-center">Chat en Vivo</h4>
+
+                <!-- Contenedor para los mensajes de chat -->
+                <div id="chat-section" class="chat-box border rounded p-2 mb-2" 
+                     style="height: 300px; overflow-y: auto;">
+                    <!-- Mensajes se insertarán aquí -->
+                </div>
+
+                <!-- Formulario para enviar mensajes -->
+                <form id="chat-form" class="d-flex">
+                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje...">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
             </div>
-            
-            <!-- Formulario para enviar mensajes -->
-            <form id="chat-form">
-                <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
-                <button type="submit">Enviar</button>
-            </form>
         </div>
     </div>
 </div>
