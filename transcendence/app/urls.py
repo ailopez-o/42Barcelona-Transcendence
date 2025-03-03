@@ -24,5 +24,7 @@ urlpatterns = [
 	path('test/', views.test_game_result_view, name='test_game_result'),
     path("login_42/", views.login_with_42, name="login_42"),
     path("oauth/callback/", views.oauth_callback, name="oauth_callback"),
+	path("notifications/", views.notifications_view, name="notifications"),
+    path("notifications/read/<int:notification_id>/", views.mark_notification_read, name="mark_notification_read"),
 ]
 

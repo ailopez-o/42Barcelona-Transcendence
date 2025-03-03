@@ -87,3 +87,13 @@ class GameResult(models.Model):
 
     def __str__(self):
         return f"Partida {self.game.id}: Ganador {self.winner} ({self.score_winner}) vs Perdedor {self.loser} ({self.score_loser})"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notificación para {self.user.username}: {self.message}"
