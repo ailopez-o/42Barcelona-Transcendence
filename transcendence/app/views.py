@@ -219,6 +219,7 @@ def game_save_view(request):
                 "score_winner": score_winner,
                 "score_loser": score_loser,
                 "duration": duration,
+                "status": "finalizado"
             }
         )
 
