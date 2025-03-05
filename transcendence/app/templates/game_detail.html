@@ -64,16 +64,16 @@
                 <h4 class="text-center">Chat en Vivo</h4>
 
                 <!-- Contenedor para los mensajes de chat -->
-                <div id="chat-section" class="chat-box border rounded p-2 mb-2" 
-                     style="height: 300px; overflow-y: auto;">
-                    <!-- Mensajes se insertarán aquí -->
+                <div id="chat-section" class="chat-box border rounded p-2 mb-2"
+                style="height: 300px; overflow-y: auto;" hx-preserve>
+               <!-- Mensajes del chat -->
                 </div>
 
                 <!-- Formulario para enviar mensajes -->
                 <form id="chat-form" class="d-flex">
-                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje...">
+                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
                     <button type="submit" class="btn btn-primary">Enviar</button>
-                </form>
+                </form>                
             </div>
         </div>
     </div>
