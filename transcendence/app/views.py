@@ -7,17 +7,17 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Game, Tournament, GameResult
-from django.http import JsonResponse
-import logging
-logger = logging.getLogger(__name__)
-import json
-from django.conf import settings
-import requests
-import urllib.parse
 from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth import logout
+from django.conf import settings
+from django.http import JsonResponse
+import logging
+from .models import Game, Tournament, GameResult, Notification
+logger = logging.getLogger(__name__)
+import json
+import requests
+import urllib.parse
 
 
 
@@ -119,6 +119,9 @@ def new_game_view(request):
             ball_color=ball_color
         )
 
+        # Enviar notificación a todos los usuarios
+        send_notification_to_all(f"¡Nueva partida creada entre {game.player1} y {game.player2}!")
+    
         if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
             response = HttpResponse()
             response["HX-Redirect"] = f"/game/{game.id}/"
@@ -181,17 +184,23 @@ def new_tournament_view(request):
 #     tournament = get_object_or_404(Tournament, id=tournament_id)
 #     return render(request, 'tournament_detail.html', {'tournament': tournament})
 
+@csrf_exempt  # En producción, usa CSRF correctamente
 @login_required
 def accept_game_view(request, game_id):
+    """El usuario acepta la partida y es redirigido a la partida en curso."""
     game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
     game.status = "en_curso"
     game.save()
 
-    if request.headers.get("HX-Request"):  # Si la petición es de HTMX
-        return HttpResponse("")  # HTMX eliminará la fila de la tabla en el front
-    else:
-        return redirect("game_detail", game_id=game.id)  # Redirección normal
+    if request.headers.get("HX-Request"):  # Si la solicitud es HTMX
+        response = HttpResponse()
+        response["HX-Redirect"] = f"/game/{game.id}/"  # Redirigir a la vista de la partida
+        return response
 
+    return redirect("game_detail", game_id=game.id)  # Redirección normal para peticiones tradicionales
+
+
+@csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
 @login_required
 def reject_game_view(request, game_id):
     game = get_object_or_404(Game, id=game_id, player2=request.user, status="pendiente")
@@ -311,6 +320,9 @@ def game_save_view(request):
             }
         )
 
+        # Enviar notificación a todos los usuarios
+        send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
+
         return JsonResponse({
             "status": "success",
             "message": "Resultado guardado correctamente",
@@ -403,6 +415,30 @@ def oauth_callback(request):
         return response
 
     return redirect("profile")  # Redirección normal si no es HTMX
+
+
+@login_required
+def notifications_view(request):
+    notifications = Notification.objects.filter(user=request.user, seen=False).order_by('-created_at')
+
+    if request.headers.get("HX-Request"):  # Si es HTMX, devuelve solo el HTML de las notificaciones
+        return render(request, "notifications.html", {"notifications": notifications})
+
+    return HttpResponse(status=204)  # No hay contenido si no es HTMX
+
+@csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
+@login_required
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.seen = True
+    notification.save()
+    return HttpResponse("")  # HTMX eliminará la notificación sin recargar la página
+
+def send_notification_to_all(message):
+    """Crea una nueva notificación para todos los usuarios."""
+    users = User.objects.all()  # Obtiene todos los usuarios registrados
+    notifications = [Notification(user=user, message=message) for user in users]
+    Notification.objects.bulk_create(notifications)  # Crea todas las notificaciones de una sola vez
 
 
 
