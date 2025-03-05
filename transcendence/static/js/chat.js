@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Obtener el bloque JSON y parsearlo
         const playerDataElement = document.getElementById("player-data");
         if (!playerDataElement) {
-            console.error("Error: No se encontró 'player-data'.");
+            console.error("❌ Error: No se encontró 'player-data'.");
             return;
         }
 
@@ -29,9 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const chatInput = document.getElementById("chat-input");
 
         if (!chatContainer || !chatForm || !chatInput) {
-            console.error("Error: Elementos del chat no encontrados en el DOM.");
+            console.error("❌ Error: Elementos del chat no encontrados en el DOM.");
             return;
         }
+
+        console.log("✅ Chat form encontrado en el DOM.");
 
         chatSocket.onopen = function () {
             console.log(`✅ Conectado al WebSocket del chat como ${currentUsername}`);
@@ -49,7 +51,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Capturar el evento submit para prevenir recarga
         chatForm.addEventListener("submit", function (event) {
-            event.preventDefault(); // 🔹 Evita que el formulario haga un GET o POST normal
+            console.log("🚀 Intentando capturar el submit del formulario...");
+            event.preventDefault(); // 🚀 Evita que el formulario haga un GET o POST normal
+
+            console.log("📩 Evento submit capturado.");
 
             const message = chatInput.value.trim();
             if (message !== "") {
@@ -59,8 +64,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     message: message,
                 };
 
+                console.log(`🟢 Intentando enviar mensaje: ${message}`);
+                console.log(`📩 Payload enviado:`, payload);
+
                 chatSocket.send(JSON.stringify(payload)); // Enviar mensaje al WebSocket
                 chatInput.value = "";
+            } else {
+                console.warn("⚠️ Mensaje vacío. No se envía.");
             }
         });
 
