@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Partida{% endblock %}
+
+{% block content %}
+<h2>Crear una nueva partida</h2>
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Seleccionar oponente -->
+    <label for="opponent">Selecciona un oponente:</label>
+    <select name="opponent" id="opponent">
+        {% for user in users %}
+            <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    
+    <!-- Seleccionar dificultad -->
+    <label for="difficulty">Dificultad:</label>
+    <select name="difficulty" id="difficulty">
+        <option value="facil">Fácil</option>
+        <option value="medio">Medio</option>
+        <option value="dificil">Difícil</option>
+    </select>
+    <br><br>
+    
+    <!-- Puntaje objetivo -->
+    <label for="points">Puntos a jugar:</label>
+    <input type="number" name="points" id="points" min="1" value="10">
+    <br><br>
+    
+    <button type="submit">Invitar</button>
+</form>
+{% endblock %}

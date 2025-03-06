@@ -91,6 +91,21 @@ def new_game_view(request):
     users = User.objects.exclude(id=request.user.id)
     return render(request, 'game.html', {'users': users})
 
+# def new_game_monument_pixel_view(request):
+#     if request.method == 'POST':
+#         opponent_id = request.POST.get('opponent')
+#         opponent = get_object_or_404(User, id=opponent_id)
+#         difficulty = request.POST.get('difficulty', 'medio')
+#         points = request.POST.get('points', 10)
+        
+#         game = Game.objects.create(
+#             player1=request.user,
+#             player2=opponent,
+#             difficulty=difficulty,
+#             points=points
+#         )
+#         return redirect('game_detail_monument_pixel', game_id=game.id)
+
 # Vista para el detalle de una partida
 @login_required
 def game_detail_view(request, game_id):

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Monument Pixel Partida #{{ game.id }}{% endblock %}
+
+{% block content %}
+<div id="game-board">
+    <div id="player1-container">
+        <h2>{{ game.player1.username }}</h2>
+        <canvas id="canvas-player1" width="400" height="400"></canvas>
+    </div>
+    <div id="player2-container">
+        <h2>{{ game.player2.username }}</h2>
+        <canvas id="canvas-player2" width="400" height="400"></canvas>
+    </div>
+</div>
+
+<!-- Datos de jugadores en JSON -->
+<script type="application/json" id="player-data">
+{
+    "player1": {
+        "id": "{{ game.player1.id }}",
+        "username": "{{ game.player1.username }}"
+    },
+    "player2": {
+        "id": "{{ game.player2.id }}",
+        "username": "{{ game.player2.username }}"
+    },
+    "current": "{% if request.user.id == game.player1.id %}player1{% elif request.user.id == game.player2.id %}player2{% else %}unknown{% endif %}"
+}
+</script>
+
+<!-- Datos de la partida en JSON -->
+<script type="application/json" id="game-data">
+{
+    "id": "{{ game.id }}",
+    "status": "{{ game.status }}",
+    "created_at": "{{ game.created_at|date:'c' }}",
+    "difficulty": "{{ game.difficulty }}",
+    "points": "{{ game.points }}"
+}
+</script>
+
+<!-- Cargar el script de Monument Pixel -->
+<script src="{% static 'js/monumentpixel.js' %}"></script>
+
+<style>
+#game-board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+#player1-container, #player2-container {
+    text-align: center;
+}
+</style>
+{% endblock %}
+
