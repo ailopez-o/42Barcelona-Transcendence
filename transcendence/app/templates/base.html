@@ -75,6 +75,18 @@ Posible sript para añadir el CSRF en todos los sitios
             </div>
         </div>
     </nav>
+    
+    {% if user.is_authenticated %}
+    <!-- Contenedor de Notificaciones (Solo para usuarios logueados) -->
+    <div id="notifications-container" 
+         class="container-fluid bg-white py-2 border-bottom shadow-sm"
+         hx-get="{% url 'notifications' %}" 
+         hx-trigger="every 5s" 
+         hx-target="#notifications-container" 
+         hx-swap="outerHTML">
+        <!-- Las notificaciones se cargarán aquí dinámicamente -->
+    </div>
+    {% endif %}
 
     <!-- Contenido principal -->
     <main id="main-content" class="container mt-3">
