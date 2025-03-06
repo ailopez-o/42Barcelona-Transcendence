@@ -36,29 +36,67 @@ let prevReadyStatus = { player1: false, player2: false };
 let gameStartTime = null;
 let gameEnded = false;
 
-// Event listener global para las teclas
-document.addEventListener('keydown', (e) => {
-    // Verificar si el foco está en un campo de texto (como el chat)
+
+function handleKeyDown(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        // Si estamos escribiendo en un campo de texto, permitir el comportamiento normal
-        return;
+        return;  // Si estamos escribiendo en un campo de texto, permitir el comportamiento normal
     }
     
-    // Prevenir el scroll con las flechas y el espacio solo si no estamos en un campo de texto
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === ' ') {
-        e.preventDefault();
+        e.preventDefault();  // Prevenir el scroll con las flechas y el espacio
     }
 
     if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
 
-    // Enviar la tecla pulsada al servidor
     socket.send(JSON.stringify({
         player: currentPlayer,
         key: e.key
     }));
+}
+
+// Event listener global para las teclas
+if (!window.isKeyListenerActive) {
+    document.addEventListener("keydown", handleKeyDown);
+    window.isKeyListenerActive = true;
+}
+
+
+// 🚀 **Desactivar el WebSocket y limpiar eventos al salir de la página**
+window.addEventListener("beforeunload", function () {
+    console.log("✅ Cerrando WebSocket y limpiando intervalos...");
+    
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+    }
+
+    // Opcional: Remover event listeners si has agregado más
+    document.removeEventListener("keydown", handleKeyDown);
 });
 
+
 document.addEventListener("DOMContentLoaded", function() {
+
+    console.log("✅ DOM completamente cargado");
+
+    if (window.gameState) {
+        console.warn("⚠️ Ya hay un `gameState` activo. Se evitará la inicialización duplicada.");
+        return;
+    }
+    window.gameState = {};
+
+    // Verificar si existen los elementos en el DOM
+    const gameContainer = document.getElementById("game-container");
+    const gameDataElement = document.getElementById("game-data");
+    const playerDataElement = document.getElementById("player-data");
+    const canvasElement = document.getElementById("pongCanvas");
+
+    if (!gameContainer || !gameDataElement || !playerDataElement || !canvasElement) {
+        console.error("No se encontraron algunos elementos necesarios en el DOM. Abortando ejecución.");
+        return;
+    }
+
+    console.log("✅ Game canvas encontrado en el DOM.");
+
     const gameId = document.getElementById("game-container").dataset.gameId;
     const gameData = JSON.parse(document.getElementById("game-data").textContent);
     const gameTargetScore = parseInt(gameData.points);
@@ -72,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
     socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
 
     socket.onopen = function(event) {
-        console.log("Conectado al WebSocket");
+        console.log("✅ Conectado al WebSocket del juego");
         // Enviar la dificultad del juego al servidor inmediatamente después de conectar
         socket.send(JSON.stringify({
             player: currentPlayer,
@@ -304,8 +342,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     socket.onclose = function(event) {
-        console.log("Conexión cerrada con el WebSocket");
+        console.warn("⚠️ Conexión WebSocket cerrada", event.code);
+        gameStarted = false;
+        gameEnded = true;  // Para evitar dibujar después de la desconexión
     };
+    
 
     // 🎾 Lógica del juego de Ping Pong
     const canvas = document.getElementById("pongCanvas");
@@ -315,6 +356,8 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.height = 400;
 
     function drawGame() {
+        if (gameEnded) return;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
