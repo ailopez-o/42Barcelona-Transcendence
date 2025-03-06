@@ -23,9 +23,10 @@
             <td style="padding: 8px;">{{ game.created_at|date:"Y-m-d H:i" }}</td>
             <td style="padding: 8px;">
                 <a href="{% url 'game_detail' game.id %}" 
-                   hx-get="{% url 'game_detail' game.id %}" 
+                   hx-post="{% url 'game_detail' game.id %}" 
                    hx-target="#main-content" 
                    hx-push-url="true"
+                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                    style="color: #007bff; text-decoration: none;">
                     Ver Detalles
                 </a>
