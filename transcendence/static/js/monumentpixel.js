@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   socket.onmessage = function(event) {
       const data = JSON.parse(event.data);
+      console.log(data);
       gameState = data;
       renderGame();
   };

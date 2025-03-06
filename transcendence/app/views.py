@@ -136,20 +136,27 @@ def new_game_view(request):
     else:  # Carga normal, devuelve base.html con el contenido de game.html
         return render(request, "base.html", {"content_template": "game.html", "users": users})
 
-# def new_game_monument_pixel_view(request):
-#     if request.method == 'POST':
-#         opponent_id = request.POST.get('opponent')
-#         opponent = get_object_or_404(User, id=opponent_id)
-#         difficulty = request.POST.get('difficulty', 'medio')
-#         points = request.POST.get('points', 10)
+def new_game_monument_pixel_view(request):
+    if request.method == 'POST':
+        opponent_id = request.POST.get('opponent')
+        opponent = get_object_or_404(User, id=opponent_id)
+        difficulty = request.POST.get('difficulty', 'medio')
+        points = request.POST.get('points', 10)
         
-#         game = Game.objects.create(
-#             player1=request.user,
-#             player2=opponent,
-#             difficulty=difficulty,
-#             points=points
-#         )
-#         return redirect('game_detail_monument_pixel', game_id=game.id)
+        game = Game.objects.create(
+            player1=request.user,
+            player2=opponent,
+            difficulty=difficulty,
+            points=points
+        )
+        return redirect('game_detail_monument_pixel', game_id=game.id)
+    
+    users = User.objects.exclude(id=request.user.id)
+
+    if request.headers.get("HX-Request"):  # Petición HTMX, devolvemos solo el formulario
+        return render(request, "game_monument_pixel.html", {"users": users})
+    else:  # Carga normal, devuelve base.html con el contenido de game.html
+        return render(request, "base.html", {"content_template": "game_monument_pixel.html", "users": users})
 
 # Vista para el detalle de una partida
 @login_required
