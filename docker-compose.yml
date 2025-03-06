@@ -7,30 +7,22 @@ services:
       context: ./
       dockerfile: django.dockerfile
     #entrypoint: ./django-entrypoint.sh
-    # depends_on:
-    #     - database
+    depends_on:
+        - database
     environment:
       DEBUG: ${DEBUG:-false}
       API_42_ENDPOINT: https://api.intra.42.fr
       API_42_UID: ${API_42_UID}
       API_42_SECRET: ${API_42_SECRET}
       DOMAIN_URL: ${DOMAIN_URL?err}
-
       # ALLOWED_HOSTS: localhost,dump-ubuntu-barcelona
       # SECRET_KEY: tr-secret-key
-      # DB_ENGINE: django.db.backends.postgresql
-      # DB_NAME: ${DB_NAME?err}
-      # DB_USER: ${DB_USER?err}
-      # DB_PASSWORD: ${DB_PASSWORD?err}
-      # DB_HOST: database
-      # DB_PORT: 5432
-      # DOMAIN: ${DOMAIN?err}
-      # DOMAIN_URL: ${DOMAIN_URL?err}
-      # REDIS_HOST: redis
-      # REDIS_PORT: 6379
-      # STATIC_URL: /static/
-      # STATIC_ROOT: static
-      # MEDIA_URL: /media/
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: ${DB_NAME?err}
+      DB_USER: ${DB_USER?err}
+      DB_PASSWORD: ${DB_PASSWORD?err}
+      DB_HOST: ${DB_HOST?err}
+      DB_PORT: ${DB_PORT?err}
     ports:
       - 80
       - 443
@@ -57,20 +49,20 @@ services:
       - ./:/usr/app/
     working_dir: /usr/app/
 
-  # database:
-  #     image: postgres:15
-  #     container_name: tr-database
-  #     restart: always
-  #     environment:
-  #         POSTGRES_DB: ${DB_NAME}
-  #         POSTGRES_USER: ${DB_USER}
-  #         POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #     volumes:
-  #         - ./postgres_data:/var/lib/postgresql/data/
-  #     networks:
-  #         - tr-network
-  #     ports:
-  #         - 5432:5432
+  database:
+      image: postgres:15
+      container_name: tr-database
+      restart: always
+      environment:
+          POSTGRES_DB: ${DB_NAME}
+          POSTGRES_USER: ${DB_USER}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+      volumes:
+          - ./postgres_data:/var/lib/postgresql/data/
+      networks:
+          - tr-network
+      ports:
+          - ${DB_PORT?err}:${DB_PORT?err}
 
 networks:
   tr-network:
