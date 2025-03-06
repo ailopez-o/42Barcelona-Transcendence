@@ -93,28 +93,52 @@ document.addEventListener("DOMContentLoaded", function() {
       ctx.fillText(`Time: ${Math.floor(gameState.gameState.timeElapsed)}s`, 10, 60);
   }
   
-  // Enviar acciones del usuario al backend.
-  document.addEventListener("keydown", function(e) {
-      if (e.key === "ArrowUp") {
-          socket.send(JSON.stringify({ player: currentPlayer, action: "jump" }));
-      }
-      if (e.key === "ArrowDown") {
-          socket.send(JSON.stringify({ player: currentPlayer, action: "crouch" }));
-      }
-      if (e.key === " ") {
-          // Acción de disparo: se crea una bala con posición inicial basada en el jugador.
-          const bullet = {
-              id: `bullet_${Date.now()}_${currentPlayer}`,
-              position: { 
-                  x: gameState.players[currentPlayer].position.x + 20, 
-                  y: gameState.players[currentPlayer].position.y + 25 
-              },
-              speed: 10,
-              active: true
-          };
-          socket.send(JSON.stringify({ player: currentPlayer, action: "shoot", bullet: bullet }));
-      }
-  });
+  function handleKeyDown(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;  // Si estamos escribiendo en un campo de texto, permitir el comportamiento normal
+    }
+    
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();  // Prevenir el scroll con las flechas y el espacio
+    }
+
+    if (e.key === "ArrowUp") {
+        socket.send(JSON.stringify({ player: currentPlayer, action: "jump" }));
+    }
+    if (e.key === "ArrowDown") {
+        socket.send(JSON.stringify({ player: currentPlayer, action: "crouch" }));
+    }
+    if (e.key === " ") {
+        // Acción de disparo: se crea una bala con posición inicial basada en el jugador.
+        const bullet = {
+            id: `bullet_${Date.now()}_${currentPlayer}`,
+            position: { 
+                x: gameState.players[currentPlayer].position.x + 20, 
+                y: gameState.players[currentPlayer].position.y + 25 
+            },
+            speed: 10,
+            active: true
+        };
+        socket.send(JSON.stringify({ player: currentPlayer, action: "shoot", bullet: bullet }));
+    }
+  }
+
+  if (!window.isKeyListenerActive) {
+    document.addEventListener("keydown", handleKeyDown);
+    window.isKeyListenerActive = true;
+}
+
+// 🚀 **Desactivar el WebSocket y limpiar eventos al salir de la página**
+window.addEventListener("beforeunload", function () {
+    console.log("✅ Cerrando WebSocket y limpiando intervalos...");
+    
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+    }
+
+    // Opcional: Remover event listeners si has agregado más
+    document.removeEventListener("keydown", handleKeyDown);
+});
   
   document.addEventListener("keyup", function(e) {
       if (e.key === "ArrowDown") {
