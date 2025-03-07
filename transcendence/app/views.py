@@ -217,11 +217,12 @@ def reject_game_view(request, game_id):
 
 @login_required
 def global_chat_view(request):
-    if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
-        response = HttpResponse()
-        response["HX-Redirect"] = f"/global_chat/"
-        return response
-
+    # if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
+    #     response = HttpResponse()
+    #     response["HX-Redirect"] = f"/global_chat/"
+    #     return response
+    if request.headers.get("HX-Request"):
+        return render(request, "global_chat.html")
     else:  # Si es una carga normal, devolvemos base.html con global_chat.html dentro
         return render(request, "base.html", {"content_template": "global_chat.html"})
 
