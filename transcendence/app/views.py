@@ -149,7 +149,7 @@ def game_detail_view(request, game_id):
         # response = HttpResponse()
         # response["HX-Redirect"] = f"/game/{game.id}/"
         # return response     
-        return render(request, "game_detail.html")
+        return render(request, "game_detail.html", {"game": game})
     else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
 
