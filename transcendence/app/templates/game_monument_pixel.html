@@ -1,8 +1,3 @@
-{% extends "base.html" %}
-
-{% block title %}Nueva Partida{% endblock %}
-
-{% block content %}
 <h2>Crear una nueva partida</h2>
 <form method="post">
     {% csrf_token %}
@@ -32,4 +27,4 @@
     
     <button type="submit">Invitar</button>
 </form>
-{% endblock %}
+

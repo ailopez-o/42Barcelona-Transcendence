@@ -1,9 +1,7 @@
-{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Monument Pixel Partida #{{ game.id }}{% endblock %}
+<h2 class="text-center">Partida de Pong #{{ game.id }}</h2>
 
-{% block content %}
 <div id="game-board">
     <div id="player1-container">
         <h2>{{ game.player1.username }}</h2>
@@ -54,5 +52,4 @@
     text-align: center;
 }
 </style>
-{% endblock %}
 

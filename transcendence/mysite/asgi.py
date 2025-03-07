@@ -12,10 +12,12 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter 
 from app.game_routing import websocket_urlpatterns as game_ws_urlpatterns
 from app.chat_routing import websocket_urlpatterns as chat_ws_urlpatterns
+from app.monument_pixel_routing import websocket_urlpatterns as monument_ws_urlpatterns
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
 
-combined_websocket_urlpatterns = game_ws_urlpatterns + chat_ws_urlpatterns
+combined_websocket_urlpatterns = game_ws_urlpatterns + chat_ws_urlpatterns + monument_ws_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),  # Maneja las peticiones HTTP

@@ -11,8 +11,8 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('profile/', views.profile_view, name='profile'),
     path('game/new/', views.new_game_view, name='new_game'),
-    path('game/monument_pixel/new/', views.new_game_monument_pixel_view, name='new_game_monument_pixel'),
     path('game/<int:game_id>/', views.game_detail_view, name='game_detail'),
+    path('game/monument_pixel/new/', views.new_game_monument_pixel_view, name='new_game_monument_pixel'),
     path('game/monument_pixel/<int:game_id>/', views.game_detail_monument_pixel_view, name='game_detail_monument_pixel'),
     path('game/save/', views.game_save_view, name='game_save'),
     path('game/list', views.games_list_view, name='game_list'),
@@ -29,4 +29,5 @@ urlpatterns = [
 	path("notifications/", views.notifications_view, name="notifications"),
     path("notifications/read/<int:notification_id>/", views.mark_notification_read, name="mark_notification_read"),
 ]
+
 
