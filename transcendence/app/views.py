@@ -172,6 +172,18 @@ def game_detail_view(request, game_id):
     else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
 
+@login_required
+def game_detail_monument_pixel_view(request, game_id):
+    game = get_object_or_404(Game, id=game_id)
+
+    context = {"game": game}
+
+    if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
+        response = HttpResponse()
+        response["HX-Redirect"] = f"/game/monument_pixel/{game.id}/"
+        return response     
+    else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
+        return render(request, "base.html", {"content_template": "game_detail_monument_pixel.html", **context})
 
 # Vista para el detalle de una partida
 @login_required
