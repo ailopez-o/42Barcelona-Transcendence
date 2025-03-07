@@ -1,18 +1,18 @@
 // Se ejecuta cuando hay recarga HTMX
 if (document.readyState === "complete") {
-    console.log("🚀 El DOM ya está listo, ejecutando directamente...");
+    console.log("🚀 [CHAT] El DOM ya está listo HTMX");
     setupChat(); // Si el DOM ya está listo, ejecuta directamente
 }
 
 // Se ejecuta cuando hay recarga completa
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM completamente cargado.");
+    console.log("✅ [CHAT] DOM completamente cargado.");
     setupChat(); // Si el DOM ya está listo, ejecuta directamente
 });
 
 
 function connectWebSocket(currentUsername) {
-    console.log("🚀 Intentando conectar al WebSocket...");
+    // console.log("🚀 Intentando conectar al WebSocket del chat...");
 
     // Para saber a qué WS hemos de conectarnos. Si estamos en una partida, se añade el ID de la partida
     const gameContainer = document.getElementById("game-container");
@@ -75,6 +75,7 @@ function connectWebSocket(currentUsername) {
 }
 
 function setupChat() {
+    console.log("🎮 Configurando el chat...");
 
     // Elementos del DOM. Comprueba si existen antes de continuar
     const chatContainer = document.getElementById("chat-section");

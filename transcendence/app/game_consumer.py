@@ -99,7 +99,29 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             # Mapear player1/player2 a left/right para las paletas
             paddle_side = "left" if data["player"] == "player1" else "right"
             key = data["key"]
+                
+            # Comprobar si ambos jugadores están listos
+            if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
+                state["game_started"] = True
+                
+                # Iniciar la bola con velocidad según la dificultad
+                state["ball"]["dx"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
+                state["ball"]["dy"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
+                
+                # Solo iniciamos el bucle del juego cuando ambos están listos
+                if self.room_name not in running_game_loops or running_game_loops[self.room_name].done():
+                    running_game_loops[self.room_name] = asyncio.create_task(self.game_loop())
             
+            # Enviar inmediatamente el estado actualizado a todos los clientes
+            # Sin mensajes de texto adicionales
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": "game_update",
+                    "state": state
+                }
+            )
+
             # Procesar tecla de espacio para marcar como listo
             if key == " " and not state["ready_status"][data["player"]]:
                 # Marcar al jugador como listo

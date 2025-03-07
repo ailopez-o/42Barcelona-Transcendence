@@ -120,5 +120,24 @@
 </script> 
 
 <!-- Cargar el script de juego y el de chat -->
-<script src="{% static 'js/game.js' %}"></script>
+<!-- <script>
+    function loadScriptOnce(scriptName, scriptSrc) {
+        if (!window[scriptName]) {
+            var script = document.createElement("script");
+            script.src = scriptSrc;
+            script.onload = function () {
+                window[scriptName] = true;
+            };
+            document.body.appendChild(script);
+        }
+    }
+
+    loadScriptOnce("gameScriptLoaded", "{% static 'js/game.js' %}");
+    loadScriptOnce("chatScriptLoaded", "{% static 'js/chat.js' %}");
+    loadScriptOnce("testScriptLoaded", "{% static 'js/test.js' %}");
+</script> -->
+
+
 <script src="{% static 'js/chat.js' %}"></script>
+<script src="{% static 'js/game.js' %}"></script>
+<script src="{% static 'js/test.js' %}"></script>

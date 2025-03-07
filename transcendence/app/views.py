@@ -118,13 +118,15 @@ def new_game_view(request):
             paddle_color=paddle_color,
             ball_color=ball_color
         )
+        context = {"game": game}
 
-        # Enviar notificación a todos los usuarios
-        send_notification_to_all(f"¡Nueva partida creada entre {game.player1} y {game.player2}!")
+        if request.headers.get("HX-Request"):  # 🔥 Si es HTMX, solo enviamos el fragmento del juego
+            return render(request, "game_detail.html", context)
     
-        if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
+      # 🚀 Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
+        if request.headers.get("HX-Request"):  
             response = HttpResponse()
-            response["HX-Redirect"] = f"/game/{game.id}/"
+            response["HX-Location"] = f"/game/{game.id}/"  # 🔥 Redirección HTMX sin recarga
             return response
 
         return redirect("game_detail", game_id=game.id)  # Redirección normal si no es HTMX
@@ -144,9 +146,10 @@ def game_detail_view(request, game_id):
     context = {"game": game}
 
     if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
-        response = HttpResponse()
-        response["HX-Redirect"] = f"/game/{game.id}/"
-        return response     
+        # response = HttpResponse()
+        # response["HX-Redirect"] = f"/game/{game.id}/"
+        # return response     
+        return render(request, "game_detail.html", {"game": game})
     else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
 
@@ -217,10 +220,6 @@ def reject_game_view(request, game_id):
 
 @login_required
 def global_chat_view(request):
-    # if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
-    #     response = HttpResponse()
-    #     response["HX-Redirect"] = f"/global_chat/"
-    #     return response
     if request.headers.get("HX-Request"):
         return render(request, "global_chat.html")
     else:  # Si es una carga normal, devolvemos base.html con global_chat.html dentro
@@ -322,9 +321,13 @@ def game_save_view(request):
                 "score_winner": score_winner,
                 "score_loser": score_loser,
                 "duration": duration,
-                "status": "finalizado"
             }
         )
+
+        game.status = "finalizado"
+        game.save()
+
+        print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
         send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
