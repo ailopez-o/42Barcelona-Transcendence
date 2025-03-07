@@ -18,11 +18,20 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("❌ Error: No se encontró 'player-data'.");
             return;
         }
-
         const playerData = JSON.parse(playerDataElement.textContent);
-        const currentPlayer = playerData[playerData.current];
-        const currentUsername = currentPlayer.username;
-
+        
+        // Verificar si el jugador actual es player1 o player2
+        const currentPlayerKey = playerData.current;
+        const currentPlayer = playerData[currentPlayerKey] || null;  // Si no es player1 ni player2, será null
+        
+        // Definir el nombre de usuario solo si el jugador es válido
+        const currentUsername = currentPlayer ? currentPlayer.username : "Espectador";
+        
+        // Opción adicional: Mostrar un mensaje en consola si el usuario es un espectador
+        if (!currentPlayer) {
+            console.warn("⚠️ Usuario en modo espectador. No tiene permisos para jugar ni chatear.");
+        }
+        
         // Elementos del DOM
         const chatContainer = document.getElementById("chat-section");
         const chatForm = document.getElementById("chat-form");

@@ -143,8 +143,10 @@ def game_detail_view(request, game_id):
 
     context = {"game": game}
 
-    if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
-        return render(request, "game_detail.html", context)
+    if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
+        response = HttpResponse()
+        response["HX-Redirect"] = f"/game/{game.id}/"
+        return response     
     else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
 
@@ -215,8 +217,11 @@ def reject_game_view(request, game_id):
 
 @login_required
 def global_chat_view(request):
-    if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
-        return render(request, "global_chat.html")
+    if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
+        response = HttpResponse()
+        response["HX-Redirect"] = f"/global_chat/"
+        return response
+
     else:  # Si es una carga normal, devolvemos base.html con global_chat.html dentro
         return render(request, "base.html", {"content_template": "global_chat.html"})
 
