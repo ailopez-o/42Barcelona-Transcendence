@@ -321,9 +321,13 @@ def game_save_view(request):
                 "score_winner": score_winner,
                 "score_loser": score_loser,
                 "duration": duration,
-                "status": "finalizado"
             }
         )
+
+        game.status = "finalizado"
+        game.save()
+
+        print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
         send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
