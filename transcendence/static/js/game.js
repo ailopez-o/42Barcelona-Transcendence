@@ -1,3 +1,15 @@
+// Se ejecuta cuando hay recarga HTMX
+if (document.readyState === "complete") {
+    console.log("🚀 [GAME] El DOM ya está listo HTMX");
+    setupGame(); // Si el DOM ya está listo, ejecuta directamente
+}
+
+// Se ejecuta cuando hay recarga completa
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ [GAME] DOM completamente cargado.");
+    setupGame(); // Si el DOM ya está listo, ejecuta directamente
+});
+
 class Ball {
     constructor(x, y, radius, speed) {
       this.radius = radius;
@@ -74,7 +86,7 @@ window.addEventListener("beforeunload", function () {
 });
 
 
-document.addEventListener("DOMContentLoaded", function() {
+function setupGame() {
 
     console.log("✅ DOM completamente cargado");
 
@@ -408,4 +420,4 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Dibujar el juego por primera vez
     drawGame();
-});
+};
