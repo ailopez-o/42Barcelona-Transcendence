@@ -17,24 +17,28 @@ function connectWebSocket(currentUsername) {
     // Para saber a qué WS hemos de conectarnos. Si estamos en una partida, se añade el ID de la partida
     const gameContainer = document.getElementById("game-container");
     let wsUrl;
+    let gameId = null;
 
     if (gameContainer) {
-        const gameId = gameContainer.dataset.gameId;
+        gameId = gameContainer.dataset.gameId;
         wsUrl = `ws://${window.location.host}/ws/chat/${gameId}/`;
     } else {
         wsUrl = `ws://${window.location.host}/ws/chat/`;
     }
 
-    // Si el WebSocket ya está abierto, no lo volvemos a crear
-    if (window.chatSocket && window.chatSocket.readyState === WebSocket.OPEN) {
-        console.log("🛑 El WebSocket ya está conectado, no se crea otro.");
-        return;
+    // Si ya hay un WebSocket abierto, lo cerramos antes de abrir uno nuevo
+    if (window.chatSocket) {
+        console.log("🔄 Cerrando WebSocket del chat anterior...");
+        window.chatSocket.close();
     }
-    
+
     window.chatSocket = new WebSocket(wsUrl); // ✅ Se guarda en `window` para que persista
 
     window.chatSocket.onopen = function () {
-        console.log(`✅ Conectado al WebSocket del chat como ${currentUsername}`);
+        if (gameId)
+            console.log(`✅ Conectado al WebSocket del chat en la sala ${gameId} como ${currentUsername}`);
+        else
+            console.log(`✅ Conectado al WebSocket del chat en la sala general como ${currentUsername}`);
     };
 
     window.chatSocket.onmessage = function (event) {
@@ -44,8 +48,8 @@ function connectWebSocket(currentUsername) {
     };
 
     window.chatSocket.onclose = function () {
-        console.warn("⚠️ Desconectado del WebSocket del chat. Intentando reconectar en 3 segundos...");
-        setTimeout(() => connectWebSocket(currentUsername), 3000); // Intentar reconectar automáticamente
+        console.warn("⚠️ Desconectado del WebSocket del chat.");
+        //setTimeout(() => connectWebSocket(currentUsername), 3000); // Entrar en un bucle infinito
     };
 
 
