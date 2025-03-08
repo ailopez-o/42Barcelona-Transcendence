@@ -42,7 +42,7 @@
 
         console.log("✅ DOM completamente cargado");
     
-        window.gameState = {};
+        gameState = {};
     
         // Verificar si existen los elementos en el DOM
         const gameContainer = document.getElementById("game-container");

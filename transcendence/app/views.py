@@ -118,17 +118,18 @@ def new_game_view(request):
             paddle_color=paddle_color,
             ball_color=ball_color
         )
-        context = {"game": game}
 
-        if request.headers.get("HX-Request"):  # 🔥 Si es HTMX, solo enviamos el fragmento del juego
-            return render(request, "game_detail.html", context)
-    
-      # 🚀 Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
-        if request.headers.get("HX-Request"):  
-            response = HttpResponse()
-            response["HX-Location"] = f"/game/{game.id}/"  # 🔥 Redirección HTMX sin recarga
+        context = {
+            "game": game,
+        }
+
+        # Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
+        if request.headers.get("HX-Request"):
+            response = render(request, "game_detail.html", context)  # 🔥 Solo devuelve el fragmento
+            response["HX-Push-Url"] = f"/game/{game.id}/"  # 🔥 HTMX actualiza la URL sin recargar
             return response
-
+        
+        # Redirección normal si no es HTMX
         return redirect("game_detail", game_id=game.id)  # Redirección normal si no es HTMX
 
     users = User.objects.exclude(id=request.user.id)
