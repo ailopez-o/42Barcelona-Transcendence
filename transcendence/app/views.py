@@ -143,15 +143,29 @@ def new_game_view(request):
 def game_detail_view(request, game_id):
     game = get_object_or_404(Game, id=game_id)
 
-    context = {"game": game}
+    # Intentar obtener el resultado de la partida (si existe, por lo tanto terminada)
+    game_result = GameResult.objects.filter(game=game).first()
 
-    if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
-        # response = HttpResponse()
-        # response["HX-Redirect"] = f"/game/{game.id}/"
-        # return response     
-        return render(request, "game_detail.html", {"game": game})
-    else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
+    # Determinar los puntajes finales
+    if game_result:
+        player1_score = game_result.score_winner if game_result.winner == game.player1 else game_result.score_loser
+        player2_score = game_result.score_winner if game_result.winner == game.player2 else game_result.score_loser
+    else:
+        player1_score = 0
+        player2_score = 0
+
+    context = {
+        "game": game,
+        "player1_score": player1_score,
+        "player2_score": player2_score,
+    }
+
+    if request.headers.get("HX-Request"):
+        return render(request, "game_detail.html", context)
+    else:
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
+
+
 
 
 # Vista para crear un nuevo torneo
