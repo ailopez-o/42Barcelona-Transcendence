@@ -6,10 +6,9 @@
     <form method="post" 
           hx-post="{% url 'new_game' %}" 
           hx-trigger="submit" 
-          hx-target="#game-form" 
-          hx-swap="outerHTML">
-          hx-push-url="true"> 
-          
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-target="#main-content">  
         {% csrf_token %}
         
         <!-- Seleccionar oponente -->

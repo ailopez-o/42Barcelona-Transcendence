@@ -33,7 +33,6 @@
 
     let gameState;
     let socket;
-    let currentPlayer;
     let gameStarted = false;
     let prevReadyStatus = { player1: false, player2: false };
     let gameStartTime = null;
@@ -43,7 +42,7 @@
 
         console.log("✅ DOM completamente cargado");
     
-        window.gameState = {};
+        gameState = {};
     
         // Verificar si existen los elementos en el DOM
         const gameContainer = document.getElementById("game-container");
@@ -51,25 +50,31 @@
         const playerDataElement = document.getElementById("player-data");
         const canvasElement = document.getElementById("pongCanvas");
     
+        
         if (!gameContainer || !gameDataElement || !playerDataElement || !canvasElement) {
             console.error("No se encontraron algunos elementos necesarios en el DOM. Abortando ejecución.");
             return;
         }
-    
-        console.log("✅ Game canvas encontrado en el DOM.");
-    
-        const gameId = document.getElementById("game-container").dataset.gameId;
-        const gameData = JSON.parse(document.getElementById("game-data").textContent);
-        const gameTargetScore = parseInt(gameData.points);
-        // const username = document.getElementById("game-container").dataset.username;
-
-        console.log("🎮 Datos del juego:", gameData);
         
-        // Obtener los datos del jugador del elemento JSON
-        const playerData = JSON.parse(document.getElementById("player-data").textContent);
-        currentPlayer = playerData.current; // Será 'player1' o 'player2'
-        console.log("🧑‍💻 Datos del jugador:", currentPlayer);
+        console.log("✅ Game canvas encontrado en el DOM.");
+        
+        if (gameDataElement) {
+            gameData = JSON.parse(gameDataElement.textContent);
+            gameId = gameData.id;
+            gameTargetScore = parseInt(gameData.points);
+        }
+        
+        if (playerDataElement) {
+            playerData = JSON.parse(playerDataElement.textContent);
+            // Obtener los datos del jugador del elemento JSON
+            window.currentPlayer = playerData.current; // Será 'player1' o 'player2'
+            console.log("🧑‍💻 Datos del jugador:", window.currentPlayer);
+        }
+        
+        console.log(playerData);
 
+        //console.log("🎮 Datos del juego:", gameData);
+        
         // Lógica del juego de Ping Pong
         const canvas = document.getElementById("pongCanvas");
         const ctx = canvas.getContext("2d");
@@ -91,7 +96,7 @@
             console.log("✅ Conectado al WebSocket del juego");
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
             socket.send(JSON.stringify({
-                player: currentPlayer,
+                player: window.currentPlayer,
                 init_game: true,
                 difficulty: gameData.difficulty
             }));
@@ -192,7 +197,7 @@
                     
                     // Informar al backend que el juego ha terminado
                     socket.send(JSON.stringify({
-                        player: currentPlayer,
+                        player: window.currentPlayer,
                         game_over: true
                     }));
                     
@@ -308,15 +313,15 @@
             }
             
             // Si el jugador actual no está listo
-            if (!gameState.ready_status[currentPlayer]) {
+            if (!gameState.ready_status[window.currentPlayer]) {
                 statusElement.innerText = "Pulsa ESPACIO para indicar que estás listo";
                 statusElement.className = "alert alert-info text-center";
                 return;
             }
             
             // Si el jugador actual está listo pero el otro no
-            const otherPlayer = currentPlayer === "player1" ? "player2" : "player1";
-            if (gameState.ready_status[currentPlayer] && !gameState.ready_status[otherPlayer]) {
+            const otherPlayer = window.currentPlayer === "player1" ? "player2" : "player1";
+            if (gameState.ready_status[window.currentPlayer] && !gameState.ready_status[otherPlayer]) {
                 statusElement.innerText = "Estás listo. Esperando al otro jugador...";
                 statusElement.className = "alert alert-warning text-center";
                 return;
@@ -461,10 +466,10 @@
         if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
     
         console.log("🔑 Tecla presionada:", e.key);
-        console.log("🔑 Player presionada:", currentPlayer);
+        console.log("🔑 Player presionada:", window.currentPlayer);
 
         socket.send(JSON.stringify({
-            player: currentPlayer,
+            player: window.currentPlayer,
             key: e.key
         }));
     }
