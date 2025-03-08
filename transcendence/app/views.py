@@ -156,6 +156,7 @@ def game_detail_view(request, game_id):
 
     context = {
         "game": game,
+        "game_result": game_result,
         "player1_score": player1_score,
         "player2_score": player2_score,
     }

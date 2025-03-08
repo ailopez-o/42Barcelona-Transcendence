@@ -61,12 +61,29 @@
         const gameId = document.getElementById("game-container").dataset.gameId;
         const gameData = JSON.parse(document.getElementById("game-data").textContent);
         const gameTargetScore = parseInt(gameData.points);
-        const username = document.getElementById("game-container").dataset.username;
+        // const username = document.getElementById("game-container").dataset.username;
+
+        console.log("🎮 Datos del juego:", gameData);
         
         // Obtener los datos del jugador del elemento JSON
         const playerData = JSON.parse(document.getElementById("player-data").textContent);
         currentPlayer = playerData.current; // Será 'player1' o 'player2'
+        console.log("🧑‍💻 Datos del jugador:", currentPlayer);
+
+        // Lógica del juego de Ping Pong
+        const canvas = document.getElementById("pongCanvas");
+        const ctx = canvas.getContext("2d");
+    
+        canvas.width = 800;
+        canvas.height = 400;
         
+        if (gameData.status === "finalizado") {
+            console.warn("⛔ La partida ya está finalizada. No se conectará al WebSocket.");
+            drawGameResult(ctx, gameData, playerData);
+            markPlayersAsFinished();
+            return;
+        }
+
         // Conectar al servidor WebSocket
         socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
     
@@ -95,7 +112,17 @@
     
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
+            if (!data) return;
             //console.log('INFO', data);
+
+            // Si el juego ha terminado, mostrar resultados y no seguir actualizando
+            if (data.game_over) {
+                console.warn("⛔ Juego finalizado. Desconectando WebSocket.");
+                socket.close();
+                drawGameResult(ctx, gameData, playerData);
+                markPlayersAsFinished();
+                return;
+            }
             
             // Verificar la estructura de los datos
             if (!data) {
@@ -188,7 +215,7 @@
                     }
                 }
             }
-            
+
             drawGame();
         };
         
@@ -307,15 +334,7 @@
             gameStarted = false;
             gameEnded = true;  // Para evitar dibujar después de la desconexión
         };
-        
-    
-        // 🎾 Lógica del juego de Ping Pong
-        const canvas = document.getElementById("pongCanvas");
-        const ctx = canvas.getContext("2d");
-    
-        canvas.width = 800;
-        canvas.height = 400;
-    
+          
         function drawGame() {
             if (gameEnded) return;
     
@@ -369,6 +388,53 @@
         
         // Dibujar el juego por primera vez
         drawGame();
+
+        function drawGameResult(ctx, gameData, playerData) {
+
+            const leftScoreElement = document.getElementById("left-score");
+            const rightScoreElement = document.getElementById("right-score");
+            
+            if (leftScoreElement && rightScoreElement) {
+                leftScoreElement.textContent = gameData.player1_score;
+                rightScoreElement.textContent = gameData.player2_score;
+            }
+
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+            ctx.fillStyle = "white";
+            ctx.font = "bold 30px Arial";
+            ctx.textAlign = "center";
+    
+            ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", ctx.canvas.width / 2, 100);
+    
+            ctx.font = "bold 24px Arial";
+            ctx.fillText(`🔹 ${playerData.player1.username} (${gameData.player1_score}) - ${playerData.player2.username} (${gameData.player2_score}) 🔹`, ctx.canvas.width / 2, 180);
+    
+            let winnerText = gameData.player1_score > gameData.player2_score
+                ? `🎉 GANADOR: ${playerData.player1.username}`
+                : `🎉 GANADOR: ${playerData.player2.username}`;
+    
+            ctx.fillText(winnerText, ctx.canvas.width / 2, 250);
+            ctx.fillText(`Duración: ${gameData.duration} segundos`, ctx.canvas.width / 2, 300);
+        }
+
+        function markPlayersAsFinished() {
+            const player1Status = document.getElementById("player1-ready-status");
+            const player2Status = document.getElementById("player2-ready-status");
+    
+            if (player1Status) {
+                player1Status.textContent = "FINISH";
+                player1Status.className = "badge bg-danger"; // Cambia a rojo
+            }
+    
+            if (player2Status) {
+                player2Status.textContent = "FINISH";
+                player2Status.className = "badge bg-danger"; // Cambia a rojo
+            }
+        }
+
     };
     
     // Se ejecuta cuando hay recarga HTMX
