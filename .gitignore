@@ -8,5 +8,6 @@ transcendence/app/migrations/
 __init__.py
 transcendence/staticfiles
 postgres_data/
+media/
 
 
