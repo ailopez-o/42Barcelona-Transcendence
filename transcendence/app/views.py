@@ -102,7 +102,6 @@ def profile_view(request):
         'user': user,
         'games': games,
         'pending_games': pending_games,
-        'avatar_url': user.avatar if user.avatar and "http" in str(user.avatar) else user.avatar.url
     }
 
     if request.headers.get("HX-Request"):  # Si la petición es de HTMX, devolvemos solo el contenido del perfil
@@ -181,9 +180,6 @@ def game_detail_view(request, game_id):
         return render(request, "game_detail.html", context)
     else:
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
-
-
-
 
 # Vista para crear un nuevo torneo
 @login_required
