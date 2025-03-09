@@ -71,8 +71,7 @@
             console.log("🧑‍💻 Datos del jugador:", window.currentPlayer);
         }
         
-        console.log(playerData);
-
+        //console.log(playerData);
         //console.log("🎮 Datos del juego:", gameData);
         
         // Lógica del juego de Ping Pong
@@ -93,7 +92,7 @@
         socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
     
         socket.onopen = function(event) {
-            console.log("✅ Conectado al WebSocket del juego");
+            console.log("✅ Conectado al WebSocket del juego", gameId);
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
             socket.send(JSON.stringify({
                 player: window.currentPlayer,
@@ -414,8 +413,9 @@
     
             ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", ctx.canvas.width / 2, 100);
     
-            ctx.font = "bold 24px Arial";
-            ctx.fillText(`🔹 ${playerData.player1.username} (${gameData.player1_score}) - ${playerData.player2.username} (${gameData.player2_score}) 🔹`, ctx.canvas.width / 2, 180);
+            // Ya tenemos el marcador arriba
+            // ctx.font = "bold 24px Arial";
+            // ctx.fillText(`🔹 ${playerData.player1.username} (${gameData.player1_score}) - ${playerData.player2.username} (${gameData.player2_score}) 🔹`, ctx.canvas.width / 2, 180);
     
             let winnerText = gameData.player1_score > gameData.player2_score
                 ? `🎉 GANADOR: ${playerData.player1.username}`
@@ -465,8 +465,8 @@
     
         if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
     
-        console.log("🔑 Tecla presionada:", e.key);
-        console.log("🔑 Player presionada:", window.currentPlayer);
+        //console.log("🔑 Tecla presionada:", e.key);
+        //console.log("🔑 Player presionada:", window.currentPlayer);
 
         socket.send(JSON.stringify({
             player: window.currentPlayer,

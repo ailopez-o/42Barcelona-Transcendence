@@ -121,6 +121,9 @@ def new_game_view(request):
 
         context = {
             "game": game,
+            "game_result": "",
+            "player1_score": 0,
+            "player2_score": 0,
         }
 
         # Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
@@ -161,6 +164,8 @@ def game_detail_view(request, game_id):
         "player1_score": player1_score,
         "player2_score": player2_score,
     }
+
+    print(context)
 
     if request.headers.get("HX-Request"):
         return render(request, "game_detail.html", context)
