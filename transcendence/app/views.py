@@ -119,14 +119,20 @@ def new_game_view(request):
             ball_color=ball_color
         )
 
-        # Enviar notificación a todos los usuarios
-        send_notification_to_all(f"¡Nueva partida creada entre {game.player1} y {game.player2}!")
-    
-        if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
-            response = HttpResponse()
-            response["HX-Redirect"] = f"/game/{game.id}/"
-            return response
+        context = {
+            "game": game,
+            "game_result": "",
+            "player1_score": 0,
+            "player2_score": 0,
+        }
 
+        # Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
+        if request.headers.get("HX-Request"):
+            response = render(request, "game_detail.html", context)  # 🔥 Solo devuelve el fragmento
+            response["HX-Push-Url"] = f"/game/{game.id}/"  # 🔥 HTMX actualiza la URL sin recargar
+            return response
+        
+        # Redirección normal si no es HTMX
         return redirect("game_detail", game_id=game.id)  # Redirección normal si no es HTMX
 
     users = User.objects.exclude(id=request.user.id)
@@ -141,12 +147,32 @@ def new_game_view(request):
 def game_detail_view(request, game_id):
     game = get_object_or_404(Game, id=game_id)
 
-    context = {"game": game}
+    # Intentar obtener el resultado de la partida (si existe, por lo tanto terminada)
+    game_result = GameResult.objects.filter(game=game).first()
 
-    if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
+    # Determinar los puntajes finales
+    if game_result:
+        player1_score = game_result.score_winner if game_result.winner == game.player1 else game_result.score_loser
+        player2_score = game_result.score_winner if game_result.winner == game.player2 else game_result.score_loser
+    else:
+        player1_score = 0
+        player2_score = 0
+
+    context = {
+        "game": game,
+        "game_result": game_result,
+        "player1_score": player1_score,
+        "player2_score": player2_score,
+    }
+
+    print(context)
+
+    if request.headers.get("HX-Request"):
         return render(request, "game_detail.html", context)
-    else:  # Si es una carga normal, devolvemos base.html con el contenido de game_detail.html
+    else:
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
+
+
 
 
 # Vista para crear un nuevo torneo
@@ -215,7 +241,7 @@ def reject_game_view(request, game_id):
 
 @login_required
 def global_chat_view(request):
-    if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
+    if request.headers.get("HX-Request"):
         return render(request, "global_chat.html")
     else:  # Si es una carga normal, devolvemos base.html con global_chat.html dentro
         return render(request, "base.html", {"content_template": "global_chat.html"})
@@ -316,9 +342,13 @@ def game_save_view(request):
                 "score_winner": score_winner,
                 "score_loser": score_loser,
                 "duration": duration,
-                "status": "finalizado"
             }
         )
+
+        game.status = "finalizado"
+        game.save()
+
+        print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
         send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")

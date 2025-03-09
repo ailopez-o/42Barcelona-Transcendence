@@ -1,0 +1,12 @@
+{% for notification in notifications %}
+    <div class="notification alert d-flex align-items-center justify-content-between bg-white text-dark border border-secondary-subtle">
+        <span>{{ notification.message }}</span>
+        <button hx-post="{% url 'mark_notification_read' notification.id %}" 
+                hx-target="closest .notification" 
+                hx-swap="outerHTML"
+                class="btn-close">
+        </button>
+    </div>
+{% empty %}
+    <div class="text-muted text-center">No hay notificaciones nuevas</div>
+{% endfor %}

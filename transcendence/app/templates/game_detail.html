@@ -11,17 +11,22 @@
             <div class="game-header bg-light p-3 rounded shadow-sm text-center mb-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <!-- Jugador 1 -->
-                    <div class="player-info d-flex align-items-center">
+                    <div class="player-info d-flex align-items-center gap-3">
                         {% if game.player1.avatar %}
-                             <img src="{{ game.player1.avatar }}" alt="{{ game.player1.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
-                         {% else %}
-                             <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player1.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
-                         {% endif %}
+                            <img src="{{ game.player1.avatar }}" alt="{{ game.player1.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player1.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                        {% endif %}
                         <div>
                             <h5 class="mb-0">{{ game.player1.username }}</h5>
                             <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
                         </div>
                     </div>
+
 
                     <!-- Puntuación -->
                     <div class="game-score text-center">
@@ -30,17 +35,22 @@
                     </div>
 
                     <!-- Jugador 2 -->
-                    <div class="player-info d-flex align-items-center">
+                    <div class="player-info d-flex align-items-center gap-3">
                         <div class="text-end">
                             <h5 class="mb-0">{{ game.player2.username }}</h5>
                             <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
                         </div>
                         {% if game.player2.avatar %}
-                        <img src="{{ game.player2.avatar }}" alt="{{ game.player2.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
+                            <img src="{{ game.player2.avatar }}" alt="{{ game.player2.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
                         {% else %}
-                        <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player2.username }}" class="avatar" class="rounded-circle border border-2 me-2" style="width: 50px; height: 50px;">
-                         {% endif %} 
+                            <img src="{% static 'images/default_avatar.png' %}" alt="{{ game.player2.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                        {% endif %}
                     </div>
+
                 </div>
             </div>
 
@@ -64,16 +74,16 @@
                 <h4 class="text-center">Chat en Vivo</h4>
 
                 <!-- Contenedor para los mensajes de chat -->
-                <div id="chat-section" class="chat-box border rounded p-2 mb-2" 
-                     style="height: 300px; overflow-y: auto;">
-                    <!-- Mensajes se insertarán aquí -->
+                <div id="chat-section" class="chat-box border rounded p-2 mb-2"
+                style="height: 300px; overflow-y: auto;" hx-preserve>
+               <!-- Mensajes del chat -->
                 </div>
 
                 <!-- Formulario para enviar mensajes -->
-                <form id="chat-form" class="d-flex">
-                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje...">
+                <form id="chat-form" class="d-flex" hx-boost="false">
+                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
                     <button type="submit" class="btn btn-primary">Enviar</button>
-                </form>
+                </form>                
             </div>
         </div>
     </div>
@@ -105,10 +115,34 @@
         "difficulty": "{{ game.difficulty }}",
         "points": {{ game.points }},
         "paddle_color": "{{ game.paddle_color }}",
-        "ball_color": "{{ game.ball_color }}"
+        "ball_color": "{{ game.ball_color }}",
+        "player1_score": {{ player1_score }},
+        "player2_score": {{ player2_score }},
+        "duration": "{{ game_result.duration }}",
+        "winner": "{{ game_result.winner }}",
+        "loser": "{{ game_result.loser }}"
     }
-</script>    
+</script> 
 
 <!-- Cargar el script de juego y el de chat -->
-<script src="{% static 'js/game.js' %}"></script>
+<!-- <script>
+    function loadScriptOnce(scriptName, scriptSrc) {
+        if (!window[scriptName]) {
+            var script = document.createElement("script");
+            script.src = scriptSrc;
+            script.onload = function () {
+                window[scriptName] = true;
+            };
+            document.body.appendChild(script);
+        }
+    }
+
+    loadScriptOnce("gameScriptLoaded", "{% static 'js/game.js' %}");
+    loadScriptOnce("chatScriptLoaded", "{% static 'js/chat.js' %}");
+    loadScriptOnce("testScriptLoaded", "{% static 'js/test.js' %}");
+</script> -->
+
+
 <script src="{% static 'js/chat.js' %}"></script>
+<script src="{% static 'js/game.js' %}"></script>
+<script src="{% static 'js/test.js' %}"></script>

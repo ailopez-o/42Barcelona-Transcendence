@@ -22,11 +22,10 @@
             <td style="padding: 8px;">{{ game.get_status_display }}</td>
             <td style="padding: 8px;">{{ game.created_at|date:"Y-m-d H:i" }}</td>
             <td style="padding: 8px;">
-                <a href="{% url 'game_detail' game.id %}" 
-                   hx-get="{% url 'game_detail' game.id %}" 
-                   hx-target="#main-content" 
-                   hx-push-url="true"
-                   style="color: #007bff; text-decoration: none;">
+                <a hx-get="{% url 'game_detail' game.id %}" 
+                    hx-target="#main-content" 
+                    hx-push-url="true"
+                    style="color: #007bff; text-decoration: none; cursor: pointer;">
                     Ver Detalles
                 </a>
             </td>
