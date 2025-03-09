@@ -130,7 +130,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 if not state["ready_status"][data["player"]]:  
                     state["ready_status"][data["player"]] = True
                     player_ready_status[self.room_name][data["player"]] = True
-                    print(f"✅ {data['player']} está listo.")
+                    
+                    #print(f"✅ {data['player']} está listo.")
                 
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:

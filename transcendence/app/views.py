@@ -177,8 +177,6 @@ def game_detail_view(request, game_id):
         "player2_score": player2_score,
     }
 
-    print(context)
-
     if request.headers.get("HX-Request"):
         return render(request, "game_detail.html", context)
     else:
@@ -360,7 +358,7 @@ def game_save_view(request):
         game.status = "finalizado"
         game.save()
 
-        print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
+        # print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
         send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
