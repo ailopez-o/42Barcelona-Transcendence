@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.conf import settings
 from django.http import JsonResponse
+from .forms import CustomUserCreationForm 
 import logging
 from .models import Game, Tournament, GameResult, Notification
 logger = logging.getLogger(__name__)
@@ -23,11 +24,6 @@ import urllib.parse
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password1', 'password2']
 
 def login_view(request):
     if request.method == 'POST':
@@ -48,6 +44,22 @@ def login_view(request):
     else:
         return render(request, "base.html", {"content_template": "login.html", "form": form})  # Carga todo el layout
 
+def home_view(request):
+    if request.user.is_authenticated:
+        if request.headers.get("HX-Request"):
+            # Si es HTMX, usamos `HX-Location` para redirigir sin recargar la página completa
+            response = HttpResponse()
+            response["HX-Location"] = "/profile/"
+            return response
+        return redirect("profile")  # Redirección normal si no es HTMX
+    else:
+        if request.headers.get("HX-Request"):
+            # Si es HTMX, usamos `HX-Location` para redirigir sin recargar la página completa
+            response = HttpResponse()
+            response["HX-Location"] = "/login/"
+            return response
+        return redirect("login")  # Redirección normal si no es HTMX
+
 def logout_view(request):
     logout(request)
 
@@ -61,7 +73,7 @@ def logout_view(request):
 # Vista para registro
 def register_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -90,7 +102,7 @@ def profile_view(request):
         'user': user,
         'games': games,
         'pending_games': pending_games,
-        'avatar_url': user.avatar
+        'avatar_url': user.avatar if user.avatar and "http" in str(user.avatar) else user.avatar.url
     }
 
     if request.headers.get("HX-Request"):  # Si la petición es de HTMX, devolvemos solo el contenido del perfil

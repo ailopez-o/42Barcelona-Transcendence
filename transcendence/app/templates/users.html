@@ -17,11 +17,7 @@
         {% for user in users %}
         <tr style="border-bottom: 1px solid #ddd;">
             <td style="padding: 8px;">
-                {% if user.avatar %}
-                    <img src="{{ user.avatar }}" alt="{{ user.username }}" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
-                {% else %}
-                    <img src="{% static 'images/default_avatar.png' %}" alt="Avatar por defecto" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
-                {% endif %}
+                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
             </td>
             <td style="padding: 8px;">{{ user.username }}</td>
             <td style="padding: 8px;">{{ user.total_games }}</td>

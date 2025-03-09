@@ -5,13 +5,20 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     display_name = models.CharField(max_length=150, unique=True)
-    intra_url = models.URLField(max_length=500, blank=True, null=True)
-
     groups = models.ManyToManyField(Group, related_name='custom_user_groups', blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_permissions', blank=True)
 
     def __str__(self):
         return self.username
+    
+    @property
+    def avatar_url(self):
+        if self.avatar:  # Verifica si el usuario tiene un avatar
+            avatar_path = str(self.avatar)  # Convierte a string por si acaso
+            if avatar_path.startswith("http"):
+                return avatar_path  # Es una URL externa
+            return self.avatar.url  # Es una imagen almacenada localmente en media/
+        return "/static/images/default_avatar.png"  # Imagen por defecto si no hay avatar
 
     @property
     def total_games(self):

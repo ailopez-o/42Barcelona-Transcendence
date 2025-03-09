@@ -58,11 +58,7 @@ Posible sript para añadir el CSRF en todos los sitios
                     <a class="nav-link d-flex align-items-center gap-2 text-white text-decoration-none" 
                        href="{% url 'profile' %}" 
                        hx-get="{% url 'profile' %}" hx-target="#main-content" hx-push-url="true">
-                         {% if user.avatar %}
-                             <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle border border-3" style="width: 30px; height: 30px;">
-                         {% else %}
-                             <img src="{% static 'images/default_avatar.png' %}" alt="Avatar por defecto" class="rounded-circle border border-3" style="width: 30px; height: 30px;">
-                         {% endif %}
+                          <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="rounded-circle border border-3" style="width: 30px; height: 30px;">
                         <span class="text-capitalize">{{ user.username }}</span>
                     </a>
                     <form action="{% url 'logout' %}" method="post" class="ms-3"
