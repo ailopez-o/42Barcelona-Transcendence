@@ -4,6 +4,10 @@ Torneo
 Integrar 3D y MonumentPixel
 
 
+Bugs:
+
+- Cuando creas una nueva partida no hace caso a la barra espaciadora, hay que recargar y ya funciona
+
 Testing:
 
 - Probar a crear nuevos usuarios y loguearse con ellos
