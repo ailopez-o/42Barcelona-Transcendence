@@ -22,6 +22,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             game_difficulty[self.room_name] = 1.0  # Valor predeterminado medio
             
             global_room_states[self.room_name] = {
+                "id": self.room_name,
                 "ball": {"x": 400, "y": 200, "dx": 0, "dy": 0},  # La bola inmóvil inicialmente
                 "paddles": {
                     "left": {"y": 150, "speed": 10 * game_difficulty[self.room_name]},
@@ -126,8 +127,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             # Procesar tecla de espacio para marcar como listo
             if key == " " and not state["ready_status"][data["player"]]:
                 # Marcar al jugador como listo
-                state["ready_status"][data["player"]] = True
-                player_ready_status[self.room_name][data["player"]] = True
+                if not state["ready_status"][data["player"]]:  
+                    state["ready_status"][data["player"]] = True
+                    player_ready_status[self.room_name][data["player"]] = True
+                    print(f"✅ {data['player']} está listo.")
                 
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
