@@ -117,13 +117,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 
             # Procesar tecla de espacio para marcar como listo
             if key == " ":
-                print(key)
+                #print(key)
                 # Marcar al jugador como listo
                 if not state["ready_status"][data["player"]]:  
                     state["ready_status"][data["player"]] = True
                     player_ready_status[self.room_name][data["player"]] = True
                     
-                    print(f"✅ {data['player']} está listo.")
+                    #print(f"✅ {data['player']} está listo.")
                 
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
