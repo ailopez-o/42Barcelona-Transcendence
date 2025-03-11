@@ -1,0 +1,27 @@
+{% block content %}
+
+<h2>Lista de Torneos</h2>
+
+<div id="tournament-list" class="tournament-list" style="display: flex; flex-direction: column; gap: 20px;">
+    {% for tournament in tournaments %}
+        {% include "tournaments/tournament_card.html" %}
+    {% empty %}
+        <p style="text-align: center; color: #777;">No hay torneos disponibles en este momento.</p>
+    {% endfor %}
+</div>
+
+<!-- Botón para Mostrar el Formulario de Creación con HTMX -->
+<div style="margin-top: 20px; text-align: center;">
+    <button 
+        hx-get="{% url 'create_tournament' %}" 
+        hx-target="#create-tournament-container"
+        hx-swap="innerHTML"
+        style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+        ➕ Crear Nuevo Torneo
+    </button>
+</div>
+
+<!-- Contenedor para el formulario de creación -->
+<div id="create-tournament-container" style="margin-top: 20px; text-align: center;"></div>
+
+{% endblock %}

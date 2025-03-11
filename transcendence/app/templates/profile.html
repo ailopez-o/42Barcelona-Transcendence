@@ -1,65 +1,200 @@
 {% load static %}
 
-<h2>Perfil de {{ user.username }}</h2>
+<div class="container mt-4">
+    <!-- Perfil del Usuario -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex align-items-center">
+            <!-- Avatar -->
+            <div class="me-4">
+                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="rounded-circle border border-primary" width="100" height="100">
+            </div>
 
-<div class="profile-container" style="display: flex; align-items: center; gap: 20px; padding: 20px; background: #f4f4f4; border-radius: 8px;">
-    <!-- Avatar -->
-    <div class="avatar-container">
-        <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #007bff;">
+            <!-- Información del Usuario -->
+            <div>
+                <h2 class="text-primary">{{ user.display_name }}</h2>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <table class="table table-bordered text-center">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Total Juegos</th>
+                            <th>Ganados</th>
+                            <th>Perdidos</th>
+                            <th>Torneos Ganados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ user.total_games }}</td>
+                            <td>{{ user.total_wins }}</td>
+                            <td>{{ user.total_losses }}</td>
+                            <td>{{ user.tournaments_won }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <!-- Información del usuario -->
-    <div class="user-info">
-        <h2>{{ user.display_name }}</h2>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <table class="user-stats" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr>
-                <th style="background-color: #007bff; color: white; padding: 8px;">Total Juegos</th>
-                <th style="background-color: #007bff; color: white; padding: 8px;">Ganados</th>
-                <th style="background-color: #007bff; color: white; padding: 8px;">Perdidos</th>
-                <th style="background-color: #007bff; color: white; padding: 8px;">Torneos Ganados</th>
-            </tr>
-            <tr style="background-color: white; text-align: center;">
-                <td style="padding: 8px;">{{ user.total_games }}</td>
-                <td style="padding: 8px;">{{ user.total_wins }}</td>
-                <td style="padding: 8px;">{{ user.total_losses }}</td>
-                <td style="padding: 8px;">{{ user.tournaments_won }}</td>
-            </tr>
-        </table>
+    <!-- Sección de Partidas -->
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Partidas Individuales -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Partidas Individuales</h4>
+                </div>
+                <div class="card-body">
+                    {% if individual_games.exists %}
+                        <table class="table table-striped text-center">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Oponente</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for game in individual_games %}
+                                    <tr>
+                                        <td>
+                                            {% if game.player1 == user %}
+                                                {{ game.player2.username }}
+                                            {% else %}
+                                                {{ game.player1.username }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if game.status == 'pendiente' %}bg-warning{% elif game.status == 'en_curso' %}bg-primary{% elif game.status == 'finalizado' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ game.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button hx-get="{% url 'game_detail' game.id %}" 
+                                                    hx-target="#main-content" 
+                                                    hx-push-url="true"
+                                                    class="btn btn-secondary btn-sm">
+                                                🎮 Ver Partida
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No tienes partidas individuales activas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Partidas de Torneos -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Partidas de Torneos</h4>
+                </div>
+                <div class="card-body">
+                    {% if tournament_games.exists %}
+                        <table class="table table-striped text-center">
+                            <thead class="table-info">
+                                <tr>
+                                    <th>Torneo</th>
+                                    <th>Oponente</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for game in tournament_games %}
+                                    <tr>
+                                        <td>{{ game.tournament.name }}</td>
+                                        <td>
+                                            {% if game.player1 == user %}
+                                                {{ game.player2.username }}
+                                            {% else %}
+                                                {{ game.player1.username }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if game.status == 'pendiente' %}bg-warning{% elif game.status == 'en_curso' %}bg-primary{% elif game.status == 'finalizado' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ game.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button hx-get="{% url 'game_detail' game.id %}" 
+                                                    hx-target="#main-content" 
+                                                    hx-push-url="true"
+                                                    class="btn btn-primary btn-sm">
+                                                🎮 Ver Partida
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No tienes partidas de torneo activas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Invitaciones a Partidas -->
-<div class="game-invitations" style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <h3>Invitaciones a Partidas</h3>
-
-    {% if pending_games.exists %}
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <th style="background-color: #28a745; color: white; padding: 8px;">Oponente</th>
-                <th style="background-color: #28a745; color: white; padding: 8px;">Acciones</th>
-            </tr>
-            {% for game in pending_games %}
-                <tr style="background-color: #f9f9f9; text-align: center;">
-                    <td style="padding: 8px;">{{ game.player1.username }}</td>
-                    <td style="padding: 8px;">
-                        <button hx-post="{% url 'accept_game' game.id %}" 
-                                hx-target="closest tr" 
-                                hx-swap="outerHTML" 
-                                style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px;">
-                            Aceptar
-                        </button>
-                        <button hx-post="{% url 'reject_game' game.id %}" 
-                                hx-target="closest tr" 
-                                hx-swap="outerHTML" 
-                                style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 5px;">
-                            Rechazar
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p style="color: #777;">No tienes partidas pendientes.</p>
-    {% endif %}
+    <!-- Partidas Finalizadas -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">Partidas Finalizadas</h4>
+        </div>
+        <div class="card-body">
+            {% if finished_games.exists %}
+                <table class="table table-striped text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Oponente</th>
+                            <th>Torneo</th>
+                            <th>Resultado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in finished_games %}
+                            <tr>
+                                <td>
+                                    {% if game.player1 == user %}
+                                        {{ game.player2.username }}
+                                    {% else %}
+                                        {{ game.player1.username }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if game.tournament %}
+                                        {{ game.tournament.name }}
+                                    {% else %}
+                                        Partida Simple
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if game.result.winner == user %}
+                                        🏆 <span class="text-success">Ganaste</span>
+                                    {% else %}
+                                        😞 <span class="text-danger">Perdiste</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button hx-get="{% url 'game_detail' game.id %}" 
+                                            hx-target="#main-content" 
+                                            hx-push-url="true"
+                                            class="btn btn-dark btn-sm">
+                                        📜 Ver Detalles
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No tienes partidas finalizadas.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
