@@ -63,3 +63,42 @@
         <p style="color: #777;">No tienes partidas pendientes.</p>
     {% endif %}
 </div>
+
+<!-- Partidas de Torneos -->
+<div class="tournament-games" style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h3>Partidas de Torneos</h3>
+
+    {% if tournament_games.exists %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th style="background-color: #17a2b8; color: white; padding: 8px;">Torneo</th>
+                <th style="background-color: #17a2b8; color: white; padding: 8px;">Oponente</th>
+                <th style="background-color: #17a2b8; color: white; padding: 8px;">Acciones</th>
+            </tr>
+            {% for game in tournament_games %}
+                <tr style="background-color: #f9f9f9; text-align: center;">
+                    <td style="padding: 8px;">
+                        {{ game.tournament.name }}
+                    </td>
+                    <td style="padding: 8px;">
+                        {% if game.player1 == user %}
+                            {{ game.player2.username }}
+                        {% else %}
+                            {{ game.player1.username }}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 8px;">
+                        <button hx-get="{% url 'game_detail' game.id %}" 
+                                hx-target="#game-container" 
+                                hx-swap="innerHTML"
+                                style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px;">
+                            Ver Partida
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="color: #777;">No tienes partidas de torneo pendientes.</p>
+    {% endif %}
+</div>

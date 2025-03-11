@@ -10,8 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth import logout
-from django.conf import settings
 from django.http import JsonResponse
+from django.db.models import Q
 from .forms import CustomUserCreationForm 
 import logging
 from .models import Game, Tournament, GameResult, Notification
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 import json
 import requests
 import urllib.parse
-
+from django.utils.timezone import now
 
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
@@ -98,10 +98,20 @@ def profile_view(request):
     games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
     pending_games = Game.objects.filter(player2=user, status="pendiente")
 
+    # Obtener todos los jugadores de los torneos en los que el usuario está inscrito
+    tournament_players = User.objects.filter(tournaments__in=user.tournaments.all()).distinct()
+
+    # Partidas de torneos en las que participa el usuario
+    tournament_games = Game.objects.filter(
+        Q(status="pendiente") & 
+        (Q(player1__in=tournament_players) | Q(player2__in=tournament_players))
+    )
+
     context = {
         'user': user,
         'games': games,
         'pending_games': pending_games,
+        'tournament_games': tournament_games,
     }
 
     if request.headers.get("HX-Request"):  # Si la petición es de HTMX, devolvemos solo el contenido del perfil
@@ -181,33 +191,111 @@ def game_detail_view(request, game_id):
     else:
         return render(request, "base.html", {"content_template": "game_detail.html", **context})
 
-# Vista para crear un nuevo torneo
+@csrf_exempt 
 @login_required
-def new_tournament_view(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        participants_ids = request.POST.getlist('participants')
-        participants = User.objects.filter(id__in=participants_ids)
+def create_tournament(request):
+    """Maneja la creación de un torneo con HTMX"""
+    if request.method == "POST":
+        name = request.POST.get("name")
+        max_participants = request.POST.get("max_participants", 8)
 
+        if not name:
+            return HttpResponse("El nombre es obligatorio", status=400)
+
+        # Convertimos el valor de max_participants a entero
+        try:
+            max_participants = int(max_participants)
+        except ValueError:
+            return HttpResponse("Número de participantes inválido", status=400)
+
+        # Creamos el torneo
         tournament = Tournament.objects.create(
+            creator=request.user,
             name=name,
-            created_by=request.user
+            max_participants=max_participants,
+            created_at=now()
         )
-        tournament.participants.set(participants)
 
-        if request.headers.get("HX-Request"):  # Si es HTMX, redirigimos sin recargar
-            response = HttpResponse()
-            response["HX-Redirect"] = f"/tournament/{tournament.id}/"
-            return response
+        # Devolvemos solo la tarjeta del nuevo torneo para HTMX
+        return render(request, "tournaments/tournament_card.html", {"tournament": tournament, "user": request.user})
 
-        return redirect("tournament_detail", tournament_id=tournament.id)  # Redirección normal
+    # Si no es un POST, devolvemos el formulario vacío para HTMX
+    return render(request, "tournaments/tournament_create_form.html")
 
-    users = User.objects.exclude(id=request.user.id)
-
+@login_required
+def tournament_list(request):
+    """Lista de todos los torneos con su información"""
+    tournaments = Tournament.objects.all().order_by("-created_at")  # Ordenados por fecha de creación (más recientes primero)
+    
+    context = {
+        "tournaments": tournaments
+    }
+    
     if request.headers.get("HX-Request"):  # Si es HTMX, devolvemos solo el formulario
-        return render(request, "tournament.html", {"users": users})
+        return render(request, "tournaments/tournament_list.html", context)
     else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
-        return render(request, "base.html", {"content_template": "tournament.html", "users": users})
+        return render(request, "base.html", {"content_template": "tournaments/tournament_list.html", **context})
+
+
+@csrf_exempt 
+@login_required
+def join_tournament(request, tournament_id):
+    """Permite a un usuario unirse a un torneo"""
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+
+    if tournament.status == "inscripcion" and request.user not in tournament.participants.all():
+        tournament.participants.add(request.user)
+
+    return render(request, "tournaments/tournament_card.html", {"tournament": tournament, "user": request.user})
+
+@csrf_exempt 
+@login_required
+def leave_tournament(request, tournament_id):
+    """Permite a un usuario salir de un torneo si está en fase de inscripción"""
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+
+    if tournament.status == "inscripcion" and request.user in tournament.participants.all():
+        tournament.participants.remove(request.user)
+
+    return render(request, "tournaments/tournament_card.html", {"tournament": tournament, "user": request.user})
+
+@login_required
+def tournament_detail(request, tournament_id):
+    """Ver detalles del torneo"""
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+    if request.headers.get("HX-Request"):  # Si es HTMX, devolvemos solo el formulario
+        return render(request, "tournaments/tournament_detail.html", {"tournament": tournament})
+    else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
+        return render(request, "base.html", {"content_template": "tournaments/tournament_detail.html", "tournament": tournament})
+
+
+# # Vista para crear un nuevo torneo
+# @login_required
+# def new_tournament_view(request):
+#     if request.method == 'POST':
+#         name = request.POST.get('name')
+#         participants_ids = request.POST.getlist('participants')
+#         participants = User.objects.filter(id__in=participants_ids)
+
+#         tournament = Tournament.objects.create(
+#             name=name,
+#             created_by=request.user
+#         )
+#         tournament.participants.set(participants)
+
+#         if request.headers.get("HX-Request"):  # Si es HTMX, redirigimos sin recargar
+#             response = HttpResponse()
+#             response["HX-Redirect"] = f"/tournament/{tournament.id}/"
+#             return response
+
+#         return redirect("tournament_detail", tournament_id=tournament.id)  # Redirección normal
+
+#     users = User.objects.exclude(id=request.user.id)
+
+#     if request.headers.get("HX-Request"):  # Si es HTMX, devolvemos solo el formulario
+#         return render(request, "tournament.html", {"users": users})
+#     else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
+#         return render(request, "base.html", {"content_template": "tournament.html", "users": users})
 
 
 # # Vista para el detalle de un torneo

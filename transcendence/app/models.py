@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Count, Q
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from random import shuffle
+from django.utils.timezone import now 
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
@@ -35,7 +37,10 @@ class User(AbstractUser):
     @property
     def tournaments_won(self):
         return 42
-
+    
+    @property
+    def open_tournaments(self):
+        return Tournament.objects.filter(status='inscripcion').exclude(participants=self)
 
 DIFFICULTY_CHOICES = [
     ('facil', 'Fácil'),
@@ -64,24 +69,63 @@ class Game(models.Model):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
 
 class Tournament(models.Model):
+    STATUS_CHOICES = [
+        ('inscripcion', 'Inscripción'),
+        ('en_curso', 'En curso'),
+        ('finalizado', 'Finalizado'),
+        ('cancelado', 'Cancelado'),
+    ]
+
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tournaments_created")
     name = models.CharField(max_length=100)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_tournaments')
-    participants = models.ManyToManyField(User, related_name='tournaments')
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('ongoing', 'Ongoing'), ('completed', 'Completed')], default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inscripcion')
+    participants = models.ManyToManyField(User, related_name="tournaments", blank=True)
+    max_participants = models.PositiveIntegerField(default=8)
+    created_at = models.DateTimeField(auto_now_add=True)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tournaments_won")
 
     def __str__(self):
-        return self.name
+        return f"Torneo {self.name} - {self.status}"
 
-class TournamentGame(models.Model):
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='games')
-    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='tournament_game')
-    round_number = models.PositiveIntegerField()
+    def is_full(self):
+        return self.participants.count() >= self.max_participants
 
-    def __str__(self):
-        return f"Juego de torneo {self.tournament.name}, Ronda {self.round_number}"
+    def start_tournament(self):
+        """ Cambia el estado a 'en_curso' y genera las partidas iniciales """
+        if self.is_full():
+            self.status = 'en_curso'
+            self.save()
+            self.create_initial_matches()
 
+    def create_initial_matches(self):
+        """ Crea las primeras partidas del torneo """
+        from random import shuffle
+        players = list(self.participants.all())
+        shuffle(players)  # Mezclar los jugadores aleatoriamente
+
+        match_pairs = [(players[i], players[i + 1]) for i in range(0, len(players), 2)]
+        for player1, player2 in match_pairs:
+            Game.objects.create(player1=player1, player2=player2, status='pendiente')
+
+    def check_next_round(self):
+        """ Verifica si se deben generar nuevas partidas """
+        if Game.objects.filter(player1__in=self.participants.all(), status='en_curso').exists():
+            return  # Aún hay partidas en curso
+
+        winners = GameResult.objects.filter(game__player1__in=self.participants.all()).values_list('winner', flat=True)
+        winners = list(set(winners))  # Evitar duplicados
+
+        if len(winners) == 1:
+            # Solo queda un jugador, es el ganador del torneo
+            self.winner = User.objects.get(id=winners[0])
+            self.status = 'finalizado'
+            self.save()
+        else:
+            # Crear la siguiente ronda de partidas
+            shuffle(winners)
+            match_pairs = [(winners[i], winners[i + 1]) for i in range(0, len(winners), 2)]
+            for player1, player2 in match_pairs:
+                Game.objects.create(player1=player1, player2=player2, status='pendiente')
 
 class GameResult(models.Model):
     game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name="result")

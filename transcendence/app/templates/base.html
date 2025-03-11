@@ -41,7 +41,7 @@ Posible sript para añadir el CSRF en todos los sitios
                 <ul class="navbar-nav me-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'new_game' %}" hx-get="{% url 'new_game' %}" hx-target="#main-content" hx-push-url="true">Nueva Partida</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'new_tournament' %}" hx-get="{% url 'new_tournament' %}" hx-target="#main-content" hx-push-url="true">Nuevo Torneo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'tournament_list' %}" hx-get="{% url 'tournament_list' %}" hx-target="#main-content" hx-push-url="true">Torneos</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'users' %}" hx-get="{% url 'users' %}" hx-target="#main-content" hx-push-url="true">Usuarios</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'game_results' %}" hx-get="{% url 'game_results' %}" hx-target="#main-content" hx-push-url="true">Resultados</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'game_list' %}" hx-get="{% url 'game_list' %}" hx-target="#main-content" hx-push-url="true">Partidas</a></li>
