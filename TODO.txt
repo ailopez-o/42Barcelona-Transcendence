@@ -1,5 +1,6 @@
 Mostrar las notificaciones de partida nueva en caliente. MOLA pero no nos va a dar más puntos
 Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
+Al menos que el chat al cambiar limpie la ventada de chat
 Integrar 3D y MonumentPixel
 Que JS actualice que la partida está en curso
 
