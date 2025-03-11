@@ -435,7 +435,7 @@ def oauth_callback(request):
         username=user_data["login"],  # Ajusta según la API
         defaults={
             "display_name": user_data.get("displayname"),
-            "intra_url": user_data.get("url"),
+            # "intra_url": user_data.get("url"),
             "avatar": user_data.get("image", {}).get("versions", {}).get("medium"),
             "email": user_data.get("email"),
         }
