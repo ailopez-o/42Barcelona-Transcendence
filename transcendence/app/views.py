@@ -222,6 +222,24 @@ def create_tournament(request):
     # Si no es un POST, devolvemos el formulario vacío para HTMX
     return render(request, "tournaments/tournament_create_form.html")
 
+@csrf_exempt 
+@login_required
+def delete_tournament(request, tournament_id):
+    """Permite al creador eliminar un torneo si NO está en curso"""
+    tournament = get_object_or_404(Tournament, id=tournament_id, creator=request.user)
+
+    if tournament.status != "en_curso":  # Se puede eliminar en cualquier estado excepto "en_curso"
+        tournament.delete()
+
+        # Si después de eliminar no quedan torneos, refrescamos la lista
+        remaining_tournaments = Tournament.objects.exists()
+        if remaining_tournaments:
+            return HttpResponse(status=204)  # Elimina solo la card
+        else:
+            return render(request, "tournaments/tournament_list.html", {"tournaments": Tournament.objects.all()})  
+
+    return HttpResponse("No puedes eliminar un torneo en curso.", status=403)
+
 @login_required
 def tournament_list(request):
     """Lista de todos los torneos con su información"""

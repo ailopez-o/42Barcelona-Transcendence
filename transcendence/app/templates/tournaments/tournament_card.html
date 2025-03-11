@@ -1,10 +1,27 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ tournament.name }}</h5>
-        <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-secondary{% endif %}">
-            {{ tournament.get_status_display }}
-        </span>
+        <div class="d-flex align-items-center">
+            <img src="{{ tournament.creator.avatar_url }}" alt="{{ tournament.creator.display_name }}" class="rounded-circle me-2" width="30" height="30">
+            <strong>{{ tournament.creator.display_name }}</strong>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-secondary{% endif %}">
+                {{ tournament.get_status_display }}
+            </span>
+
+            {% if request.user == tournament.creator and tournament.status != "en_curso" %}
+                <button 
+                    hx-delete="{% url 'delete_tournament' tournament.id %}"
+                    hx-target="closest .card"
+                    hx-swap="outerHTML"
+                    class="btn btn-danger btn-sm ms-2">
+                    🗑️
+                </button>
+            {% endif %}
+        </div>
     </div>
+
     <div class="card-body">
         <p><strong>Máximo de Jugadores:</strong> {{ tournament.max_participants }}</p>
         <p><strong>Jugadores Registrados:</strong> {{ tournament.participants.count }}/{{ tournament.max_participants }}</p>
