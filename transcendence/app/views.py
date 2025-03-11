@@ -231,12 +231,8 @@ def delete_tournament(request, tournament_id):
     if tournament.status != "en_curso":  # Se puede eliminar en cualquier estado excepto "en_curso"
         tournament.delete()
 
-        # Si después de eliminar no quedan torneos, refrescamos la lista
-        remaining_tournaments = Tournament.objects.exists()
-        if remaining_tournaments:
-            return HttpResponse(status=204)  # Elimina solo la card
-        else:
-            return render(request, "tournaments/tournament_list.html", {"tournaments": Tournament.objects.all()})  
+        # Retornamos un HTML vacío para que HTMX elimine la card correctamente
+        return HttpResponse("<!-- Eliminado -->", status=200)
 
     return HttpResponse("No puedes eliminar un torneo en curso.", status=403)
 
@@ -263,6 +259,10 @@ def join_tournament(request, tournament_id):
 
     if tournament.status == "inscripcion" and request.user not in tournament.participants.all():
         tournament.participants.add(request.user)
+
+        # Verificar si el torneo está lleno y debe comenzar
+        if tournament.is_full():
+            tournament.start_tournament()
 
     return render(request, "tournaments/tournament_card.html", {"tournament": tournament, "user": request.user})
 

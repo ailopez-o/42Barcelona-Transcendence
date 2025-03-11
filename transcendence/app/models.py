@@ -48,26 +48,6 @@ DIFFICULTY_CHOICES = [
     ('dificil', 'Difícil'),
 ]
 
-class Game(models.Model):
-    STATUS_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('en_curso', 'En curso'),
-        ('finalizado', 'Finalizado'),
-        ('cancelado', 'Cancelado'),
-    ]
-
-    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
-    player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
-    created_at = models.DateTimeField(auto_now_add=True)
-    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medio')
-    points = models.PositiveIntegerField(default=10)
-    paddle_color = models.CharField(max_length=7, default="#0000ff")  # Formato hexadecimal, ejemplo: azul
-    ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
-
-    def __str__(self):
-        return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
-
 class Tournament(models.Model):
     STATUS_CHOICES = [
         ('inscripcion', 'Inscripción'),
@@ -99,13 +79,14 @@ class Tournament(models.Model):
 
     def create_initial_matches(self):
         """ Crea las primeras partidas del torneo """
-        from random import shuffle
         players = list(self.participants.all())
         shuffle(players)  # Mezclar los jugadores aleatoriamente
 
+        print(f"Generando partidas para {len(players)} jugadores en el torneo {self.name}.")
         match_pairs = [(players[i], players[i + 1]) for i in range(0, len(players), 2)]
         for player1, player2 in match_pairs:
-            Game.objects.create(player1=player1, player2=player2, status='pendiente')
+            Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self)
+            print(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
     def check_next_round(self):
         """ Verifica si se deben generar nuevas partidas """
@@ -127,6 +108,31 @@ class Tournament(models.Model):
             for player1, player2 in match_pairs:
                 Game.objects.create(player1=player1, player2=player2, status='pendiente')
 
+class Game(models.Model):
+    STATUS_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('en_curso', 'En curso'),
+        ('finalizado', 'Finalizado'),
+        ('cancelado', 'Cancelado'),
+    ]
+
+    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
+    player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, on_delete=models.SET_NULL, null=True, blank=True, related_name="games")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
+    created_at = models.DateTimeField(auto_now_add=True)
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medio')
+    points = models.PositiveIntegerField(default=10)
+    paddle_color = models.CharField(max_length=7, default="#0000ff")  # Formato hexadecimal, ejemplo: azul
+    ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
+
+    def __str__(self):
+        return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
+
+    def is_tournament_game(self):
+        """Retorna True si la partida pertenece a un torneo"""
+        return self.tournament is not None
+    
 class GameResult(models.Model):
     game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name="result")
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="winner")

@@ -89,11 +89,12 @@
                     </td>
                     <td style="padding: 8px;">
                         <button hx-get="{% url 'game_detail' game.id %}" 
-                                hx-target="#game-container" 
-                                hx-swap="innerHTML"
+                                hx-target="#main-content" 
+                                hx-push-url="true"
                                 style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px;">
                             Ver Partida
                         </button>
+                    </a>
                     </td>
                 </tr>
             {% endfor %}
