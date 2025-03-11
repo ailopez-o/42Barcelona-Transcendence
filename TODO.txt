@@ -1,12 +1,12 @@
 Mostrar las notificaciones de partida nueva en caliente. MOLA pero no nos va a dar más puntos
 Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
-Torneo
 Integrar 3D y MonumentPixel
+Que JS actualice que la partida está en curso
 
 
 Bugs:
 
-- Cuando creas una nueva partida no hace caso a la barra espaciadora, hay que recargar y ya funciona
+- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona
 
 Testing:
 

@@ -95,23 +95,20 @@ def register_view(request):
 @login_required
 def profile_view(request):
     user = request.user
-    games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
-    pending_games = Game.objects.filter(player2=user, status="pendiente")
+    
+    # Obtener todas las partidas donde el usuario participa
+    all_games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
 
-    # Obtener todos los jugadores de los torneos en los que el usuario está inscrito
-    tournament_players = User.objects.filter(tournaments__in=user.tournaments.all()).distinct()
-
-    # Partidas de torneos en las que participa el usuario
-    tournament_games = Game.objects.filter(
-        Q(status="pendiente") & 
-        (Q(player1__in=tournament_players) | Q(player2__in=tournament_players))
-    )
+    # Separar las partidas en categorías
+    individual_games = all_games.filter(tournament__isnull=True)
+    tournament_games = all_games.filter(tournament__isnull=False)
+    finished_games = all_games.filter(status="finalizado")
 
     context = {
         'user': user,
-        'games': games,
-        'pending_games': pending_games,
+        'individual_games': individual_games,
         'tournament_games': tournament_games,
+        'finished_games': finished_games,
     }
 
     if request.headers.get("HX-Request"):  # Si la petición es de HTMX, devolvemos solo el contenido del perfil

@@ -36,7 +36,7 @@ class User(AbstractUser):
     
     @property
     def tournaments_won(self):
-        return 42
+        return Tournament.objects.filter(winner=self).count() or 0
     
     @property
     def open_tournaments(self):
@@ -62,7 +62,7 @@ class Tournament(models.Model):
     participants = models.ManyToManyField(User, related_name="tournaments", blank=True)
     max_participants = models.PositiveIntegerField(default=8)
     created_at = models.DateTimeField(auto_now_add=True)
-    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tournaments_won")
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="won_tournaments")
 
     def __str__(self):
         return f"Torneo {self.name} - {self.status}"
