@@ -1,7 +1,14 @@
 import json
 import asyncio
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+django.setup()
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
+from .models import Game
 
 # Variables globales para controlar el estado y el bucle de cada sala
 global_room_states = {}
@@ -129,6 +136,12 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
                     state["game_started"] = True
                     
+                    # Actualizar el estado de la partida en la base de datos
+                    game_id = self.scope['url_route']['kwargs']['game_id']
+                    game = Game.objects.get(id=game_id)  # Especificamos que buscamos por el campo 'id'
+                    game.status = 'en_curso'
+                    game.save(update_fields=['status'])
+   
                     # Iniciar la bola con velocidad según la dificultad
                     state["ball"]["dx"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
                     state["ball"]["dy"] = random.choice([-5, 5]) * game_difficulty[self.room_name]

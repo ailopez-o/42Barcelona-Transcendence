@@ -20,6 +20,7 @@ import json
 import requests
 import urllib.parse
 from django.utils.timezone import now
+from .models import ChatRoom, ChatMessage
 
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
@@ -580,5 +581,15 @@ def send_notification_to_all(message):
     Notification.objects.bulk_create(notifications)  # Crea todas las notificaciones de una sola vez
 
 
+def chat_history(request, room_name):
+    room = get_object_or_404(ChatRoom, name=room_name)
+    messages = ChatMessage.objects.filter(room=room).order_by("-timestamp")[:50]
+    
+    return JsonResponse({
+        "messages": [
+            {"user": msg.user.username, "message": msg.message, "timestamp": msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")}
+            for msg in messages
+        ]
+    })
 
 
