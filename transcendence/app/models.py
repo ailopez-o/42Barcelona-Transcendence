@@ -154,3 +154,22 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notificación para {self.user.username}: {self.message}"
+
+
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class ChatMessage(models.Model):
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Usa el modelo User de Django
+    message = models.TextField()
+    timestamp = models.DateTimeField(default=now)
+
+    class Meta:
+        ordering = ['timestamp']  # Los mensajes se ordenan por fecha
+
+    def __str__(self):
+        return f"{self.user.username} in {self.room.name}: {self.message[:50]}"
