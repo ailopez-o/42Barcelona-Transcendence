@@ -59,7 +59,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
         User = get_user_model()
         user, _ = User.objects.get_or_create(username=username)  # Si el usuario no existe, se crea temporalmente
-        
+
         ChatMessage.objects.create(room=room, user=user, message=message)
 
     # Función para recuperar historial de chat
@@ -68,7 +68,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         room = ChatRoom.objects.filter(name=room_name).first()
         if not room:
             return []
-        messages = ChatMessage.objects.filter(room=room).order_by("-timestamp")[:50]
+        messages = ChatMessage.objects.filter(room=room).order_by("timestamp")[:50]
         return [
             {"type": "chat", "username": msg.user.username, "message": msg.message}
             for msg in messages

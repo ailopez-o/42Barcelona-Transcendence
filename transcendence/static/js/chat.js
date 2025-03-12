@@ -32,6 +32,9 @@ function connectWebSocket(currentUsername) {
         window.chatSocket.close();
     }
 
+    // 🧹 Limpiar el contenedor de mensajes antes de abrir un nuevo WebSocket
+    document.getElementById("chat-messages").innerHTML = "";
+
     window.chatSocket = new WebSocket(wsUrl); // ✅ Se guarda en `window` para que persista
 
     window.chatSocket.onopen = function () {
