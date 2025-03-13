@@ -89,7 +89,7 @@
         }
 
         // Conectar al servidor WebSocket
-        socket = new WebSocket(`ws://${window.location.host}/ws/game/${gameId}/`);
+        socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
     
         socket.onopen = function(event) {
             console.log("✅ Conectado al WebSocket del juego", gameId);

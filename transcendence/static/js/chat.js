@@ -21,9 +21,9 @@ function connectWebSocket(currentUsername) {
 
     if (gameContainer) {
         gameId = gameContainer.dataset.gameId;
-        wsUrl = `ws://${window.location.host}/ws/chat/${gameId}/`;
+        wsUrl = `wss://${window.location.host}/ws/chat/${gameId}/`;
     } else {
-        wsUrl = `ws://${window.location.host}/ws/chat/`;
+        wsUrl = `wss://${window.location.host}/ws/chat/`;
     }
 
     // Si ya hay un WebSocket abierto, lo cerramos antes de abrir uno nuevo
