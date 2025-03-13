@@ -3,9 +3,9 @@
 <h2 class="text-center">Partida de Pong #{{ game.id }}</h2>
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="row flex-column flex-md-row">
         <!-- Sección del juego -->
-        <div class="col-md-8" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+        <div class="col-12 col-md-8 mb-3 mb-md-0" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
             
             <!-- Información del juego y jugadores -->
             <div class="game-header bg-light p-3 rounded shadow-sm text-center mb-3">
@@ -45,7 +45,7 @@
             <!-- Canvas del juego -->
             <div class="text-center">
                 <canvas id="pongCanvas" width="800" height="400" 
-                        class="border border-dark rounded shadow" 
+                        class="border border-dark rounded shadow img-fluid"
                         style="display: block; margin: auto;">
                 </canvas>
             </div>
@@ -57,7 +57,7 @@
         </div>
 
         <!-- Sección del chat -->
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="chat-container bg-light p-3 rounded shadow-sm">
                 <h4 class="text-center">Chat en Vivo</h4>
 
