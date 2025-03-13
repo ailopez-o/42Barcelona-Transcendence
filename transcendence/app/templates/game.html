@@ -1,45 +1,52 @@
-{% extends "base.html" %}
+{% load static %}
 
-{% block title %}Nueva Partida{% endblock %}
+<div class="card shadow-sm p-4">
+    <h2 class="text-center mb-4">Crear una nueva partida</h2>
 
-{% block content %}
-<h2>Crear una nueva partida</h2>
-<form method="post">
-    {% csrf_token %}
-    
-    <!-- Seleccionar oponente -->
-    <label for="opponent">Selecciona un oponente:</label>
-    <select name="opponent" id="opponent">
-        {% for user in users %}
-            <option value="{{ user.id }}">{{ user.username }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
-    
-    <!-- Seleccionar dificultad -->
-    <label for="difficulty">Dificultad:</label>
-    <select name="difficulty" id="difficulty">
-        <option value="facil">Fácil</option>
-        <option value="medio">Medio</option>
-        <option value="dificil">Difícil</option>
-    </select>
-    <br><br>
-    
-    <!-- Puntaje objetivo -->
-    <label for="points">Puntos a jugar:</label>
-    <input type="number" name="points" id="points" min="1" value="10">
-    <br><br>
-    
-    <!-- Color de las palas -->
-    <label for="paddle_color">Color de las palas:</label>
-    <input type="color" name="paddle_color" id="paddle_color" value="#0000ff">
-    <br><br>
-    
-    <!-- Color de la pelota -->
-    <label for="ball_color">Color de la pelota:</label>
-    <input type="color" name="ball_color" id="ball_color" value="#ff0000">
-    <br><br>
-    
-    <button type="submit">Invitar</button>
-</form>
-{% endblock %}
+    <form method="post" 
+          hx-post="{% url 'new_game' %}" 
+          hx-trigger="submit" 
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-target="#main-content">  
+        
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="opponent" class="form-label">Selecciona un oponente</label>
+            <select name="opponent" id="opponent" class="form-select" required>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Dificultad</label>
+            <select name="difficulty" id="difficulty" class="form-select">
+                <option value="facil">Fácil</option>
+                <option value="medio" selected>Medio</option>
+                <option value="dificil">Difícil</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="points" class="form-label">Puntos a jugar</label>
+            <input type="number" name="points" id="points" min="1" value="10" class="form-control">
+        </div>
+
+        <div class="mb-3 d-flex align-items-center">
+            <label for="paddle_color" class="form-label me-2">Color de las palas</label>
+            <input type="color" name="paddle_color" id="paddle_color" value="#0000ff" class="form-control form-control-color">
+        </div>
+
+        <div class="mb-3 d-flex align-items-center">
+            <label for="ball_color" class="form-label me-2">Color de la pelota</label>
+            <input type="color" name="ball_color" id="ball_color" value="#ff0000" class="form-control form-control-color">
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Invitar</button>
+        </div>
+    </form>
+</div>

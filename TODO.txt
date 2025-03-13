@@ -1,0 +1,20 @@
+Mostrar las notificaciones de partida nueva en caliente. MOLA pero no nos va a dar más puntos
+Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
+Al menos que el chat al cambiar limpie la ventada de chat
+Integrar 3D y MonumentPixel
+Que JS actualice que la partida está en curso
+
+
+Bugs:
+
+- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona
+
+Testing:
+
+- Probar a crear nuevos usuarios y loguearse con ellos
+- Probar a crear una partida y unirse a ella
+- Probar a unirse a una partida ya creada
+- Probar a jugar una partida
+- Probar a abandonar una partida
+- Usar el chat global y el de una partida entre dos usuarios y ver que son autónomos
+

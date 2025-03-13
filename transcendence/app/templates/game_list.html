@@ -1,10 +1,7 @@
-{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Lista de Partidas{% endblock %}
-
-{% block content %}
 <h2>Lista de Partidas</h2>
+
 <table class="table table-striped" style="width: 100%; border-collapse: collapse;">
     <thead>
         <tr style="background-color: #007bff; color: #fff;">
@@ -25,7 +22,12 @@
             <td style="padding: 8px;">{{ game.get_status_display }}</td>
             <td style="padding: 8px;">{{ game.created_at|date:"Y-m-d H:i" }}</td>
             <td style="padding: 8px;">
-                <a href="{% url 'game_detail' game.id %}" style="color: #007bff; text-decoration: none;">Ver Detalles</a>
+                <a hx-get="{% url 'game_detail' game.id %}" 
+                    hx-target="#main-content" 
+                    hx-push-url="true"
+                    style="color: #007bff; text-decoration: none; cursor: pointer;">
+                    Ver Detalles
+                </a>
             </td>
         </tr>
         {% empty %}
@@ -35,4 +37,3 @@
         {% endfor %}
     </tbody>
 </table>
-{% endblock %}
