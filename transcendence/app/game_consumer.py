@@ -7,6 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 import random
 from .models import Game
 
@@ -17,6 +18,14 @@ player_ready_status = {}  # Diccionario para el estado de "listo" de los jugador
 game_difficulty = {}  # Almacenar la dificultad de cada juego
 
 class PongGameConsumer(AsyncWebsocketConsumer):
+    
+    @database_sync_to_async
+    def update_game_status(self, status, game_id):
+        """Actualiza la base de datos de forma segura en un hilo separado"""
+        game = Game.objects.get(id=game_id)
+        game.status = status
+        game.save(update_fields=['status'])
+    
     async def connect(self):
         self.room_name = f"game_{self.scope['url_route']['kwargs']['game_id']}"
         await self.channel_layer.group_add(self.room_name, self.channel_name)
@@ -137,11 +146,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     state["game_started"] = True
                     
                     # Actualizar el estado de la partida en la base de datos
-                    game_id = self.scope['url_route']['kwargs']['game_id']
-                    game = Game.objects.get(id=game_id)  # Especificamos que buscamos por el campo 'id'
-                    game.status = 'en_curso'
-                    game.save(update_fields=['status'])
-   
+                    await self.update_game_status("en_curso", self.scope['url_route']['kwargs']['game_id'])
+
                     # Iniciar la bola con velocidad según la dificultad
                     state["ball"]["dx"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
                     state["ball"]["dy"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
