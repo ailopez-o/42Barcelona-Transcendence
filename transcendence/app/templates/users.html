@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="container mt-4">
+<div class="container mt-4" id="main-content">
     <h2 class="text-center mb-4">Lista de Usuarios</h2>
 
     <div class="table-responsive">
@@ -13,27 +13,37 @@
                     <th>Total Wins</th>
                     <th>Total Losses</th>
                     <th>Torneos Ganados</th>
+                    {% if user.is_superuser %}
+                        <th>Acciones</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <!-- Avatar + Username -->
                     <td class="d-flex align-items-center">
                         <div style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; margin-right: 10px;">
                             <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <span>{{ user.username }}</span>
                     </td>
-
-                    <!-- Display Name -->
                     <td class="text-center">{{ user.display_name }}</td>
-
-                    <!-- Estadísticas -->
                     <td class="text-center">{{ user.total_games }}</td>
                     <td class="text-center">{{ user.total_wins }}</td>
                     <td class="text-center">{{ user.total_losses }}</td>
                     <td class="text-center">{{ user.tournaments_won }}</td>
+
+                    {% if request.user.is_superuser %}
+                    <td class="text-center">
+                        <button 
+                            hx-post="{% url 'delete_user' user.id %}" 
+                            hx-target="#main-content"
+                            hx-confirm="¿Estás seguro de eliminar a {{ user.username }}?"
+                            class="btn btn-danger btn-sm">
+                            Eliminar
+                        </button>
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

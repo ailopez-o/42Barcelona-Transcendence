@@ -21,6 +21,8 @@ import requests
 import urllib.parse
 from django.utils.timezone import now
 from .models import ChatRoom, ChatMessage
+from django.contrib import messages
+from django.http import HttpResponseForbidden
 
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
@@ -283,42 +285,6 @@ def tournament_detail(request, tournament_id):
         return render(request, "tournaments/tournament_detail.html", {"tournament": tournament})
     else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
         return render(request, "base.html", {"content_template": "tournaments/tournament_detail.html", "tournament": tournament})
-
-
-# # Vista para crear un nuevo torneo
-# @login_required
-# def new_tournament_view(request):
-#     if request.method == 'POST':
-#         name = request.POST.get('name')
-#         participants_ids = request.POST.getlist('participants')
-#         participants = User.objects.filter(id__in=participants_ids)
-
-#         tournament = Tournament.objects.create(
-#             name=name,
-#             created_by=request.user
-#         )
-#         tournament.participants.set(participants)
-
-#         if request.headers.get("HX-Request"):  # Si es HTMX, redirigimos sin recargar
-#             response = HttpResponse()
-#             response["HX-Redirect"] = f"/tournament/{tournament.id}/"
-#             return response
-
-#         return redirect("tournament_detail", tournament_id=tournament.id)  # Redirección normal
-
-#     users = User.objects.exclude(id=request.user.id)
-
-#     if request.headers.get("HX-Request"):  # Si es HTMX, devolvemos solo el formulario
-#         return render(request, "tournament.html", {"users": users})
-#     else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
-#         return render(request, "base.html", {"content_template": "tournament.html", "users": users})
-
-
-# # Vista para el detalle de un torneo
-# @login_required
-# def tournament_detail_view(request, tournament_id):
-#     tournament = get_object_or_404(Tournament, id=tournament_id)
-#     return render(request, 'tournament_detail.html', {'tournament': tournament})
 
 @csrf_exempt  # En producción, usa CSRF correctamente
 @login_required
@@ -591,5 +557,30 @@ def chat_history(request, room_name):
             for msg in messages
         ]
     })
+
+@csrf_exempt
+@login_required
+def delete_user(request, user_id):
+    """Vista para eliminar usuarios con HTMX"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("No tienes permisos para eliminar usuarios.")
+
+    user = get_object_or_404(User, id=user_id)
+
+    if user == request.user:
+        messages.error(request, "No puedes eliminarte a ti mismo.")
+    else:
+        user.delete()
+        messages.success(request, f"El usuario {user.username} ha sido eliminado con éxito.")
+
+    # Obtener la lista de usuarios actualizada
+    users = User.objects.all()
+
+    # Si la solicitud viene de HTMX, recargar el contenedor principal
+    if request.headers.get("HX-Request"):
+        return render(request, "users.html", {"users": users})
+
+    return redirect("users_list")
+
 
 
