@@ -1,30 +1,42 @@
 {% load static %}
 
-<h2>Lista de Usuarios</h2>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Lista de Usuarios</h2>
 
-<table class="table table-striped" style="width: 100%; border-collapse: collapse;">
-    <thead>
-        <tr style="background-color: #007bff; color: #fff;">
-            <th style="padding: 8px; text-align: left;">Foto</th>
-            <th style="padding: 8px; text-align: left;">Nombre</th>
-            <th style="padding: 8px; text-align: left;">Total Games</th>
-            <th style="padding: 8px; text-align: left;">Total Wins</th>
-            <th style="padding: 8px; text-align: left;">Total Losses</th>
-            <th style="padding: 8px; text-align: left;">Torneos Ganados</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr style="border-bottom: 1px solid #ddd;">
-            <td style="padding: 8px;">
-                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" style="max-width: 50px; max-height: 50px; border-radius: 50%;">
-            </td>
-            <td style="padding: 8px;">{{ user.username }}</td>
-            <td style="padding: 8px;">{{ user.total_games }}</td>
-            <td style="padding: 8px;">{{ user.total_wins }}</td>
-            <td style="padding: 8px;">{{ user.total_losses }}</td>
-            <td style="padding: 8px;">{{ user.tournaments_won }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre Visible</th>
+                    <th>Total Games</th>
+                    <th>Total Wins</th>
+                    <th>Total Losses</th>
+                    <th>Torneos Ganados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <!-- Avatar + Username -->
+                    <td class="d-flex align-items-center">
+                        <div style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; margin-right: 10px;">
+                            <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <span>{{ user.username }}</span>
+                    </td>
+
+                    <!-- Display Name -->
+                    <td class="text-center">{{ user.display_name }}</td>
+
+                    <!-- Estadísticas -->
+                    <td class="text-center">{{ user.total_games }}</td>
+                    <td class="text-center">{{ user.total_wins }}</td>
+                    <td class="text-center">{{ user.total_losses }}</td>
+                    <td class="text-center">{{ user.tournaments_won }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
