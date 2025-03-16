@@ -1,0 +1,120 @@
+{% load static %}
+
+<h2 class="text-center">Partida de Pong #{{ game.id }}</h2>
+
+<div class="container-fluid">
+    <div class="row flex-column flex-md-row">
+        <!-- Sección del juego -->
+        <div class="col-12 col-md-8 mb-3 mb-md-0" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
+            
+            <!-- Información del juego y jugadores -->
+            <div class="game-header bg-light p-3 rounded shadow-sm text-center mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Jugador 1 -->
+                    <div class="player-info d-flex align-items-center gap-3">
+                            <img src="{{ game.player1.avatar_url }}" alt="{{ game.player1.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                        <div>
+                            <h5 class="mb-0">{{ game.player1.username }}</h5>
+                            <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
+                        </div>
+                    </div>
+
+
+                    <!-- Puntuación -->
+                    <div class="game-score text-center">
+                        <h3 class="mb-0"><span id="left-score">0</span> - <span id="right-score">0</span></h3>
+                        <small class="text-muted">Puntuación</small>
+                    </div>
+
+                    <!-- Jugador 2 -->
+                    <div class="player-info d-flex align-items-center gap-3">
+                        <div class="text-end">
+                            <h5 class="mb-0">{{ game.player2.username }}</h5>
+                            <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
+                        </div>
+                            <img src="{{ game.player2.avatar_url }}" alt="{{ game.player2.username }}" 
+                                class="avatar rounded-circle border border-2" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Canvas del juego -->
+            <div class="text-center">
+                <canvas id="pongCanvas" width="800" height="400" 
+                        class="border border-dark rounded shadow img-fluid"
+                        style="display: block; margin: auto;">
+                </canvas>
+            </div>
+
+            <!-- Controles del juego -->
+            <div class="game-controls text-center mt-3">
+                <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
+            </div>
+        </div>
+
+        <!-- Sección del chat -->
+        <div class="col-12 col-md-4">
+            <div class="chat-container bg-light p-3 rounded shadow-sm">
+                <h4 class="text-center">Chat en Vivo</h4>
+
+                <!-- Contenedor para los mensajes de chat -->
+                <div id="chat-section" class="chat-box border rounded p-2 mb-2"
+                style="height: 300px; overflow-y: auto;" hx-preserve>
+               <!-- Mensajes del chat -->
+                </div>
+
+                <!-- Formulario para enviar mensajes -->
+                <form id="chat-form" class="d-flex" hx-boost="false">
+                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información de jugadores en formato JSON -->
+<script type="application/json" id="player-data">
+    {
+        "player1": {
+            "id": "{{ game.player1.id }}",
+            "username": "{{ game.player1.username }}",
+            "email": "{{ game.player1.email }}"
+        },
+        "player2": {
+            "id": "{{ game.player2.id }}",
+            "username": "{{ game.player2.username }}",
+            "email": "{{ game.player2.email }}"
+        },
+        "current": "{% if request.user.id == game.player1.id %}player1{% elif request.user.id == game.player2.id %}player2{% else %}unknown{% endif %}"
+    }
+</script>
+
+<!-- Información de la partida en formato JSON -->
+<script type="application/json" id="game-data">
+    {
+        "id": "{{ game.id }}",
+        "status": "{{ game.status }}",
+        "created_at": "{{ game.created_at|date:'c' }}",
+        "difficulty": "{{ game.difficulty }}",
+        "points": {{ game.points }},
+        "paddle_color": "{{ game.paddle_color }}",
+        "ball_color": "{{ game.ball_color }}",
+        "player1_score": {{ player1_score }},
+        "player2_score": {{ player2_score }},
+        "duration": "{{ game_result.duration }}",
+        "winner": "{{ game_result.winner }}",
+        "loser": "{{ game_result.loser }}"
+    }
+</script> 
+
+{% if use_3d_mode %}
+<script src="{% static 'js/game3d.js' %}"></script>
+{% else %}
+<script src="{% static 'js/game.js' %}"></script>
+{% endif %}
+<script src="{% static 'js/chat.js' %}"></script>
