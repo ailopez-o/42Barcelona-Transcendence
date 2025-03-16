@@ -132,7 +132,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             # print(f"🎮 Tecla presionada: {key} por {data['player']}")
                 
             # Procesar tecla de espacio para marcar como listo
-            if key == " ":
+            if key == " " and not state["game_started"]:
                 #print(key)
                 # Marcar al jugador como listo
                 if not state["ready_status"][data["player"]]:  
