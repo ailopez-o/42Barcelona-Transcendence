@@ -20,6 +20,9 @@ Fixed:
 17/03/2025: Manda dos notificaciones cuando se acaba una partida. 
 17/03/2025: Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
 17/03/2025: Que JS actualice que la partida está en curso
+17/03/2025: Se pueden borrar partidas y usuarios si eres superuser
+17/03/2025: Restyling
+17/03/2025: Todos nuestros usuarios de 42 son superusers
 
 Testing:
 
