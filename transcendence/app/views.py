@@ -427,7 +427,9 @@ def game_save_view(request):
         # print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
-        send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
+        # Solo enviar notificación si fue la PRIMERA vez que se guardó el resultado
+        if created:
+            send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         return JsonResponse({
             "status": "success",
