@@ -89,24 +89,70 @@ class Tournament(models.Model):
             print(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
     def check_next_round(self):
-        """ Verifica si se deben generar nuevas partidas """
-        if Game.objects.filter(player1__in=self.participants.all(), status='en_curso').exists():
-            return  # Aún hay partidas en curso
+        """Verifica si deben generarse nuevas partidas en el torneo"""
+        # Obtener todas las partidas activas de este torneo
+        games_in_progress = self.games.filter(status__in=["pendiente", "en_curso"])
+        if games_in_progress.exists():
+            return  # Todavía hay partidas sin finalizar
 
-        winners = GameResult.objects.filter(game__player1__in=self.participants.all()).values_list('winner', flat=True)
-        winners = list(set(winners))  # Evitar duplicados
+        # Obtener los ganadores de las partidas anteriores
+        results = GameResult.objects.filter(game__tournament=self)
+        winners_ids = results.values_list('winner_id', flat=True)
+
+        # Convertir a conjunto para evitar duplicados
+        winners = list(set(winners_ids))
 
         if len(winners) == 1:
-            # Solo queda un jugador, es el ganador del torneo
+            # Solo queda un jugador, es el campeón
             self.winner = User.objects.get(id=winners[0])
             self.status = 'finalizado'
             self.save()
-        else:
-            # Crear la siguiente ronda de partidas
-            shuffle(winners)
-            match_pairs = [(winners[i], winners[i + 1]) for i in range(0, len(winners), 2)]
-            for player1, player2 in match_pairs:
-                Game.objects.create(player1=player1, player2=player2, status='pendiente')
+            return
+
+        if len(winners) < 2:
+            # Algo anda mal si no hay suficientes ganadores para una ronda
+            return
+
+        # Preparar siguiente ronda
+        shuffle(winners)
+        match_pairs = [(winners[i], winners[i + 1]) for i in range(0, len(winners), 2)]
+
+        for pair in match_pairs:
+            player1_id = pair[0]
+            try:
+                player2_id = pair[1]
+            except IndexError:
+                # Número impar: player1 pasa a la siguiente ronda automáticamente
+                self.create_bye_win(player1_id)
+                continue
+
+            player1 = User.objects.get(id=player1_id)
+            player2 = User.objects.get(id=player2_id)
+            Game.objects.create(
+                player1=player1,
+                player2=player2,
+                status='pendiente',
+                tournament=self
+            )
+
+    def create_bye_win(self, player_id):
+        """Registra una victoria automática para jugadores sin oponente (bye)"""
+        player = User.objects.get(id=player_id)
+        # Crear partida simulada y resultado
+        bye_game = Game.objects.create(
+            player1=player,
+            player2=player,  # puede ser sí mismo o null
+            status='finalizado',
+            tournament=self
+        )
+        GameResult.objects.create(
+            game=bye_game,
+            winner=player,
+            loser=player,
+            score_winner=0,
+            score_loser=0,
+            duration=0
+        )
 
 class Game(models.Model):
     STATUS_CHOICES = [

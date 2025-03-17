@@ -12,10 +12,10 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.db.models import Q
+from django.shortcuts import redirect
 from .forms import CustomUserCreationForm 
 import logging
 from .models import Game, Tournament, GameResult, Notification
-logger = logging.getLogger(__name__)
 import json
 import requests
 import urllib.parse
@@ -23,7 +23,7 @@ from django.utils.timezone import now
 from .models import ChatRoom, ChatMessage
 from django.contrib import messages
 from django.http import HttpResponseForbidden
-
+logger = logging.getLogger(__name__)
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
@@ -429,6 +429,11 @@ def game_save_view(request):
         # Enviar notificación a todos los usuarios
         send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
+        # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
+        if game.tournament:
+            logger.info(f"Llamando a check_next_round para el torneo: {game.tournament.name}")
+            game.tournament.check_next_round()
+
         return JsonResponse({
             "status": "success",
             "message": "Resultado guardado correctamente",
@@ -440,14 +445,6 @@ def game_save_view(request):
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
     
-
-def test_game_result_view(request):
-    return render(request, "test_game_result.html")
-
-
-    import requests
-from django.shortcuts import redirect
-
 def login_with_42(request):
     """Redirige al usuario a la plataforma de autenticación de 42."""
     
