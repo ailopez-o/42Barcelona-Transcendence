@@ -1,5 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
+from .models import ChatRoom, ChatMessage
+from django.contrib.auth import get_user_model
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -14,6 +17,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
+        # Recuperar y enviar historial de mensajes
+        history = await self.get_chat_history(self.room_group_name)
+        for msg in history:
+            await self.send(text_data=json.dumps(msg))
+
     async def disconnect(self, close_code):
         # Abandonar el grupo
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -23,6 +31,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data.get("message")
         username = data.get("username", "Anónimo")
         
+        # Guardar el mensaje en la base de datos
+        await self.save_message(self.room_group_name, username, message)
+
         # Enviar el mensaje a todos los miembros del grupo
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -40,3 +51,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "username": event["username"],
             "message": event["message"],
         }))
+
+    # Función para guardar mensajes en la base de datos
+    @sync_to_async
+    def save_message(self, room_name, username, message):
+        room, _ = ChatRoom.objects.get_or_create(name=room_name)
+        # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
+        User = get_user_model()
+        user, _ = User.objects.get_or_create(username=username)  # Si el usuario no existe, se crea temporalmente
+
+        ChatMessage.objects.create(room=room, user=user, message=message)
+
+    # Función para recuperar historial de chat
+    @sync_to_async
+    def get_chat_history(self, room_name):
+        room = ChatRoom.objects.filter(name=room_name).first()
+        if not room:
+            return []
+        messages = ChatMessage.objects.filter(room=room).order_by("timestamp")[:50]
+        return [
+            {"type": "chat", "username": msg.user.username, "message": msg.message}
+            for msg in messages
+        ]
