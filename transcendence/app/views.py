@@ -338,21 +338,8 @@ def users_list_view(request):
     else:  # Si es una carga normal, devolvemos base.html con users.html dentro
         return render(request, "base.html", {"content_template": "users.html", **context})
 
-
 @login_required
-def game_results_list_view(request):
-    results = GameResult.objects.select_related("game", "winner", "loser").order_by('-recorded_at')
-
-    context = {"results": results}
-
-    if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
-        return render(request, "game/game_results.html", context)
-    else:  # Si es una carga normal, devolvemos base.html con game_results.html dentro
-        return render(request, "base.html", {"content_template": "game/game_results.html", **context})
-
-
-@login_required
-def games_list_view(request):
+def game_list_view(request):
     games = Game.objects.select_related("player1", "player2").order_by('-created_at')
 
     context = {"games": games}

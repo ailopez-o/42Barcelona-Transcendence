@@ -1,39 +1,75 @@
 {% load static %}
 
-<h2>Lista de Partidas</h2>
+<h2 class="text-center mb-4">Lista de Partidas</h2>
 
-<table class="table table-striped" style="width: 100%; border-collapse: collapse;">
-    <thead>
-        <tr style="background-color: #007bff; color: #fff;">
-            <th style="padding: 8px; text-align: left;">ID de Partida</th>
-            <th style="padding: 8px; text-align: left;">Jugador 1</th>
-            <th style="padding: 8px; text-align: left;">Jugador 2</th>
-            <th style="padding: 8px; text-align: left;">Estado</th>
-            <th style="padding: 8px; text-align: left;">Fecha de Creación</th>
-            <th style="padding: 8px; text-align: left;">Detalles</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for game in games %}
-        <tr style="border-bottom: 1px solid #ddd;">
-            <td style="padding: 8px;">{{ game.id }}</td>
-            <td style="padding: 8px;">{{ game.player1.username }}</td>
-            <td style="padding: 8px;">{{ game.player2.username }}</td>
-            <td style="padding: 8px;">{{ game.get_status_display }}</td>
-            <td style="padding: 8px;">{{ game.created_at|date:"Y-m-d H:i" }}</td>
-            <td style="padding: 8px;">
-                <a hx-get="{% url 'game_detail' game.id %}" 
-                    hx-target="#main-content" 
-                    hx-push-url="true"
-                    style="color: #007bff; text-decoration: none; cursor: pointer;">
-                    Ver Detalles
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6" style="padding: 8px; text-align: center;">No hay partidas registradas.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-primary text-center">
+            <tr>
+                <th>Game ID</th>
+                <th>Jugador 1</th>
+                <th>Jugador 2</th>
+                <th>Estado</th>
+                <th>Torneo</th>
+                <th>Ganador</th>
+                <th>Resultado</th>
+                <th>Detalles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+            <tr>
+                <td class="text-center">{{ game.id }}</td>
+                <td class="text-center">{{ game.player1.username }}</td>
+                <td class="text-center">{{ game.player2.username }}</td>
+
+                <!-- Estado con color -->
+                <td class="text-center">
+                    <span class="badge 
+                        {% if game.status == 'pendiente' %}bg-warning
+                        {% elif game.status == 'en_curso' %}bg-success
+                        {% elif game.status == 'finalizado' %}bg-secondary
+                        {% elif game.status == 'cancelado' %}bg-danger
+                        {% else %}bg-light text-dark{% endif %}">
+                        {{ game.get_status_display }}
+                    </span>
+                </td>
+
+                <!-- Torneo (si aplica) -->
+                <td class="text-center">
+                    {% if game.tournament %}
+                        {{ game.tournament.name }}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+
+                <!-- Ganador -->
+                {% if game.result %}
+                    <td class="text-center">{{ game.result.winner.username }}</td>
+                    <td class="text-center">{{ game.result.score_winner }} - {{ game.result.score_loser }}</td>
+                {% else %}
+                    <td class="text-center text-muted">-</td>
+                    <td class="text-center text-muted">-</td>
+                {% endif %}
+
+                <!-- Botón Detalles -->
+                <td class="text-center">
+                    <button 
+                        hx-get="{% url 'game_detail' game.id %}" 
+                        hx-target="#main-content" 
+                        hx-push-url="true"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Ver Detalles">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">No hay partidas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
