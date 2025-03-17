@@ -9,20 +9,22 @@ Bugs:
 
 - Intento loggearme SIN 42 y cada vez que fallas en la contraseña se duplica el titulo "Iniciar Sesión" y el botón de loggeo de 42.
 - En el momento de finalizar la partida falta el número de segundos, cuando ya esta finalizada y te metes si sale.
-- Bloquear que no se puedan crear partidas de gente impar, porque ahora mismo no empieza el torneo si se apuntan 3, no se crean las partidas.
-- Me salen las notificaciones, duplicadas, o triplicadas 
-- He creado un torneo de 4, se crean las partidas iniciales pero cuando las terminas, no aparece la siguiente ronda y se queda el torneo sin terminar.
-- Manda dos notificaciones cuando se acaba una partida. 17/03/2025
+
+- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona 
 
 Fixed:
 
-15/03/2025: Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona 
+[PENDIENTE DE PROBAR] He creado un torneo de 4, se crean las partidas iniciales pero cuando las terminas, no aparece la siguiente ronda y se queda el torneo sin terminar.
+[PENDIENTE DE PROBAR] Bloquear que no se puedan crear partidas de gente impar, porque ahora mismo no empieza el torneo si se apuntan 3, no se crean las partidas.
+
 17/03/2025: Manda dos notificaciones cuando se acaba una partida. 
 17/03/2025: Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
 17/03/2025: Que JS actualice que la partida está en curso
 17/03/2025: Se pueden borrar partidas y usuarios si eres superuser
 17/03/2025: Restyling
 17/03/2025: Todos nuestros usuarios de 42 son superusers
+17/03/2025: Logger
+17/03/2025: Manda dos notificaciones cuando se acaba una partida. 
 
 Testing:
 
