@@ -24,6 +24,10 @@ superusers = [
     {"username": "admin", "password": "123456", "email": "admin@example.com", "display_name": "Admin"},
     {"username": "alba", "password": "123456", "email": "alba@example.com", "display_name": "Alba"},
     {"username": "aitor", "password": "123456", "email": "aitor@example.com", "display_name": "Aitor"},
+    {"username": "ailopez-", "password": "123456", "email": "ailopez-@student.42barcelona.com", "display_name": "Aitor"},
+    {"username": "albagarc", "password": "123456", "email": "albagarc@student.42barcelona.com", "display_name": "Alba"},
+    {"username": "lsulzbac", "password": "123456", "email": "lsulzbac@student.42barcelona.com", "display_name": "Alba"},
+    {"username": "", "password": "123456", "email": "davifern@student.42barcelona.com", "display_name": "Alba"},
 ]
 
 for su in superusers:
