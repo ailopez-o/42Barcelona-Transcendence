@@ -3,6 +3,8 @@ from django.db.models import Count, Q
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from random import shuffle
 from django.utils.timezone import now 
+import logging
+logger = logging.getLogger(__name__)
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
@@ -82,11 +84,12 @@ class Tournament(models.Model):
         players = list(self.participants.all())
         shuffle(players)  # Mezclar los jugadores aleatoriamente
 
-        print(f"Generando partidas para {len(players)} jugadores en el torneo {self.name}.")
+        logger.info(f"Generando partidas para {len(players)} jugadores en el torneo {self.name}.")
+
         match_pairs = [(players[i], players[i + 1]) for i in range(0, len(players), 2)]
         for player1, player2 in match_pairs:
             Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self)
-            print(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
+            logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
     def check_next_round(self):
         """Verifica si deben generarse nuevas partidas en el torneo"""
@@ -107,6 +110,7 @@ class Tournament(models.Model):
             self.winner = User.objects.get(id=winners[0])
             self.status = 'finalizado'
             self.save()
+            logger.info(f"Torneo finalizado {self.name}. Ganador {self.winner.username}.")
             return
 
         if len(winners) < 2:

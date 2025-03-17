@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from .models import ChatRoom, ChatMessage
 from django.contrib.auth import get_user_model
+import logging
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -17,12 +19,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
+        logger.info(f"Conexion a la sala {self.room_group_name}")
+
         # Recuperar y enviar historial de mensajes
         history = await self.get_chat_history(self.room_group_name)
         for msg in history:
             await self.send(text_data=json.dumps(msg))
 
     async def disconnect(self, close_code):
+        logger.info(f"Desconexion a la sala {self.room_group_name}")
         # Abandonar el grupo
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -31,6 +36,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data.get("message")
         username = data.get("username", "Anónimo")
         
+        logger.info(f"Mensaje recibido de {username} en la sala {self.room_group_name}: {message}")
+
         # Guardar el mensaje en la base de datos
         await self.save_message(self.room_group_name, username, message)
 

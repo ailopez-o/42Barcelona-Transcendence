@@ -1,15 +1,15 @@
-import json
-import asyncio
 import os
 import django
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
-
+import json
+import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import random
 from .models import Game
+import logging
+logger = logging.getLogger(__name__)
 
 # Variables globales para controlar el estado y el bucle de cada sala
 global_room_states = {}
@@ -30,6 +30,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         self.room_name = f"game_{self.scope['url_route']['kwargs']['game_id']}"
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
+
+        logger.info(f"Conexion a al juego {self.room_name}")
 
         # Si aún no existe estado para esta sala, créalo
         if self.room_name not in global_room_states:
@@ -75,13 +77,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        # print(f"📥 Mensaje recibido: {data}")
+        logger.info(f"Mensaje recibido: {data}")
         state = global_room_states[self.room_name]
         
         # Comprobar si el evento viene de uno de los jugadores válidos
         if "player" not in data or data["player"] not in ["player1", "player2"]:
             # Si no es un jugador válido, ignoramos el evento
-            #print(f"Evento ignorado: no proviene de un jugador válido: {data}")
+            logger.info(f"Evento ignorado: no proviene de un jugador válido: {data}")
             return
         
         # Manejar mensaje de inicialización con dificultad
@@ -99,7 +101,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             state["paddles"]["left"]["speed"] = 10 * difficulty_factor
             state["paddles"]["right"]["speed"] = 10 * difficulty_factor
             
-            #print(f"Dificultad del juego establecida: {data['difficulty']} (factor: {difficulty_factor})")
+            logger.info(f"Dificultad del juego establecida: {data['difficulty']} (factor: {difficulty_factor})")
             return
         
         # Procesar mensaje de fin de juego
@@ -129,18 +131,17 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             paddle_side = "left" if data["player"] == "player1" else "right"
             key = data["key"]
 
-            # print(f"🎮 Tecla presionada: {key} por {data['player']}")
+            logger.info(f"Tecla presionada: [{key}] por {data['player']} en {self.room_name}.")
                 
             # Procesar tecla de espacio para marcar como listo
             if key == " " and not state["game_started"]:
-                #print(key)
                 # Marcar al jugador como listo
                 if not state["ready_status"][data["player"]]:  
                     state["ready_status"][data["player"]] = True
                     player_ready_status[self.room_name][data["player"]] = True
                     
-                    #print(f"✅ {data['player']} está listo.")
-                
+                    logger.info(f"{data['player']} está listo en {self.room_name}.")
+
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
                     state["game_started"] = True
@@ -269,4 +270,5 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event["state"]))
 
     async def disconnect(self, close_code):
+        logger.info(f"Desconexion del juego {self.room_name}")
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
