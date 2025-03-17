@@ -153,7 +153,7 @@ def new_game_view(request):
 
         # Si la solicitud es de HTMX, usar el encabezado HX-Location en lugar de JsonResponse
         if request.headers.get("HX-Request"):
-            response = render(request, "game_detail.html", context)  # 🔥 Solo devuelve el fragmento
+            response = render(request, "game/game_detail.html", context)  # 🔥 Solo devuelve el fragmento
             response["HX-Push-Url"] = f"/game/{game.id}/"  # 🔥 HTMX actualiza la URL sin recargar
             return response
         
@@ -163,9 +163,9 @@ def new_game_view(request):
     users = User.objects.exclude(id=request.user.id)
 
     if request.headers.get("HX-Request"):  # Petición HTMX, devolvemos solo el formulario
-        return render(request, "game.html", {"users": users})
-    else:  # Carga normal, devuelve base.html con el contenido de game.html
-        return render(request, "base.html", {"content_template": "game.html", "users": users})
+        return render(request, "game/game_new.html", {"users": users})
+    else:  # Carga normal, devuelve base.html con el contenido de game_new.html
+        return render(request, "base.html", {"content_template": "game/game_new.html", "users": users})
 
 # Vista para el detalle de una partida
 @login_required
@@ -191,9 +191,9 @@ def game_detail_view(request, game_id):
     }
 
     if request.headers.get("HX-Request"):
-        return render(request, "game_detail.html", context)
+        return render(request, "game/game_detail.html", context)
     else:
-        return render(request, "base.html", {"content_template": "game_detail.html", **context})
+        return render(request, "base.html", {"content_template": "game/game_detail.html", **context})
 
 @csrf_exempt 
 @login_required
@@ -346,9 +346,9 @@ def game_results_list_view(request):
     context = {"results": results}
 
     if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
-        return render(request, "game_results.html", context)
+        return render(request, "game/game_results.html", context)
     else:  # Si es una carga normal, devolvemos base.html con game_results.html dentro
-        return render(request, "base.html", {"content_template": "game_results.html", **context})
+        return render(request, "base.html", {"content_template": "game/game_results.html", **context})
 
 
 @login_required
@@ -358,9 +358,9 @@ def games_list_view(request):
     context = {"games": games}
 
     if request.headers.get("HX-Request"):  # Si la petición es HTMX, solo devolvemos el contenido
-        return render(request, "game_list.html", context)
+        return render(request, "game/game_list.html", context)
     else:  # Si es una carga normal, devolvemos base.html con game_list.html dentro
-        return render(request, "base.html", {"content_template": "game_list.html", **context})
+        return render(request, "base.html", {"content_template": "game/game_list.html", **context})
 
 
 

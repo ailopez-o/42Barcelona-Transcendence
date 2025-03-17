@@ -10,8 +10,8 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter 
-from app.game_routing import websocket_urlpatterns as game_ws_urlpatterns
-from app.chat_routing import websocket_urlpatterns as chat_ws_urlpatterns
+from app.consumers.game_routing import websocket_urlpatterns as game_ws_urlpatterns
+from app.consumers.chat_routing import websocket_urlpatterns as chat_ws_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
 

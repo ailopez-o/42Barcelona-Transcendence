@@ -7,7 +7,7 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import random
-from .models import Game
+from ..models import Game
 import logging
 logger = logging.getLogger(__name__)
 
