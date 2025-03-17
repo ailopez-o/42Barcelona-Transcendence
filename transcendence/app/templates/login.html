@@ -1,48 +1,64 @@
-<h2>Iniciar Sesión</h2>
+<div id="login-container">
+    <h2>Iniciar Sesión</h2>
 
-<!-- Botón para alternar entre métodos de login -->
-<button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
-    Ingresar con 42
-</button>
+    <!-- Botón para alternar -->
+    <button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
+        Ingresar con 42
+    </button>
 
-<!-- Formulario de login con usuario y contraseña -->
-<div id="credentials_login" style="display: block;">
-    <form id="login_form" method="post" hx-post="{% url 'login' %}" hx-target="#credentials_login" hx-swap="outerHTML">
-        {% csrf_token %}
-        <div class="form-group d-flex flex-column">
-            <label for="{{ form.username.id_for_label }}">Usuario:</label>
-            {{ form.username }}
-            <div class="form-error">{{ form.username.errors }}</div>
-        </div>
-        <div class="form-group d-flex flex-column">
-            <label for="{{ form.password.id_for_label }}">Contraseña:</label>
-            {{ form.password }}
-            <div class="form-error">{{ form.password.errors }}</div>
-        </div>
-        <div class="non-field-error">
-            {{ form.non_field_errors }}
-        </div>
-        <button class="btn btn-outline-dark" type="submit">Ingresar</button>
-    </form>
-</div>
+    <!-- Formulario de login -->
+    <div id="credentials_login" style="display: block;">
+        <form id="login_form" method="post" 
+              hx-post="{% url 'login' %}" 
+              hx-target="#login-container" 
+              hx-swap="outerHTML">
+            {% csrf_token %}
+            <div class="form-group d-flex flex-column">
+                <label for="{{ form.username.id_for_label }}">Usuario:</label>
+                {{ form.username }}
+                <div class="form-error">{{ form.username.errors }}</div>
+            </div>
+            <div class="form-group d-flex flex-column">
+                <label for="{{ form.password.id_for_label }}">Contraseña:</label>
+                {{ form.password }}
+                <div class="form-error">{{ form.password.errors }}</div>
+            </div>
+            <div class="non-field-error">
+                {{ form.non_field_errors }}
+            </div>
+            <button class="btn btn-outline-dark" type="submit">Ingresar</button>
+        </form>
+    </div>
 
-<!-- Botón para login con 42 -->
-<div id="intra_login" style="display: none;">
-    <div class="text-center">
-        <p class="text-white mb-4">Inicia sesión con tu cuenta de 42</p>
-        <button class="btn btn-outline-dark" 
-                hx-get="{% url 'login_42' %}" 
-                hx-trigger="click"
-                hx-target="body"
-                hx-swap="outerHTML">
-            Ingresar con 42
-        </button>
+    <!-- Login con 42 -->
+    <div id="intra_login" style="display: none;">
+        <div class="text-center">
+            <p class="text-white mb-4">Inicia sesión con tu cuenta de 42</p>
+            <button class="btn btn-outline-dark" 
+                    hx-get="{% url 'login_42' %}" 
+                    hx-trigger="click"
+                    hx-target="body"
+                    hx-swap="outerHTML">
+                Ingresar con 42
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
+    document.addEventListener("htmx:afterSwap", function(event) {
+        // Solo si el swap fue en #login-container
+        if (event.target.id === "login-container") {
+            // Reasigna el listener del botón
+            const btn = document.getElementById('toggle_login_btn');
+            if (btn) {
+                btn.onclick = toggleLoginMethod;
+            }
+        }
+    });
+
     let currentMethod = 'credentials';
-    
+
     function toggleLoginMethod() {
         if (currentMethod === 'credentials') {
             document.getElementById('credentials_login').style.display = 'none';
@@ -57,3 +73,4 @@
         }
     }
 </script>
+
