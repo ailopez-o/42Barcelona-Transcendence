@@ -16,9 +16,47 @@ import urllib.parse
 
 AUTH_USER_MODEL = 'app.User'
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# LOGER CONFIGURATION
+# Crear carpeta de logs si no existe
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} (line {lineno}): {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',  # Guardará todo desde DEBUG en adelante
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'debug.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+
+    'root': {
+        'handlers': ['file', 'console'],  # Ambos: consola y archivo
+        'level': 'INFO',  # Mínimo nivel mostrado
+    },
+}
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +69,6 @@ SECRET_KEY = 'django-insecure-cn3)fucx)l#9q*2iyf&56y3-qm&2tq_%9(0d8l7l4)hco^be2d
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 

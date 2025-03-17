@@ -9,5 +9,7 @@ __init__.py
 transcendence/staticfiles
 postgres_data/
 media/
+logs/
+
 
 

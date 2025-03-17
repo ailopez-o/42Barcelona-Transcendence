@@ -12,10 +12,9 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.db.models import Q
+from django.shortcuts import redirect
 from .forms import CustomUserCreationForm 
-import logging
 from .models import Game, Tournament, GameResult, Notification
-logger = logging.getLogger(__name__)
 import json
 import requests
 import urllib.parse
@@ -23,7 +22,8 @@ from django.utils.timezone import now
 from .models import ChatRoom, ChatMessage
 from django.contrib import messages
 from django.http import HttpResponseForbidden
-
+import logging
+logger = logging.getLogger(__name__)
 
 # Obtener el modelo de usuario configurado en AUTH_USER_MODEL
 User = get_user_model()
@@ -34,6 +34,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            logger.info(f"Usuario {user.username} logeado con credenciales.")
             if request.headers.get("HX-Request"):  # Si es HTMX, enviamos una redirección HTMX
                 response = HttpResponse()
                 response["HX-Redirect"] = "/profile/"  # Redirige a la vista de perfil sin recargar
@@ -64,7 +65,10 @@ def home_view(request):
         return redirect("login")  # Redirección normal si no es HTMX
 
 def logout_view(request):
+    current_user = request.user
     logout(request)
+
+    logger.info(f"Usuario {current_user.username} logout.")
 
     if request.headers.get("HX-Request"):  # Si es una petición HTMX
         response = HttpResponse()
@@ -424,12 +428,17 @@ def game_save_view(request):
         game.status = "finalizado"
         game.save()
 
-        # print(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
+        logger.info(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
 
         # Enviar notificación a todos los usuarios
         # Solo enviar notificación si fue la PRIMERA vez que se guardó el resultado
         if created:
             send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
+
+        # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
+        if game.tournament:
+            logger.info(f"Llamando a check_next_round para el torneo: {game.tournament.name}")
+            game.tournament.check_next_round()
 
         return JsonResponse({
             "status": "success",
@@ -442,14 +451,6 @@ def game_save_view(request):
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
     
-
-def test_game_result_view(request):
-    return render(request, "test_game_result.html")
-
-
-    import requests
-from django.shortcuts import redirect
-
 def login_with_42(request):
     """Redirige al usuario a la plataforma de autenticación de 42."""
     
@@ -515,6 +516,8 @@ def oauth_callback(request):
 
     # Autenticar al usuario en Django
     login(request, user)
+    
+    logger.info(f"Usuario {user.username} logeado con API 42.")
 
     # Manejar redirección según si la petición es HTMX o no
     if request.headers.get("HX-Request"):  # Si la petición es HTMX
