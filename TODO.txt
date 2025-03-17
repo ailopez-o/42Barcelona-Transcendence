@@ -1,19 +1,25 @@
+Features:
+
 Mostrar las notificaciones de partida nueva en caliente. MOLA pero no nos va a dar más puntos
-Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
-Al menos que el chat al cambiar limpie la ventada de chat
 Integrar 3D y MonumentPixel
-Que JS actualice que la partida está en curso
+Que en una partida al pulsar por ejemplo F10 se termine la partida con un ganador y resultado random. MUY util para testing
 
 
 Bugs:
 
-- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona
-15/03/2025
 - Intento loggearme SIN 42 y cada vez que fallas en la contraseña se duplica el titulo "Iniciar Sesión" y el botón de loggeo de 42.
 - En el momento de finalizar la partida falta el número de segundos, cuando ya esta finalizada y te metes si sale.
 - Bloquear que no se puedan crear partidas de gente impar, porque ahora mismo no empieza el torneo si se apuntan 3, no se crean las partidas.
 - Me salen las notificaciones, duplicadas, o triplicadas 
 - He creado un torneo de 4, se crean las partidas iniciales pero cuando las terminas, no aparece la siguiente ronda y se queda el torneo sin terminar.
+- Manda dos notificaciones cuando se acaba una partida. 17/03/2025
+
+Fixed:
+
+15/03/2025: Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona 
+17/03/2025: Manda dos notificaciones cuando se acaba una partida. 
+17/03/2025: Que el chat no pierda la conversacion si cambias de pestaña. MOLA pero no nos va a dar más puntos
+17/03/2025: Que JS actualice que la partida está en curso
 
 Testing:
 
