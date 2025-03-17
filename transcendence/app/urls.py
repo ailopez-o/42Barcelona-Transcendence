@@ -16,6 +16,7 @@ urlpatterns = [
     path('game/list', views.game_list_view, name='game_list'),
     path('game/<int:game_id>/accept/', views.accept_game_view, name='accept_game'),
     path('game/<int:game_id>/reject/', views.reject_game_view, name='reject_game'),
+	path("game/<int:game_id>/delete", views.delete_game_view, name="delete_game"),
     path('global_chat/', views.global_chat_view, name='global_chat'),
     path('users/', views.users_list_view, name='users'),
     path("login_42/", views.login_with_42, name="login_42"),

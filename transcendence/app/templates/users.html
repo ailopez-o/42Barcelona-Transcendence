@@ -39,8 +39,9 @@
                             hx-post="{% url 'delete_user' user.id %}" 
                             hx-target="#main-content"
                             hx-confirm="¿Estás seguro de eliminar a {{ user.username }}?"
-                            class="btn btn-danger btn-sm">
-                            Eliminar
+                            class="btn btn-outline-danger btn-sm"
+                            title="Eliminar">
+                            <i class="bi bi-trash3"></i>
                         </button>
                     </td>
                     {% endif %}

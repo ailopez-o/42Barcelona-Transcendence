@@ -167,6 +167,23 @@ def new_game_view(request):
     else:  # Carga normal, devuelve base.html con el contenido de game_new.html
         return render(request, "base.html", {"content_template": "game/game_new.html", "users": users})
 
+@csrf_exempt 
+@login_required
+def delete_game_view(request, game_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("No tienes permisos para eliminar partidas.")
+
+    game = get_object_or_404(Game, id=game_id)
+    game.delete()
+
+    games = Game.objects.select_related('player1', 'player2', 'tournament', 'result').order_by('-created_at')
+
+    if request.headers.get("HX-Request"):
+        return render(request, "game/game_list.html", {"games": games})
+    
+    return redirect("game_list")
+
+
 # Vista para el detalle de una partida
 @login_required
 def game_detail_view(request, game_id):
