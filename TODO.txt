@@ -10,7 +10,22 @@ Bugs:
 - Intento loggearme SIN 42 y cada vez que fallas en la contraseña se duplica el titulo "Iniciar Sesión" y el botón de loggeo de 42.
 - En el momento de finalizar la partida falta el número de segundos, cuando ya esta finalizada y te metes si sale.
 
-- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona 
+- Cuando creas una nueva partida (creo que solo la primera vez) no hace caso a la barra espaciadora, hay que recargar y ya funciona. Quizas esto solamente pase cuando haga notificaciones (además las notificaciones se veem cortadas)
+
+- Invité al usuario wakawaka a jugar. En su ventana los dos estaban ready, en la mía (jugador davifern) no. La partida empezó y en mi ventana no cambió el estado de wakawaka. En la ventana de wakawaka sí y además hubo ponto aunque la pelota no hubiera movidose. [imagenes bug01 y bug02]
+
+- Cuando registro un nuevo usuário con foto, la foto no es cargana en ningun lugar.
+
+- pacoloco ha recibido una invitación para jugar pelo la notificación no salió por si solamente, tuve que hacer un refresh. Y ella tampoco aparecia intera. [imagen bug03]
+
+- cuando pacoloco ha presionado la tecla espacio ha cambiado su estado correctamente, pero cundo yo la he presionado (davifern), ha invertido los estados (paco ha salido de ready para pending y yo de pending para ready). Despues si presiono espacio con paco loco, esto lo pone en ready y a mi en pending.
+
+- cuando la pelota toca en una extremidad de la barra ella pasa por de trás de la barra
+
+- invite un user para jugar. Aunque el perca sale como vencedor en la ultima pantalla. [img bug04]
+
+- aunque maricarmen tenga ganado (la verdad davifern ha ganado) sale como si todavía estuviera en curso. [img bug05]
+
 
 Fixed:
 
