@@ -1,0 +1,15 @@
+<!-- templates/view_logs.html -->
+<div class="card bg-dark text-light">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Logs de la Aplicación</h5>
+        <button class="btn btn-sm btn-outline-light"
+                hx-get="{% url 'view_logs' %}" hx-target="#main-content" hx-swap="innerHTML">
+            🔄 Recargar
+        </button>
+    </div>
+    <div class="card-body">
+        <pre class="bg-black text-light p-3 rounded" style="max-height: 500px; overflow-y: auto; font-size: 0.85rem;">
+{{ log_content }}
+        </pre>
+    </div>
+</div>
