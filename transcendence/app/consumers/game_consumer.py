@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 # Variables globales para controlar el estado y el bucle de cada sala
 global_room_states = {}
 running_game_loops = {}
-player_ready_status = {}  # Diccionario para el estado de "listo" de los jugadores
 game_difficulty = {}  # Almacenar la dificultad de cada juego
 
 class PongGameConsumer(AsyncWebsocketConsumer):
@@ -25,8 +24,16 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         game = Game.objects.get(id=game_id)
         game.status = status
         game.save(update_fields=['status'])
+        
+    @database_sync_to_async
+    def game_exists(self, game_id):
+        return Game.objects.filter(id=game_id).exists()
     
     async def connect(self):
+        game_id = self.scope['url_route']['kwargs']['game_id']
+        if not await self.game_exists(game_id):
+            await self.close()
+            return
         self.user = self.scope["user"]  # Obtener usuario conectado
         self.room_name = f"game_{self.scope['url_route']['kwargs']['game_id']}"
         await self.channel_layer.group_add(self.room_name, self.channel_name)
@@ -55,12 +62,6 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     "player1": False,
                     "player2": False
                 }
-            }
-            
-            # Inicializamos el estado de "listo" de los jugadores
-            player_ready_status[self.room_name] = {
-                "player1": False,
-                "player2": False
             }
             
         # Enviamos un mensaje inicial SOLO con el estado actual, sin mensaje adicional
@@ -142,8 +143,6 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 # Marcar al jugador como listo
                 if not state["ready_status"][data["player"]]:  
                     state["ready_status"][data["player"]] = True
-                    player_ready_status[self.room_name][data["player"]] = True
-                    
                     logger.info(f"{data['player']} está listo en {self.room_name}.")
 
                 # Comprobar si ambos jugadores están listos

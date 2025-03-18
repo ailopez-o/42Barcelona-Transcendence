@@ -465,8 +465,8 @@
     
         if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
     
-        //console.log("🔑 Tecla presionada:", e.key);
-        //console.log("🔑 Player presionada:", window.currentPlayer);
+        console.log("🔑 Tecla presionada:", e.key);
+        console.log("🔑 Player presionada:", window.currentPlayer);
 
         socket.send(JSON.stringify({
             player: window.currentPlayer,
