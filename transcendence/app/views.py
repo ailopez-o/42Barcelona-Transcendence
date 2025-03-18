@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
@@ -591,5 +592,26 @@ def delete_user(request, user_id):
 
     return redirect("users_list")
 
+@login_required
+def view_logs(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("No tienes permiso para ver los logs.")
+
+    log_file_path = os.path.join(settings.BASE_DIR, 'logs', 'debug.log')  # Ajusta si tu ruta es distinta
+
+    if not os.path.exists(log_file_path):
+        log_content = "El archivo de log no existe."
+    else:
+        with open(log_file_path, 'r') as f:
+            lines = f.readlines()[-200:]
+        log_content = ''.join(lines)
+
+    if request.headers.get("HX-Request"):
+        return render(request, "view_logs.html", {"log_content": log_content})
+
+    return render(request, "base.html", {
+        "content_template": "view_logs.html",
+        "log_content": log_content
+    })
 
 

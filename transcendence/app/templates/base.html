@@ -34,6 +34,9 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'users' %}" hx-get="{% url 'users' %}" hx-target="#main-content" hx-push-url="true">Usuarios</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'game_list' %}" hx-get="{% url 'game_list' %}" hx-target="#main-content" hx-push-url="true">Partidas</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'global_chat' %}" hx-get="{% url 'global_chat' %}" hx-target="#main-content" hx-push-url="true">Chat Global</a></li>
+                        {% if user.is_superuser %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'view_logs' %}" hx-get="{% url 'view_logs' %}" hx-target="#main-content" hx-push-url="true">Logs</a></li>
+                        {% endif %}
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}" hx-get="{% url 'login' %}" hx-target="#main-content" hx-push-url="true">Ingresar</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'register' %}" hx-get="{% url 'register' %}" hx-target="#main-content" hx-push-url="true">Registrarse</a></li>
