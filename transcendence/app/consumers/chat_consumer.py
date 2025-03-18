@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.user = self.scope["user"]  # Obtener usuario conectado
         # Intenta obtener el game_id de la URL; si no existe, se usa global_chat
         self.game_id = self.scope['url_route']['kwargs'].get('game_id', None)
         if self.game_id:
@@ -19,7 +20,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-        logger.info(f"Conexion a la sala {self.room_group_name}")
+        username = self.user.username if self.user.is_authenticated else "Anónimo"
+        logger.info(f"Conexión a la sala {self.room_group_name} de {username}")
 
         # Recuperar y enviar historial de mensajes
         history = await self.get_chat_history(self.room_group_name)
@@ -27,7 +29,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps(msg))
 
     async def disconnect(self, close_code):
-        logger.info(f"Desconexion a la sala {self.room_group_name}")
+        self.user = self.scope["user"]  # Obtener usuario conectado
+        username = self.user.username if self.user.is_authenticated else "Anónimo"
+        logger.info(f"Desconexion de la sala {self.room_group_name} de {username}")
         # Abandonar el grupo
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 

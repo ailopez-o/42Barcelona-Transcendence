@@ -27,11 +27,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         game.save(update_fields=['status'])
     
     async def connect(self):
+        self.user = self.scope["user"]  # Obtener usuario conectado
         self.room_name = f"game_{self.scope['url_route']['kwargs']['game_id']}"
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
 
-        logger.info(f"Conexion a al juego {self.room_name}")
+        username = self.user.username if self.user.is_authenticated else "Anónimo"
+        logger.info(f"Conexion a al juego {self.room_name} de {username}")
 
         # Si aún no existe estado para esta sala, créalo
         if self.room_name not in global_room_states:
@@ -76,8 +78,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
+        self.user = self.scope["user"]  # Obtener usuario conectado
+        username = self.user.username if self.user.is_authenticated else "Anónimo"
         data = json.loads(text_data)
-        logger.info(f"Mensaje recibido: {data}")
+        logger.info(f"Mensaje recibido en {self.room_name} de {username}: {data}")
         state = global_room_states[self.room_name]
         
         # Comprobar si el evento viene de uno de los jugadores válidos
@@ -270,5 +274,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event["state"]))
 
     async def disconnect(self, close_code):
-        logger.info(f"Desconexion del juego {self.room_name}")
+        self.user = self.scope["user"]  # Obtener usuario conectado
+        username = self.user.username if self.user.is_authenticated else "Anónimo"
+        logger.info(f"Desconexion del juego {self.room_name} de {username}")
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
