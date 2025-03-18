@@ -111,8 +111,21 @@ function setupChat() {
     
     // Opción adicional: Mostrar un mensaje en consola si el usuario es un espectador
     if (!currentPlayer) {
-        console.warn("⚠️ Usuario en modo espectador. No tiene permisos para jugar ni chatear.");
+        console.warn("⚠️ Usuario en modo espectador. No puede enviar mensajes.");
+    
+        // Deshabilita el input y botón
+        chatInput.disabled = true;
+        chatInput.placeholder = "🔒 Solo los jugadores pueden escribir";
+        chatInput.classList.add("bg-light");
+    
+        const submitBtn = chatForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add("btn-secondary");
+            submitBtn.innerHTML = '<i class="bi bi-lock-fill"></i>';  // Icono de candado
+        }
     }
+    
     
     console.log("✅ Chat form encontrado en el DOM.");
 
