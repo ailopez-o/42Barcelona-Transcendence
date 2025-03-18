@@ -44,6 +44,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
         # Si aún no existe estado para esta sala, créalo
         if self.room_name not in global_room_states:
+            logger.info(f"Nuevo state para {self.room_name}")
+
             # Usaremos un valor predeterminado para la dificultad, que se actualizará 
             # cuando recibamos el primer mensaje del cliente
             game_difficulty[self.room_name] = 1.0  # Valor predeterminado medio
