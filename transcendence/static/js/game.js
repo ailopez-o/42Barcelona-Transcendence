@@ -117,7 +117,7 @@
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             if (!data) return;
-            //console.log('INFO', data);
+            console.log('INFO', data);
 
             // Si el juego ha terminado, mostrar resultados y no seguir actualizando
             if (data.game_over) {
