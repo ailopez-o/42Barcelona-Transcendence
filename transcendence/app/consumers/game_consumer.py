@@ -72,6 +72,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         # Enviar inmediatamente el estado actualizado a todos los clientes
         # Sin mensajes de texto adicionales
         state = global_room_states[self.room_name]
+        logger.info(f"Estado actual ready_status en {self.room_name}: {state['ready_status']}")
         await self.channel_layer.group_send(
             self.room_name,
             {
@@ -146,6 +147,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 if not state["ready_status"][data["player"]]:  
                     state["ready_status"][data["player"]] = True
                     logger.info(f"{data['player']} está listo en {self.room_name}.")
+                
+                logger.info(f"Estado actual ready_status en {self.room_name}: {state['ready_status']}")
 
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
