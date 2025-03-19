@@ -69,10 +69,26 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         # Enviamos un mensaje inicial SOLO con el estado actual, sin mensaje adicional
         # await self.send(text_data=json.dumps(global_room_states[self.room_name]))
 
-        # Enviar inmediatamente el estado actualizado a todos los clientes
-        # Sin mensajes de texto adicionales
+        # recuperamos el state
         state = global_room_states[self.room_name]
-        logger.info(f"Estado actual ready_status en {self.room_name}: {state['ready_status']}")
+
+        # para mantener la persistencia, sacaremos el ready_status y status de la partida de la base de datos
+        game_id = self.scope['url_route']['kwargs']['game_id']
+        game = await Game.objects.aget(id=game_id)
+        state["ready_status"]["player1"] = game.player1_ready
+        state["ready_status"]["player2"] = game.player2_ready
+        # Sincronizamos el estado del juego con la base de datos
+        state["game_started"] = game.status == "en_curso"
+        state["game_over"] = game.status == "finalizado"
+        # Si el estado del juego es en_curso, ambos jugadores están listos
+        if (game.status == "en_curso"):
+            state["ready_status"]["player1"] = True
+            state["ready_status"]["player2"] = True
+
+        # TODO: Si el juego ya ha terminado, limpiar el estado y detener el bucle del juego
+
+        # Enviar inmediatamente el estado actualizado a todos los clientes
+        logger.info(f"Estado actual en {self.room_name}: {state} ")
         await self.channel_layer.group_send(
             self.room_name,
             {
@@ -145,7 +161,15 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             if key == " " and not state["game_started"]:
                 # Marcar al jugador como listo
                 if not state["ready_status"][data["player"]]:  
+                    #actualizamos el state
                     state["ready_status"][data["player"]] = True
+                    # persistencia en la base de datos
+                    game_id = self.scope['url_route']['kwargs']['game_id']
+                    if data["player"] == "player1":
+                        await Game.objects.filter(id=game_id).aupdate(player1_ready=True)
+                    if data["player"] == "player2":
+                        await Game.objects.filter(id=game_id).aupdate(player2_ready=True)
+                    # Loggear el estado actual
                     logger.info(f"{data['player']} está listo en {self.room_name}.")
                 
                 logger.info(f"Estado actual ready_status en {self.room_name}: {state['ready_status']}")
@@ -155,7 +179,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     state["game_started"] = True
                     
                     # Actualizar el estado de la partida en la base de datos
-                    await self.update_game_status("en_curso", self.scope['url_route']['kwargs']['game_id'])
+                    game_id = self.scope['url_route']['kwargs']['game_id']
+                    await Game.objects.filter(id=game_id).aupdate(status="en_curso")
 
                     # Iniciar la bola con velocidad según la dificultad
                     state["ball"]["dx"] = random.choice([-5, 5]) * game_difficulty[self.room_name]
