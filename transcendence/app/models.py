@@ -172,6 +172,9 @@ class Game(models.Model):
     points = models.PositiveIntegerField(default=10)
     paddle_color = models.CharField(max_length=7, default="#0000ff")  # Formato hexadecimal, ejemplo: azul
     ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
+    background_color = models.CharField(max_length=7, default="#000000")  # Formato hexadecimal, ejemplo: negro
+    game_mode = models.BooleanField(default=True) # Game mode true si es 2d
+
 
     def __str__(self):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"

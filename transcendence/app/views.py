@@ -135,6 +135,8 @@ def new_game_view(request):
         points = request.POST.get('points', 10)
         paddle_color = request.POST.get('paddle_color', "#0000ff")
         ball_color = request.POST.get('ball_color', "#ff0000")
+        background_color = request.POST.get('background_color', "#000000")
+        game_mode = request.POST.get('game_mode', '2d') == '2d'
 
         game = Game.objects.create(
             player1=request.user,
@@ -142,7 +144,9 @@ def new_game_view(request):
             difficulty=difficulty,
             points=points,
             paddle_color=paddle_color,
-            ball_color=ball_color
+            ball_color=ball_color,
+            background_color=background_color,
+            game_mode=game_mode
         )
 
         context = {

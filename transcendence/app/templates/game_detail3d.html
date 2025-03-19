@@ -70,9 +70,7 @@
                 <!-- Formulario para enviar mensajes -->
                 <form id="chat-form" class="d-flex" hx-boost="false">
                     <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i>
-                    </button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
                 </form>                
             </div>
         </div>
@@ -106,7 +104,6 @@
         "points": {{ game.points }},
         "paddle_color": "{{ game.paddle_color }}",
         "ball_color": "{{ game.ball_color }}",
-        "background_color": "{{ game.background_color }}",
         "player1_score": {{ player1_score }},
         "player2_score": {{ player2_score }},
         "duration": "{{ game_result.duration }}",
@@ -115,9 +112,9 @@
     }
 </script> 
 
-{% if game.game_mode %}
-<script src="{% static 'js/game.js' %}"></script>
+{% if use_3d_mode %}
+<script src="{% static 'js/game3d.js' %}"></script>
 {% else %}
-<script type="module" src="{% static 'js/game3D.js' %}"></script>
+<script src="{% static 'js/game.js' %}"></script>
 {% endif %}
 <script src="{% static 'js/chat.js' %}"></script>
