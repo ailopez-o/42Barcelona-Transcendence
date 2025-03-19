@@ -106,6 +106,7 @@
         "points": {{ game.points }},
         "paddle_color": "{{ game.paddle_color }}",
         "ball_color": "{{ game.ball_color }}",
+        "background_color": "{{ game.background_color }}",
         "player1_score": {{ player1_score }},
         "player2_score": {{ player2_score }},
         "duration": "{{ game_result.duration }}",
@@ -114,5 +115,9 @@
     }
 </script> 
 
-<script src="{% static 'js/chat.js' %}"></script>
+{% if game.game_mode %}
 <script src="{% static 'js/game.js' %}"></script>
+{% else %}
+<script type="module" src="{% static 'js/game3D.js' %}"></script>
+{% endif %}
+<script src="{% static 'js/chat.js' %}"></script>
