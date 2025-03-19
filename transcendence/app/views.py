@@ -398,7 +398,7 @@ def game_save_view(request):
         duration = data.get("duration")
 
         # Validar que no falten datos
-        if not all([game_id, winner_id, loser_id, score_winner, score_loser, duration]):
+        if None in (game_id, winner_id, loser_id, score_winner, score_loser, duration):
             return JsonResponse({"status": "error", "message": "Faltan datos en la solicitud"}, status=400)
 
         # Obtener el juego manualmente para evitar que `get_object_or_404` devuelva HTML
