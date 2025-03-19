@@ -168,6 +168,8 @@ class Game(models.Model):
 
     player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
     player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE)
+    player1_ready = models.BooleanField(default=False)
+    player2_ready = models.BooleanField(default=False)
     tournament = models.ForeignKey(Tournament, on_delete=models.SET_NULL, null=True, blank=True, related_name="games")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
     created_at = models.DateTimeField(auto_now_add=True)
