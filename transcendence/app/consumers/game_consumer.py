@@ -173,7 +173,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     # Loggear el estado actual
                     logger.info(f"{data['player']} está listo en {self.room_name}.")
                 
-                logger.info(f"Estado actual ready_status en {self.room_name}: {state['ready_status']}")
+                logger.info(f"Estado actual en {self.room_name}: {state} ")
 
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
