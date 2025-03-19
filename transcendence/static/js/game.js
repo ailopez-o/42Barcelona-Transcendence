@@ -226,49 +226,6 @@
             drawGame();
         };
         
-        /**
-         * Envía los resultados del juego al endpoint
-         */
-        function sendGameResults(results) {
-            console.log('Enviando resultados:', results);
-            
-            fetch('/game/save/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
-                },
-                body: JSON.stringify(results)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error HTTP:', response.status, response.statusText);
-                    throw new Error(`Error al enviar resultados: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Resultados guardados correctamente:', data);
-                // Puedes mostrar un mensaje de éxito aquí si lo deseas
-                if (data.status === 'success') {
-                    // Opcional: Mostrar alguna notificación o actualizar la UI
-                    const statusElement = document.getElementById("status-message");
-                    if (statusElement) {
-                        const actionText = data.created ? "registrado" : "actualizado";
-                        statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error al guardar resultados:', error);
-                // Opcional: Mostrar un mensaje de error al usuario
-                const statusElement = document.getElementById("status-message");
-                if (statusElement) {
-                    statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
-                }
-            });
-        }
-        
         // Función para actualizar la visualización del estado READY/PENDING en el HTML
         function updateReadyStatusDisplay() {
             const player1StatusElement = document.getElementById("player1-ready-status");
@@ -428,21 +385,6 @@
             ctx.fillText(`Duración: ${gameData.duration} segundos`, ctx.canvas.width / 2, 300);
         }
 
-        function markPlayersAsFinished() {
-            const player1Status = document.getElementById("player1-ready-status");
-            const player2Status = document.getElementById("player2-ready-status");
-    
-            if (player1Status) {
-                player1Status.textContent = "FINISH";
-                player1Status.className = "badge bg-danger"; // Cambia a rojo
-            }
-    
-            if (player2Status) {
-                player2Status.textContent = "FINISH";
-                player2Status.className = "badge bg-danger"; // Cambia a rojo
-            }
-        }
-
     };
     
     // Se ejecuta cuando hay recarga HTMX
@@ -471,8 +413,7 @@
         console.log("🔑 Tecla presionada:", e.key);
         console.log("🔑 Player presionada:", window.currentPlayer);
 
-        // Handle R key to randomly end the game
-        if (e.key.toLowerCase() === 'r' && !gameEnded) {
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r' && !gameEnded) {
             e.preventDefault();
             randomlyEndGame();
             return;
@@ -484,8 +425,65 @@
         }));
     }
 
+    /**
+    * Envía los resultados del juego al endpoint
+    */
+    function sendGameResults(results) {
+        console.log('Enviando resultados:', results);
+        
+        fetch('/game/save/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
+            },
+            body: JSON.stringify(results)
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error HTTP:', response.status, response.statusText);
+                throw new Error(`Error al enviar resultados: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Resultados guardados correctamente:', data);
+            // Puedes mostrar un mensaje de éxito aquí si lo deseas
+            if (data.status === 'success') {
+                // Opcional: Mostrar alguna notificación o actualizar la UI
+                const statusElement = document.getElementById("status-message");
+                if (statusElement) {
+                    const actionText = data.created ? "registrado" : "actualizado";
+                    statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error al guardar resultados:', error);
+            // Opcional: Mostrar un mensaje de error al usuario
+            const statusElement = document.getElementById("status-message");
+            if (statusElement) {
+                statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
+            }
+        });
+    }
+    
+    function markPlayersAsFinished() {
+        const player1Status = document.getElementById("player1-ready-status");
+        const player2Status = document.getElementById("player2-ready-status");
+
+        if (player1Status) {
+            player1Status.textContent = "FINISH";
+            player1Status.className = "badge bg-danger"; // Cambia a rojo
+        }
+
+        if (player2Status) {
+            player2Status.textContent = "FINISH";
+            player2Status.className = "badge bg-danger"; // Cambia a rojo
+        }
+    }
+
     function randomlyEndGame() {
-        if (gameEnded) return;
         
         // Generate random scores between 0 and gameTargetScore
         const player1Score = Math.floor(Math.random() * (gameTargetScore + 1));
@@ -497,7 +495,7 @@
         const loserId = isLeftWinner ? playerData.player2.id : playerData.player1.id;
         
         // Calculate game duration
-        const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
+        const gameDuration = 42;
         
         // Inform backend that game is over
         socket.send(JSON.stringify({
