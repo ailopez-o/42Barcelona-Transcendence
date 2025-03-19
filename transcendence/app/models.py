@@ -113,13 +113,11 @@ class Tournament(models.Model):
             logger.info(f"Torneo finalizado {self.name}. Ganador {self.winner.username}.")
             return
 
-        if len(winners) < 2:
-            # Algo anda mal si no hay suficientes ganadores para una ronda
-            return
-
         # Preparar siguiente ronda
         shuffle(winners)
         match_pairs = [(winners[i], winners[i + 1]) for i in range(0, len(winners), 2)]
+
+        logger.info(f"Siguiente ronda en torneo {self.name}")
 
         for pair in match_pairs:
             player1_id = pair[0]
@@ -132,12 +130,9 @@ class Tournament(models.Model):
 
             player1 = User.objects.get(id=player1_id)
             player2 = User.objects.get(id=player2_id)
-            Game.objects.create(
-                player1=player1,
-                player2=player2,
-                status='pendiente',
-                tournament=self
-            )
+            Game.objects.create(player1=player1,player2=player2,status='pendiente',tournament=self)
+            logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
+
 
     def create_bye_win(self, player_id):
         """Registra una victoria automática para jugadores sin oponente (bye)"""
