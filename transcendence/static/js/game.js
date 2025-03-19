@@ -471,14 +471,77 @@
         console.log("🔑 Tecla presionada:", e.key);
         console.log("🔑 Player presionada:", window.currentPlayer);
 
+        // Handle R key to randomly end the game
+        if (e.key.toLowerCase() === 'r' && !gameEnded) {
+            e.preventDefault();
+            randomlyEndGame();
+            return;
+        }
+
         socket.send(JSON.stringify({
             player: window.currentPlayer,
             key: e.key
         }));
     }
+
+    function randomlyEndGame() {
+        if (gameEnded) return;
+        
+        // Generate random scores between 0 and gameTargetScore
+        const player1Score = Math.floor(Math.random() * (gameTargetScore + 1));
+        const player2Score = Math.floor(Math.random() * (gameTargetScore + 1));
+        
+        // Randomly determine winner
+        const isLeftWinner = Math.random() < 0.5;
+        const winnerId = isLeftWinner ? playerData.player1.id : playerData.player2.id;
+        const loserId = isLeftWinner ? playerData.player2.id : playerData.player1.id;
+        
+        // Calculate game duration
+        const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
+        
+        // Inform backend that game is over
+        socket.send(JSON.stringify({
+            player: window.currentPlayer,
+            game_over: true
+        }));
+        
+        // Send results to endpoint
+        sendGameResults({
+            game_id: gameId,
+            winner_id: winnerId,
+            loser_id: loserId,
+            score_winner: isLeftWinner ? player1Score : player2Score,
+            score_loser: isLeftWinner ? player2Score : player1Score,
+            duration: gameDuration
+        });
+        
+        // Update UI
+        gameEnded = true;
+        const statusElement = document.getElementById("status-message");
+        if (statusElement) {
+            const winnerName = isLeftWinner ? playerData.player1.username : playerData.player2.username;
+            statusElement.innerText = `¡Juego terminado! ${winnerName} ha ganado la partida.`;
+            statusElement.className = "alert alert-success text-center";
+        }
+        
+        // Update scores display
+        const leftScoreElement = document.getElementById("left-score");
+        const rightScoreElement = document.getElementById("right-score");
+        if (leftScoreElement && rightScoreElement) {
+            leftScoreElement.textContent = player1Score;
+            rightScoreElement.textContent = player2Score;
+        }
+        
+        // Mark players as finished
+        markPlayersAsFinished();
+        
+        // Close WebSocket connection
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+    }
     
-    
-    // 🚀 **Desactivar el WebSocket y limpiar eventos al salir de la página**
+    // Event listener global para las teclas
     window.addEventListener("beforeunload", function () {
         console.log("✅ Cerrando WebSocket y limpiando intervalos...");
         
