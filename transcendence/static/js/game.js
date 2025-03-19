@@ -40,7 +40,7 @@
 
     function setupGame() {
 
-        console.log("✅ DOM completamente cargado");
+        console.log("Setup Game ejecutado");
     
         gameState = {};
     
@@ -476,6 +476,7 @@
     
     // Event listener global para las teclas
     if (!window.isKeyListenerActive) {
+        console.log("EventListener");
         document.addEventListener("keydown", handleKeyDown);
         window.isKeyListenerActive = true;
     }
