@@ -275,7 +275,6 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         function updateReadyStatusDisplay() {
             const player1StatusElement = document.getElementById("player1-ready-status");
             const player2StatusElement = document.getElementById("player2-ready-status");
-            console.log("🔄 Actualizando estado READY/PENDING...", gameState.ready_status.player1, gameState.ready_status.player2);           
             if (player1StatusElement) {
                 if (gameState.ready_status.player1) {
                     player1StatusElement.textContent = "READY";
