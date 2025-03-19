@@ -42,6 +42,9 @@
 
         console.log("Setup Game ejecutado");
     
+        document.removeEventListener("keydown", handleKeyDown);
+        document.addEventListener("keydown", handleKeyDown);
+
         gameState = {};
     
         // Verificar si existen los elementos en el DOM
@@ -472,13 +475,6 @@
             player: window.currentPlayer,
             key: e.key
         }));
-    }
-    
-    // Event listener global para las teclas
-    if (!window.isKeyListenerActive) {
-        console.log("EventListener");
-        document.addEventListener("keydown", handleKeyDown);
-        window.isKeyListenerActive = true;
     }
     
     
