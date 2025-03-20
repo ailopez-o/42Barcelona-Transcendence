@@ -364,6 +364,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
             await self.update_ball(state)
 
+            if "start_time" in state:
+                current_time = int(time.time())
+                state["duration"] = current_time - int(state["start_time"])
+
             # Enviar el estado actualizado a todos los clientes conectados a esta sala
             await self.channel_layer.group_send(
                 self.room_name,

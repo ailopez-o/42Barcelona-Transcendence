@@ -163,9 +163,18 @@ window.setupGame = function () {
             window.gameState.paddles.right.position.y = data.paddles.right.y;
         }
 
+        if (data.duration){
+            // Actualizamos el JSON recibido del html para que se mentenga vivo
+            window.gameData.player1_score.duration = data.duration
+        }
+
         if (data.scores) {
             const leftScore = document.getElementById("left-score");
             const rightScore = document.getElementById("right-score");
+
+            // Actualizamos el JSON recibido del html para que se mentenga vivo
+            window.gameData.player1_score = data.scores.left
+            window.gameData.player2_score = data.scores.right
 
             if (leftScore && rightScore) {
                 leftScore.textContent = data.scores.left;
@@ -271,6 +280,7 @@ function drawGame() {
 
 function drawGameResult() {
 
+    // Esta funcion recoge todos los datos del JSON de entrada y los pinta en el canvas
 	const leftScoreElement = document.getElementById("left-score");
 	const rightScoreElement = document.getElementById("right-score");
 	
@@ -288,10 +298,6 @@ function drawGameResult() {
 	window.ctx.textAlign = "center";
 
 	window. window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆",  window.ctx.canvas.width / 2, 100);
-
-	// Ya tenemos el marcador arriba
-	// ctx.font = "bold 24px Arial";
-	// ctx.fillText(`🔹 ${playerData.player1.username} (${gameData.player1_score}) - ${playerData.player2.username} (${gameData.player2_score}) 🔹`, ctx.canvas.width / 2, 180);
 
 	let winnerText =  window.gameData.player1_score > window.gameData.player2_score
 		? `🎉 GANADOR: ${ window.playerData.player1.username}`
