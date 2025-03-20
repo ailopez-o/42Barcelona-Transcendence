@@ -165,7 +165,7 @@ window.setupGame = function () {
 
         if (data.duration){
             // Actualizamos el JSON recibido del html para que se mentenga vivo
-            window.gameData.player1_score.duration = data.duration
+            window.gameData.duration = data.duration
         }
 
         if (data.scores) {
