@@ -447,7 +447,8 @@ def game_save_view(request):
         # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
         if game.tournament:
             logger.info(f"Llamando a check_next_round para el torneo: {game.tournament.name}")
-            game.tournament.check_next_round()
+            max_round = game.round_number 
+            game.tournament.check_next_round(max_round)
 
         return JsonResponse({
             "status": "success",

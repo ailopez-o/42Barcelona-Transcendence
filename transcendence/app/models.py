@@ -91,7 +91,7 @@ class Tournament(models.Model):
             Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self, round_number=1)
             logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
-    def check_next_round(self):
+    def check_next_round(self, max_round):
         """Verifica si deben generarse nuevas partidas en el torneo"""
         logger.info(f"Siguiente ronda del torneo {self.name}")
         
@@ -102,7 +102,6 @@ class Tournament(models.Model):
             return  # Todavía hay partidas sin finalizar
 
         # Obtener la ronda más alta jugada hasta ahora
-        max_round = self.games.aggregate(Max('round_number'))['round_number__max'] or 1
         logger.info(f"Última ronda completada: {max_round}")
 
         # Obtener ganadores de la última ronda
@@ -135,7 +134,7 @@ class Tournament(models.Model):
                 player2_id = pair[1]
             except IndexError:
                 # Número impar: player1 pasa a la siguiente ronda automáticamente
-                self.create_bye_win(player1_id, round_number=next_round)
+                self.create_bye_win(player1_id, next_round)
                 continue
 
             player1 = User.objects.get(id=player1_id)
