@@ -258,7 +258,7 @@ function startScene() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.2); // Soft warm sunset light
     scene.add(ambientLight);
 
-    var light = new THREE.PointLight(0xffffff, 10000, 1000);
+    var light = new THREE.PointLight(0xffffff, 20000, 1000);
     light.position.set(-40, 220, 30);
     light.shadow.radius = 1; // Soften the shadow
 
@@ -266,7 +266,7 @@ function startScene() {
     //console.log("🔦 Luz:", light);
     scene.add(light);
 
-    var light2 = new THREE.PointLight(0xffffff, 10000, 1000);
+    var light2 = new THREE.PointLight(0xffffff, 20000, 1000);
     light2.position.set(840, 220, 30);
     light2.shadow.radius = 1; // Soften the shadow
 
@@ -366,27 +366,22 @@ function drawGameResult() {
 
     if (!oldCanvas || !container) return;
 
-    // Get original canvas attributes
     const width = oldCanvas.width;
     const height = oldCanvas.height;
     const className = oldCanvas.className;
-    const style = oldCanvas.style.cssText; // Preserve inline styles
+    const style = oldCanvas.style.cssText;
 
-    // Remove the old Three.js canvas
     oldCanvas.remove();
 
-    // Create a new 2D canvas
     const newCanvas = document.createElement('canvas');
-    newCanvas.id = 'pongCanvas'; // Keep the same ID
+    newCanvas.id = 'pongCanvas';
     newCanvas.width = width;
     newCanvas.height = height;
     newCanvas.className = className;
-    newCanvas.style.cssText = style; // Apply same styles
+    newCanvas.style.cssText = style;
 
-    // Append the new canvas inside the container
     container.appendChild(newCanvas);
 
-    // Get the 2D context
     const ctx = newCanvas.getContext('2d');
 
 	ctx.fillStyle = "black";
