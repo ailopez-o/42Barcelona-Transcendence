@@ -83,7 +83,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
     def check_tournament_next_round(self, game_id):
         game = Game.objects.select_related('tournament').get(id=game_id)
         if game.tournament:
-            max_round = game.max_round
+            max_round = game.round_number
             game.tournament.check_next_round(max_round)
 
 
