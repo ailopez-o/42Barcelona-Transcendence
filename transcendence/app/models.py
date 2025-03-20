@@ -93,6 +93,7 @@ class Tournament(models.Model):
 
     def check_next_round(self):
         """Verifica si deben generarse nuevas partidas en el torneo"""
+        logger.info(f"Siguiente ronda del torneo {self.name}")
         # Obtener todas las partidas activas de este torneo
         games_in_progress = self.games.filter(status__in=["pendiente", "en_curso"])
         if games_in_progress.exists():
@@ -104,6 +105,8 @@ class Tournament(models.Model):
 
         # Convertir a conjunto para evitar duplicados
         winners = list(set(winners_ids))
+
+        logger.info(f"{len(winners)} ganadores para la siguiente ronda")
 
         if len(winners) == 1:
             # Solo queda un jugador, es el campeón
