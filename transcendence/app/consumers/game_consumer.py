@@ -1,5 +1,6 @@
 import os
 import django
+import time
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 import json
@@ -9,6 +10,7 @@ from channels.db import database_sync_to_async
 import random
 from ..models import Game
 import logging
+from ..models import GameResult  # Import aquí si no lo tienes arriba
 logger = logging.getLogger(__name__)
 
 # Variables globales para controlar el estado y el bucle de cada sala
@@ -29,6 +31,93 @@ class PongGameConsumer(AsyncWebsocketConsumer):
     def game_exists(self, game_id):
         return Game.objects.filter(id=game_id).exists()
     
+    @database_sync_to_async
+    def save_game_result(self, game_id, winner_side, score_winner, score_loser, duration):
+        game = Game.objects.get(id=game_id)
+
+        if winner_side == "left":
+            winner = game.player1
+            loser = game.player2
+        else:
+            winner = game.player2
+            loser = game.player1
+
+        # Crear el resultado si no existe
+        result, created = GameResult.objects.get_or_create(
+            game=game,
+            defaults={
+                'winner': winner,
+                'loser': loser,
+                'score_winner': score_winner,
+                'score_loser': score_loser,
+                'duration': duration
+            }
+        )
+        # Si ya existía, actualízalo
+        if not created:
+            result.winner = winner
+            result.loser = loser
+            result.score_winner = score_winner
+            result.score_loser = score_loser
+            result.duration = duration
+            result.save()
+
+        logger.info(
+            "\n"
+            f"========== GAME RESULT ==========\n"
+            f"Game ID       : {game_id}\n"
+            f"Winner        : {winner.username} (Score: {score_winner})\n"
+            f"Loser         : {loser.username} (Score: {score_loser})\n"
+            f"Duration (s)  : {duration}\n"
+            f"Final Result  : {winner.username} defeated {loser.username} ({score_winner}-{score_loser})\n"
+            f"================================="
+        )
+
+    @database_sync_to_async
+    def finalize_game(self, game_id):
+        game = Game.objects.get(id=game_id)
+        game.status = "finalizado"
+        game.save(update_fields=["status"])
+
+    async def end_game(self, winner_side, state):
+        state["game_over"] = True
+        state["ball"]["dx"] = 0
+        state["ball"]["dy"] = 0
+        state["ball"]["x"] = 400
+        state["ball"]["y"] = 200
+
+        game_id = self.scope['url_route']['kwargs']['game_id']
+        
+        # Calcular puntuaciones y duración
+        score_winner = state["scores"]["left"] if winner_side == "left" else state["scores"]["right"]
+        score_loser = state["scores"]["right"] if winner_side == "left" else state["scores"]["left"]
+        
+        duration = 0
+        if "start_time" in state:
+            duration = int(time.time() - state["start_time"])  # 🔹 Duración en segundos, redondeada
+
+        # Guardar estado de la partida
+        await self.finalize_game(game_id)
+        
+        # Guardar resultado
+        await self.save_game_result(game_id, winner_side, score_winner, score_loser, duration)
+
+        # Enviar estado final
+        await self.channel_layer.group_send(
+            self.room_name,
+            {
+                "type": "game_update",
+                "state": state
+            }
+        )
+
+        # Cancelar bucle
+        loop_task = running_game_loops.pop(self.room_name, None)
+        if loop_task and not loop_task.done():
+            loop_task.cancel()
+
+
+    
     async def connect(self):
         game_id = self.scope['url_route']['kwargs']['game_id']
         if not await self.game_exists(game_id):
@@ -42,13 +131,22 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         username = self.user.username if self.user.is_authenticated else "Anónimo"
         logger.info(f"Conexion a al juego {self.room_name} de {username}")
 
+        # Sacamos la info de la partida de la BBDD
+        game_id = self.scope['url_route']['kwargs']['game_id']
+        game = await Game.objects.aget(id=game_id)
+        
         # Si aún no existe estado para esta sala, créalo
         if self.room_name not in global_room_states:
             logger.info(f"Nuevo state para {self.room_name}")
 
-            # Usaremos un valor predeterminado para la dificultad, que se actualizará 
-            # cuando recibamos el primer mensaje del cliente
-            game_difficulty[self.room_name] = 1.0  # Valor predeterminado medio
+            # Convertir la dificultad textual a un factor numérico
+            difficulty_factor = {
+                'facil': 1,
+                'medio': 1.5,
+                'dificil': 2
+            }.get(game.difficulty, 1.5)  # Valor predeterminado 1.5 si hay algún problema
+
+            game_difficulty[self.room_name] = difficulty_factor
             
             global_room_states[self.room_name] = {
                 "id": self.room_name,
@@ -63,7 +161,9 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 "ready_status": {        # Estado de "listo" de ambos jugadores
                     "player1": False,
                     "player2": False
-                }
+                },
+                "max_points": game.points,
+                "difficulty": game.difficulty
             }
             
         # Enviamos un mensaje inicial SOLO con el estado actual, sin mensaje adicional
@@ -71,10 +171,6 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
         # recuperamos el state
         state = global_room_states[self.room_name]
-
-        # para mantener la persistencia, sacaremos el ready_status y status de la partida de la base de datos
-        game_id = self.scope['url_route']['kwargs']['game_id']
-        game = await Game.objects.aget(id=game_id)
         state["ready_status"]["player1"] = game.player1_ready
         state["ready_status"]["player2"] = game.player2_ready
         # Sincronizamos el estado del juego con la base de datos
@@ -177,7 +273,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                 # Comprobar si ambos jugadores están listos
                 if state["ready_status"]["player1"] and state["ready_status"]["player2"]:
                     state["game_started"] = True
-                    
+                    state["start_time"] = time.time()
+
                     # Actualizar el estado de la partida en la base de datos
                     game_id = self.scope['url_route']['kwargs']['game_id']
                     await Game.objects.filter(id=game_id).aupdate(status="en_curso")
@@ -228,13 +325,12 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     async def game_loop(self):
         """ Bucle principal del juego que actualiza el estado y lo difunde a todos los clientes. """
-        while True:
+        state = global_room_states[self.room_name]
+        while state["game_started"] and not state["game_over"]:
             state = global_room_states[self.room_name]
-            
-            # Solo actualizamos la pelota si el juego ha comenzado y no ha terminado
-            if state["game_started"] and not state["game_over"]:
-                self.update_ball(state)
-                
+
+            await self.update_ball(state)
+
             # Enviar el estado actualizado a todos los clientes conectados a esta sala
             await self.channel_layer.group_send(
                 self.room_name,
@@ -245,7 +341,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             )
             await asyncio.sleep(0.03)  # Aproximadamente 30 FPS
 
-    def update_ball(self, state):
+    async def update_ball(self, state):
         """ Actualiza la posición de la bola y maneja colisiones y puntuaciones. """
         # Si el juego no ha comenzado o ya terminó, la bola no se mueve
         if not state["game_started"] or state["game_over"]:
@@ -271,6 +367,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         elif state["ball"]["x"] >= 800:
             state["scores"]["left"] += 1
             self.reset_ball(state)
+
+        # logica del fin de la patida
+        if state["scores"]["left"] >= state["max_points"]:
+            await self.end_game("left", state)
+        elif state["scores"]["right"] >= state["max_points"]:
+            await self.end_game("right", state)
+
 
     def ball_hits_paddle(self, side, state):
         """ Comprueba si la bola colisiona con la pala indicada. """

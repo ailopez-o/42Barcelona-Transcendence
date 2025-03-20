@@ -171,37 +171,6 @@ window.setupGame = function () {
                 leftScore.textContent = data.scores.left;
                 rightScore.textContent = data.scores.right;
             }
-
-			console.log("TargetScore ", window.gameTargetScore)
-			console.log("window.gameEnded ", window.gameEnded)
-			console.log("data.scores.left ", data.scores.left)
-			console.log("data.scores.right", data.scores.right)
-
-            if (!window.gameEnded && (data.scores.left >=  window.gameTargetScore || data.scores.right >= window.gameTargetScore)) {
-                window.gameEnded = true;
-                const isLeftWinner = data.scores.left >=  window.gameTargetScore;
-                const winnerId = isLeftWinner ?  window.playerData.player1.id :  window.playerData.player2.id;
-                const loserId = isLeftWinner ?  window.playerData.player2.id :  window.playerData.player1.id;
-                const duration = Math.floor((new Date() - window.gameStartTime) / 1000);
-
-                window.socket.send(JSON.stringify({ player: window.currentPlayer, game_over: true }));
-
-                sendGameResults({
-                    game_id: window.gameId,
-                    winner_id: winnerId,
-                    loser_id: loserId,
-                    score_winner: isLeftWinner ? data.scores.left : data.scores.right,
-                    score_loser: isLeftWinner ? data.scores.right : data.scores.left,
-                    duration: duration
-                });
-
-                const statusElement = document.getElementById("status-message");
-                if (statusElement) {
-                    const winnerName = isLeftWinner ? window.playerData.player1.username : window.playerData.player2.username;
-                    statusElement.innerText = `¡Juego terminado! ${winnerName} ha ganado la partida.`;
-                    statusElement.className = "alert alert-success text-center";
-                }
-            }
         }
 
         drawGame();
@@ -256,12 +225,6 @@ function updateStatusMessage() {
 }
 
 function drawGame() {
-	// console.log("draw called")
-	// if (window.gameEnded) 
-	// 	return;
-
-	// console.log("draw drawing")
-
 	window.ctx.clearRect(0, 0,  window.canvas.width,  window.canvas.height);
 	window.ctx.fillStyle = "black";
 	window.ctx.fillRect(0, 0,  window.canvas.width,  window.canvas.height);
