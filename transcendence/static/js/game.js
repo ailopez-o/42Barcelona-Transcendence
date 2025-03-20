@@ -1,5 +1,5 @@
 (function () {
-    console.log("🚀 Script cargado.");
+    console.log("🎮 Script cargado.");
 
     class Ball {
         constructor(x, y, radius, speed) {
@@ -40,7 +40,7 @@
 
     function setupGame() {
 
-        console.log("Setup Game ejecutado");
+        console.log("🎮 Setup Game ejecutado.");
     
         document.removeEventListener("keydown", handleKeyDown);
         document.addEventListener("keydown", handleKeyDown);
@@ -59,7 +59,7 @@
             return;
         }
         
-        console.log("✅ Game canvas encontrado en el DOM.");
+        console.log("🎮 Game canvas encontrado en el DOM.");
         
         if (gameDataElement) {
             gameData = JSON.parse(gameDataElement.textContent);
@@ -95,7 +95,7 @@
         socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
     
         socket.onopen = function(event) {
-            console.log("✅ Conectado al WebSocket del juego", gameId);
+            console.log("🎮 Conectado al WebSocket del juego", gameId);
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
             socket.send(JSON.stringify({
                 player: window.currentPlayer,
@@ -124,7 +124,7 @@
 
             // Si el juego ha terminado, mostrar resultados y no seguir actualizando
             if (data.game_over) {
-                console.warn("⛔ Juego finalizado. Desconectando WebSocket.");
+                console.warn("🎮 Juego finalizado. Desconectando WebSocket.");
                 socket.close();
                 drawGameResult(ctx, gameData, playerData);
                 markPlayersAsFinished();
@@ -389,13 +389,13 @@
     
     // Se ejecuta cuando hay recarga HTMX
     if (document.readyState === "complete") {
-        console.log("🚀 [GAME] El DOM ya está listo HTMX");
+        console.log("🎮 El DOM ya está listo HTMX");
         setupGame(); // Si el DOM ya está listo, ejecuta directamente
     }
 
     // Se ejecuta cuando hay recarga completa
     document.addEventListener("DOMContentLoaded", function () {
-        console.log("✅ [GAME] DOM completamente cargado.");
+        console.log("🎮 DOM completamente cargado.");
         setupGame(); // Si el DOM ya está listo, ejecuta directamente
     });
 
@@ -410,8 +410,7 @@
     
         if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
     
-        console.log("🔑 Tecla presionada:", e.key);
-        console.log("🔑 Player presionada:", window.currentPlayer);
+        console.log(`🔑 Tecla: ${e.key} | Player: ${window.currentPlayer} | Game: ${gameId}`);
 
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r' && !gameEnded) {
             e.preventDefault();
@@ -429,7 +428,7 @@
     * Envía los resultados del juego al endpoint
     */
     function sendGameResults(results) {
-        console.log('Enviando resultados:', results);
+        console.log('🎮 Enviando resultados:', results);
         
         fetch('/game/save/', {
             method: 'POST',
@@ -447,7 +446,7 @@
             return response.json();
         })
         .then(data => {
-            console.log('Resultados guardados correctamente:', data);
+            console.log('🎮 Resultados guardados correctamente:', data);
             // Puedes mostrar un mensaje de éxito aquí si lo deseas
             if (data.status === 'success') {
                 // Opcional: Mostrar alguna notificación o actualizar la UI
@@ -459,7 +458,7 @@
             }
         })
         .catch(error => {
-            console.error('Error al guardar resultados:', error);
+            console.error('🎮 Error al guardar resultados:', error);
             // Opcional: Mostrar un mensaje de error al usuario
             const statusElement = document.getElementById("status-message");
             if (statusElement) {
@@ -541,7 +540,7 @@
     
     // Event listener global para las teclas
     window.addEventListener("beforeunload", function () {
-        console.log("✅ Cerrando WebSocket y limpiando intervalos...");
+        console.log("🎮 Cerrando WebSocket y limpiando intervalos...");
         
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.close();

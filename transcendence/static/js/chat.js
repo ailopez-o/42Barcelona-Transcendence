@@ -1,12 +1,12 @@
 // Se ejecuta cuando hay recarga HTMX
 if (document.readyState === "complete") {
-    console.log("🚀 [CHAT] El DOM ya está listo HTMX");
+    console.log("💬 El DOM ya está listo HTMX");
     setupChat(); // Si el DOM ya está listo, ejecuta directamente
 }
 
 // Se ejecuta cuando hay recarga completa
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ [CHAT] DOM completamente cargado.");
+    console.log("💬 DOM completamente cargado.");
     setupChat(); // Si el DOM ya está listo, ejecuta directamente
 });
 
@@ -28,20 +28,20 @@ function connectWebSocket(currentUsername) {
 
     // Si ya hay un WebSocket abierto, lo cerramos antes de abrir uno nuevo
     if (window.chatSocket) {
-        console.log("🔄 Cerrando WebSocket del chat anterior...");
+        console.log("💬 Cerrando WebSocket del chat anterior...");
         window.chatSocket.close();
     }
 
     // 🧹 Limpiar el contenedor de mensajes antes de abrir un nuevo WebSocket
     document.getElementById("chat-section").innerHTML = "";
 
-    window.chatSocket = new WebSocket(wsUrl); // ✅ Se guarda en `window` para que persista
+    window.chatSocket = new WebSocket(wsUrl); //Se guarda en `window` para que persista
 
     window.chatSocket.onopen = function () {
         if (gameId)
-            console.log(`✅ Conectado al WebSocket del chat en la sala ${gameId} como ${currentUsername}`);
+            console.log(`💬 Conectado al WebSocket del chat en la sala ${gameId} como ${currentUsername}`);
         else
-            console.log(`✅ Conectado al WebSocket del chat en la sala general como ${currentUsername}`);
+            console.log(`💬 Conectado al WebSocket del chat en la sala general como ${currentUsername}`);
     };
 
     window.chatSocket.onmessage = function (event) {
@@ -82,7 +82,7 @@ function connectWebSocket(currentUsername) {
 }
 
 function setupChat() {
-    console.log("🎮 Configurando el chat...");
+    console.log("💬 Setup Chat ejecutado.");
 
     // Elementos del DOM. Comprueba si existen antes de continuar
     const chatContainer = document.getElementById("chat-section");
@@ -127,17 +127,17 @@ function setupChat() {
     }
     
     
-    console.log("✅ Chat form encontrado en el DOM.");
+    console.log("💬 Chat form encontrado en el DOM.");
 
     // Conexión al WebSocket
     connectWebSocket(currentUsername);
 
     // Capturar el evento submit para prevenir recarga
     chatForm.addEventListener("submit", function (event) {
-        console.log("🚀 Intentando capturar el submit del formulario...");
+        // console.log("🚀 Intentando capturar el submit del formulario...");
         event.preventDefault(); // 🚀 Evita que el formulario haga un GET o POST normal
 
-        console.log("📩 Evento submit capturado.");
+        // console.log("📩 Evento submit capturado.");
 
         const message = chatInput.value.trim();
         if (message !== "") {
@@ -147,7 +147,7 @@ function setupChat() {
                 message: message,
             };
 
-            console.log(`🟢 Intentando enviar mensaje: ${message}`);
+            // console.log(`🟢 Intentando enviar mensaje: ${message}`);
             console.log(`📩 Payload enviado:`, payload);
 
             window.chatSocket.send(JSON.stringify(payload)); // Enviar mensaje al WebSocket

@@ -1,7 +1,7 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
 
 (function () {
-    console.log("🚀 Script cargado.");
+    console.log("🎮 Script cargado.");
 
     class Ball {
         constructor(x, y, radius, speed) {
@@ -43,7 +43,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 
     function setupGame() {
 
-        console.log("✅ DOM completamente cargado");
+        console.log(" 🎮 Setup Game ejecutado.");
+
+
+        document.removeEventListener("keydown", handleKeyDown);
+        document.addEventListener("keydown", handleKeyDown);
     
         gameState = {};
         animationItems = {};
@@ -60,7 +64,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             return;
         }
         
-        console.log("✅ Game canvas encontrado en el DOM.");
+        console.log("🎮 Game canvas encontrado en el DOM.");
         let gameData;
         let gameId;
         let gameTargetScore;
@@ -97,7 +101,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
     
         socket.onopen = function(event) {
-            console.log("✅ Conectado al WebSocket del juego", gameId);
+            console.log("🎮 Conectado al WebSocket del juego", gameId);
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
             socket.send(JSON.stringify({
                 player: window.currentPlayer,
@@ -122,11 +126,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             if (!data) return;
-            //console.log('INFO', data);
+            console.log('INFO', data);
 
             // Si el juego ha terminado, mostrar resultados y no seguir actualizando
             if (data.game_over) {
-                console.warn("⛔ Juego finalizado. Desconectando WebSocket.");
+                console.warn("🎮 Juego finalizado. Desconectando WebSocket.");
                 socket.close();
                 drawGameResult(ctx, gameData, playerData);
                 markPlayersAsFinished();
@@ -227,49 +231,6 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 
             drawGame();
         };
-        
-        /**
-         * Envía los resultados del juego al endpoint
-         */
-        function sendGameResults(results) {
-            console.log('Enviando resultados:', results);
-            
-            fetch('/game/save/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
-                },
-                body: JSON.stringify(results)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error HTTP:', response.status, response.statusText);
-                    throw new Error(`Error al enviar resultados: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Resultados guardados correctamente:', data);
-                // Puedes mostrar un mensaje de éxito aquí si lo deseas
-                if (data.status === 'success') {
-                    // Opcional: Mostrar alguna notificación o actualizar la UI
-                    const statusElement = document.getElementById("status-message");
-                    if (statusElement) {
-                        const actionText = data.created ? "registrado" : "actualizado";
-                        statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error al guardar resultados:', error);
-                // Opcional: Mostrar un mensaje de error al usuario
-                const statusElement = document.getElementById("status-message");
-                if (statusElement) {
-                    statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
-                }
-            });
-        }
         
         // Función para actualizar la visualización del estado READY/PENDING en el HTML
         function updateReadyStatusDisplay() {
@@ -378,7 +339,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             light.shadow.radius = 1; // Soften the shadow
     
             light.castShadow = true; // Enable shadows for the light
-            console.log("🔦 Luz:", light);
+            //console.log("🔦 Luz:", light);
             scene.add(light);
 
             var light2 = new THREE.PointLight(0xffffff, 10000, 1000);
@@ -386,7 +347,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             light2.shadow.radius = 1; // Soften the shadow
     
             light2.castShadow = true; // Enable shadows for the light
-            console.log("🔦 Luz:", light2);
+            //console.log("🔦 Luz:", light2);
             scene.add(light2);
 
         
@@ -421,7 +382,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         
             const leftPaddle = new THREE.Mesh( leftPaddleGeometry, leftPaddleMaterial );
             leftPaddle.position.set(gameState.paddles.left.position.x, gameState.paddles.left.position.y + (gameState.paddles.left.height / 2), 0);
-            console.log("Left paddle: ", leftPaddle.position);
+            //console.log("Left paddle: ", leftPaddle.position);
             leftPaddle.castShadow = true; // Enable shadows for the paddle
             scene.add( leftPaddle );
             animationItems.leftPaddle = leftPaddle;
@@ -430,7 +391,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             const rightPaddleMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } );
             const rightPaddle = new THREE.Mesh( rightPaddleGeometry, rightPaddleMaterial );
             rightPaddle.position.set(gameState.paddles.right.position.x, gameState.paddles.right.position.y + (gameState.paddles.right.height / 2), 0);
-            console.log("Right paddle: ", rightPaddle.position);
+            //console.log("Right paddle: ", rightPaddle.position);
 
             rightPaddle.castShadow = true; // Enable shadows for the paddle
             scene.add( rightPaddle );
@@ -499,32 +460,75 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             ctx.fillText(`Duración: ${gameData.duration} segundos`, ctx.canvas.width / 2, 300);
         }
 
-        function markPlayersAsFinished() {
-            const player1Status = document.getElementById("player1-ready-status");
-            const player2Status = document.getElementById("player2-ready-status");
-    
-            if (player1Status) {
-                player1Status.textContent = "FINISH";
-                player1Status.className = "badge bg-danger"; // Cambia a rojo
-            }
-    
-            if (player2Status) {
-                player2Status.textContent = "FINISH";
-                player2Status.className = "badge bg-danger"; // Cambia a rojo
-            }
-        }
-
     };
     
+
+     // Envía los resultados del juego al endpoint
+    function sendGameResults(results) {
+        console.log('🎮 Enviando resultados:', results);
+        
+        fetch('/game/save/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
+            },
+            body: JSON.stringify(results)
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error HTTP:', response.status, response.statusText);
+                throw new Error(`Error al enviar resultados: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('🎮 Resultados guardados correctamente:', data);
+            // Puedes mostrar un mensaje de éxito aquí si lo deseas
+            if (data.status === 'success') {
+                // Opcional: Mostrar alguna notificación o actualizar la UI
+                const statusElement = document.getElementById("status-message");
+                if (statusElement) {
+                    const actionText = data.created ? "registrado" : "actualizado";
+                    statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('🎮 Error al guardar resultados:', error);
+            // Opcional: Mostrar un mensaje de error al usuario
+            const statusElement = document.getElementById("status-message");
+            if (statusElement) {
+                statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
+            }
+        });
+    }
+
+    function markPlayersAsFinished() {
+        const player1Status = document.getElementById("player1-ready-status");
+        const player2Status = document.getElementById("player2-ready-status");
+
+        if (player1Status) {
+            player1Status.textContent = "FINISH";
+            player1Status.className = "badge bg-danger"; // Cambia a rojo
+        }
+
+        if (player2Status) {
+            player2Status.textContent = "FINISH";
+            player2Status.className = "badge bg-danger"; // Cambia a rojo
+        }
+    }
+
+
     // Se ejecuta cuando hay recarga HTMX
     if (document.readyState === "complete") {
-        console.log("🚀 [GAME] El DOM ya está listo HTMX");
+        console.log("🎮 El DOM ya está listo HTMX");
         setupGame(); // Si el DOM ya está listo, ejecuta directamente
     }
 
     // Se ejecuta cuando hay recarga completa
     document.addEventListener("DOMContentLoaded", function () {
-        console.log("✅ [GAME] DOM completamente cargado.");
+        console.log("🎮 DOM completamente cargado.");
         setupGame(); // Si el DOM ya está listo, ejecuta directamente
     });
 
@@ -544,22 +548,79 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
     
         if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
     
+        console.log(`🔑 Tecla: ${e.key} | Player: ${window.currentPlayer} | Game: ${gameId}`);
+
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r' && !gameEnded) {
+            e.preventDefault();
+            randomlyEndGame();
+            return;
+        }
+
         socket.send(JSON.stringify({
             player: window.currentPlayer,
             key: key
         }));
     }
-    
-    // Event listener global para las teclas
-    if (!window.isKeyListenerActive) {
-        document.addEventListener("keydown", handleKeyDown);
-        window.isKeyListenerActive = true;
+        
+    function randomlyEndGame() {
+        
+        // Generate random scores between 0 and gameTargetScore
+        const player1Score = Math.floor(Math.random() * (gameTargetScore + 1));
+        const player2Score = Math.floor(Math.random() * (gameTargetScore + 1));
+        
+        // Randomly determine winner
+        const isLeftWinner = Math.random() < 0.5;
+        const winnerId = isLeftWinner ? playerData.player1.id : playerData.player2.id;
+        const loserId = isLeftWinner ? playerData.player2.id : playerData.player1.id;
+        
+        // Calculate game duration
+        const gameDuration = 42;
+        
+        // Inform backend that game is over
+        socket.send(JSON.stringify({
+            player: window.currentPlayer,
+            game_over: true
+        }));
+        
+        // Send results to endpoint
+        sendGameResults({
+            game_id: gameId,
+            winner_id: winnerId,
+            loser_id: loserId,
+            score_winner: isLeftWinner ? player1Score : player2Score,
+            score_loser: isLeftWinner ? player2Score : player1Score,
+            duration: gameDuration
+        });
+        
+        // Update UI
+        gameEnded = true;
+        const statusElement = document.getElementById("status-message");
+        if (statusElement) {
+            const winnerName = isLeftWinner ? playerData.player1.username : playerData.player2.username;
+            statusElement.innerText = `¡Juego terminado! ${winnerName} ha ganado la partida.`;
+            statusElement.className = "alert alert-success text-center";
+        }
+        
+        // Update scores display
+        const leftScoreElement = document.getElementById("left-score");
+        const rightScoreElement = document.getElementById("right-score");
+        if (leftScoreElement && rightScoreElement) {
+            leftScoreElement.textContent = player1Score;
+            rightScoreElement.textContent = player2Score;
+        }
+        
+        // Mark players as finished
+        markPlayersAsFinished();
+        
+        // Close WebSocket connection
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
     }
-    
     
     // 🚀 **Desactivar el WebSocket y limpiar eventos al salir de la página**
     window.addEventListener("beforeunload", function () {
-        console.log("✅ Cerrando WebSocket y limpiando intervalos...");
+        console.log("🎮 Cerrando WebSocket y limpiando intervalos...");
         
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.close();
