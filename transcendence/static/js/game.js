@@ -172,10 +172,10 @@ window.setupGame = function () {
                 rightScore.textContent = data.scores.right;
             }
 
-			// console.log("TargetScore ", window.gameTargetScore)
-			// console.log("window.gameEnded ", window.gameEnded)
-			// console.log("data.scores.left ", data.scores.left)
-			// console.log("data.scores.right", data.scores.right)
+			console.log("TargetScore ", window.gameTargetScore)
+			console.log("window.gameEnded ", window.gameEnded)
+			console.log("data.scores.left ", data.scores.left)
+			console.log("data.scores.right", data.scores.right)
 
             if (!window.gameEnded && (data.scores.left >=  window.gameTargetScore || data.scores.right >= window.gameTargetScore)) {
                 window.gameEnded = true;
