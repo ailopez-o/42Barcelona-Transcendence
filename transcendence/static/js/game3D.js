@@ -34,9 +34,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
     }
 
     let gameState;
-    let window.socket;
     let gameStarted = false;
-    let prevReadyStatus = { player1: false, player2: false };
     let gameStartTime = null;
     let gameEnded = false;
     let animationItems;
@@ -45,6 +43,10 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 
         console.log("🎮 Setup Game 3D ejecutado.");
 
+        if (window.listenerAdded === undefined) {
+            window.listenerAdded = false; // Garantiza que exista
+        }
+    
         // Para añadir un solo listener
         if (!window.listenerAdded) {
             console.log("listener añadido")

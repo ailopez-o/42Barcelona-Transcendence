@@ -40,7 +40,11 @@
     function setupGame() {
 
         console.log("🎮 Setup Game 2D ejecutado.");
-    
+
+        if (window.listenerAdded === undefined) {
+            window.listenerAdded = false; // Garantiza que exista
+        }
+            
         // Para añadir un solo listener
         if (!window.listenerAdded) {
             console.log("listener añadido")
