@@ -111,13 +111,10 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         # Guardar resultado
         await self.save_game_result(game_id, winner_side, score_winner, score_loser, duration)
 
-        # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
-        game = await self.get_game(game_id)
-
-        logger.info(f"Juego {game.game_id} terminado")
-
+        # Gestionar siguientes rondas si es torneo
         await self.check_tournament_next_round(game_id)
 
+        logger.info(f"Juego {game_id} terminado")
         # Enviar estado final
         await self.channel_layer.group_send(
             self.room_name,
