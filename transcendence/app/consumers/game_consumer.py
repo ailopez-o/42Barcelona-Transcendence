@@ -85,8 +85,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_tournament_next_round(self, game):
-    if game.tournament:
-        game.tournament.check_next_round()
+        if game.tournament:
+            game.tournament.check_next_round()
 
 
     async def end_game(self, winner_side, state):
