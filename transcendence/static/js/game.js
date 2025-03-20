@@ -297,7 +297,7 @@ function drawGameResult() {
 	window.ctx.font = "bold 30px Arial";
 	window.ctx.textAlign = "center";
 
-	window. window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆",  window.ctx.canvas.width / 2, 100);
+	window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆",  window.ctx.canvas.width / 2, 100);
 
 	let winnerText =  window.gameData.player1_score > window.gameData.player2_score
 		? `🎉 GANADOR: ${ window.playerData.player1.username}`
@@ -305,49 +305,6 @@ function drawGameResult() {
 
 	window.ctx.fillText(winnerText, window.ctx.canvas.width / 2, 250);
 	window.ctx.fillText(`Duración: ${window.gameData.duration} segundos`, window.ctx.canvas.width / 2, 300);
-}
-
-/**
-    * Envía los resultados del juego al endpoint
-    */
-function sendGameResults(results) {
-	console.log('🎮 Enviando resultados:', results);
-	
-	fetch('/game/save/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			// No se necesita CSRF token porque el endpoint está marcado como @csrf_exempt
-		},
-		body: JSON.stringify(results)
-	})
-	.then(response => {
-		if (!response.ok) {
-			console.error('Error HTTP:', response.status, response.statusText);
-			throw new Error(`Error al enviar resultados: ${response.status}`);
-		}
-		return response.json();
-	})
-	.then(data => {
-		console.log('🎮 Resultados guardados correctamente:', data);
-		// Puedes mostrar un mensaje de éxito aquí si lo deseas
-		if (data.status === 'success') {
-			// Opcional: Mostrar alguna notificación o actualizar la UI
-			const statusElement = document.getElementById("status-message");
-			if (statusElement) {
-				const actionText = data.created ? "registrado" : "actualizado";
-				statusElement.innerHTML += `<br>Resultado ${actionText} en la base de datos.`;
-			}
-		}
-	})
-	.catch(error => {
-		console.error('🎮 Error al guardar resultados:', error);
-		// Opcional: Mostrar un mensaje de error al usuario
-		const statusElement = document.getElementById("status-message");
-		if (statusElement) {
-			statusElement.innerHTML += '<br><span class="text-danger">Error al guardar el resultado. Intenta de nuevo.</span>';
-		}
-	});
 }
 
 function markPlayersAsFinished() {
