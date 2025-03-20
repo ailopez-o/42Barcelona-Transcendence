@@ -95,6 +95,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         duration = 0
         if "start_time" in state:
             duration = int(time.time() - state["start_time"])  # 🔹 Duración en segundos, redondeada
+        else:
+            duracion = 42
 
         # Guardar estado de la partida
         await self.finalize_game(game_id)
@@ -206,6 +208,21 @@ class PongGameConsumer(AsyncWebsocketConsumer):
             logger.info(f"Evento ignorado: no proviene de un jugador válido: {data}")
             return
         
+        # Si se fuerza una finalización de la partida
+        if "action" in data and data["action"] == "finish":
+            # creamos un resultado aleatorio
+            winner_side, score_winner, score_loser = generate_random_result(state["max_points"])
+            if (winner_side == "left"):
+                state["scores"]["left"] = score_winner
+                state["scores"]["right"] = score_loser
+            else:
+                state["scores"]["right"] = score_winner
+                state["scores"]["left"] = score_loser
+
+            # fornzamos el final de la partida
+            await self.end_game(winner_side, state)
+
+
         # Manejar mensaje de inicialización con dificultad
         if "init_game" in data and "difficulty" in data:
             # Convertir la dificultad textual a un factor numérico
@@ -322,6 +339,22 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                         "state": state
                     }
                 )
+
+        def generate_random_result(max_points):
+            # score_loser debe ser < max_points // 2 para que el winner tenga más puntos
+            max_loser_score = max_points - 1
+            score_loser = random.randint(1, max_loser_score - 1)
+            score_winner = max_points - score_loser
+
+            # Asegurar que winner tiene más puntos
+            if score_loser >= score_winner:
+                score_loser, score_winner = score_winner, score_loser
+            if score_loser == score_winner:
+                score_winner += 1
+                score_loser -= 1
+
+            winner_side = random.choice(["left", "right"])
+            return winner_side, score_winner, score_loser
 
     async def game_loop(self):
         """ Bucle principal del juego que actualiza el estado y lo difunde a todos los clientes. """

@@ -362,57 +362,11 @@ function markPlayersAsFinished() {
 
 function randomlyEndGame() {
         
-	// Generate random scores between 0 and gameTargetScore
-	const player1Score = Math.floor(Math.random() * ( window.gameTargetScore + 1));
-	const player2Score = Math.floor(Math.random() * ( window.gameTargetScore + 1));
-	
-	// Randomly determine winner
-	const isLeftWinner = Math.random() < 0.5;
-	const winnerId = isLeftWinner ?  window.playerData.player1.id :  window.playerData.player2.id;
-	const loserId = isLeftWinner ?  window.playerData.player2.id :  window.playerData.player1.id;
-	
-	// Calculate game duration
-	const gameDuration = 42;
-	
-	// Inform backend that game is over
-	window.socket.send(JSON.stringify({
-		player: window.currentPlayer,
-		game_over: true
-	}));
-	
-	// Send results to endpoint
-	sendGameResults({
-		game_id: gameId,
-		winner_id: winnerId,
-		loser_id: loserId,
-		score_winner: isLeftWinner ? player1Score : player2Score,
-		score_loser: isLeftWinner ? player2Score : player1Score,
-		duration: gameDuration
-	});
-	
-	window.gameEnded = true;
-	const statusElement = document.getElementById("status-message");
-	if (statusElement) {
-		const winnerName = isLeftWinner ?  window.playerData.player1.username :  window.playerData.player2.username;
-		statusElement.innerText = `¡Juego terminado! ${winnerName} ha ganado la partida.`;
-		statusElement.className = "alert alert-success text-center";
-	}
-	
-	// Update scores display
-	const leftScoreElement = document.getElementById("left-score");
-	const rightScoreElement = document.getElementById("right-score");
-	if (leftScoreElement && rightScoreElement) {
-		leftScoreElement.textContent = player1Score;
-		rightScoreElement.textContent = player2Score;
-	}
-	
-	// Mark players as finished
-	markPlayersAsFinished();
-	
-	// Close WebSocket connection
-	if (window.socket && window.socket.readyState === WebSocket.OPEN) {
-		window.socket.close();
-	}
+    // Mandamos al backend la info de que ya se ha terminado
+    window.socket.send(JSON.stringify({
+        player: window.currentPlayer,
+        action: "finish"
+    }));
 }
 
 
