@@ -33,9 +33,7 @@
     }
 
     let gameState;
-    let socket;
     let gameStarted = false;
-    let prevReadyStatus = { player1: false, player2: false };
     let gameStartTime = null;
     let gameEnded = false;
 
@@ -96,13 +94,20 @@
             return;
         }
 
+        // Si ya hay un WebSocket abierto, lo cerramos antes de abrir uno nuevo
+        if (window.socket) {
+            console.log("🎮 Cerrando WebSocket del game anterior...");
+            window.socket.close();
+        }
+
         // Conectar al servidor WebSocket
-        socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
-    
-        socket.onopen = function(event) {
+        window.socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
+        
+
+        window.socket.onopen = function(event) {
             console.log("🎮 Conectado al WebSocket del juego", gameId);
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
-            socket.send(JSON.stringify({
+            window.socket.send(JSON.stringify({
                 player: window.currentPlayer,
                 init_game: true,
                 difficulty: gameData.difficulty
@@ -122,7 +127,7 @@
             }
         };
     
-        socket.onmessage = function(event) {
+        window.socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             if (!data) return;
             console.log('INFO', data);
@@ -130,7 +135,7 @@
             // Si el juego ha terminado, mostrar resultados y no seguir actualizando
             if (data.game_over) {
                 console.warn("🎮 Juego finalizado. Desconectando WebSocket.");
-                socket.close();
+                window.socket.close();
                 drawGameResult(ctx, gameData, playerData);
                 markPlayersAsFinished();
                 return;
@@ -203,7 +208,7 @@
                     const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
                     
                     // Informar al backend que el juego ha terminado
-                    socket.send(JSON.stringify({
+                    window.socket.send(JSON.stringify({
                         player: window.currentPlayer,
                         game_over: true
                     }));
@@ -298,7 +303,7 @@
             }
         }
     
-        socket.onclose = function(event) {
+        window.socket.onclose = function(event) {
             console.warn("⚠️ Conexión WebSocket cerrada", event.code);
             gameStarted = false;
             gameEnded = true;  // Para evitar dibujar después de la desconexión
@@ -413,7 +418,7 @@
             e.preventDefault();  // Prevenir el scroll con las flechas y el espacio
         }
     
-        if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
+        if (!gameState || !window.socket || window.socket.readyState !== WebSocket.OPEN) return;
     
         console.log(`🔑 Tecla: ${e.key} | Player: ${window.currentPlayer} | Game: ${gameId}`);
 
@@ -423,7 +428,7 @@
             return;
         }
 
-        socket.send(JSON.stringify({
+        window.socket.send(JSON.stringify({
             player: window.currentPlayer,
             key: e.key
         }));
@@ -502,7 +507,7 @@
         const gameDuration = 42;
         
         // Inform backend that game is over
-        socket.send(JSON.stringify({
+        window.socket.send(JSON.stringify({
             player: window.currentPlayer,
             game_over: true
         }));
@@ -538,8 +543,8 @@
         markPlayersAsFinished();
         
         // Close WebSocket connection
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+        if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+            window.socket.close();
         }
     }
     
@@ -547,8 +552,8 @@
     window.addEventListener("beforeunload", function () {
         console.log("🎮 Cerrando WebSocket y limpiando intervalos...");
         
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+        if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+            window.socket.close();
         }
     
         // Opcional: Remover event listeners si has agregado más

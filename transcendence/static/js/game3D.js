@@ -34,7 +34,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
     }
 
     let gameState;
-    let socket;
+    let window.socket;
     let gameStarted = false;
     let prevReadyStatus = { player1: false, player2: false };
     let gameStartTime = null;
@@ -100,13 +100,17 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             return;
         }
 
-        // Conectar al servidor WebSocket
-        socket = new WebSocket(`wss://${window.location.host}/ws/game/${gameId}/`);
+        // Si ya hay un WebSocket abierto, lo cerramos antes de abrir uno nuevo
+        if (window.socket) {
+            console.log("🎮 Cerrando WebSocket del game anterior...");
+            window.socket.close();
+        }
+
     
-        socket.onopen = function(event) {
+        window.socket.onopen = function(event) {
             console.log("🎮 Conectado al WebSocket del juego", gameId);
             // Enviar la dificultad del juego al servidor inmediatamente después de conectar
-            socket.send(JSON.stringify({
+            window.socket.send(JSON.stringify({
                 player: window.currentPlayer,
                 init_game: true,
                 difficulty: gameData.difficulty
@@ -126,7 +130,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             }
         };
     
-        socket.onmessage = function(event) {
+        window.socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             if (!data) return;
             console.log('INFO', data);
@@ -134,7 +138,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             // Si el juego ha terminado, mostrar resultados y no seguir actualizando
             if (data.game_over) {
                 console.warn("🎮 Juego finalizado. Desconectando WebSocket.");
-                socket.close();
+                window.socket.close();
                 drawGameResult(ctx, gameData, playerData);
                 markPlayersAsFinished();
                 return;
@@ -207,7 +211,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
                     const gameDuration = Math.floor((new Date() - gameStartTime) / 1000);
                     
                     // Informar al backend que el juego ha terminado
-                    socket.send(JSON.stringify({
+                    window.socket.send(JSON.stringify({
                         player: window.currentPlayer,
                         game_over: true
                     }));
@@ -305,7 +309,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             }
         }
     
-        socket.onclose = function(event) {
+        window.socket.onclose = function(event) {
             console.warn("⚠️ Conexión WebSocket cerrada", event.code);
             gameStarted = false;
             gameEnded = true;  // Para evitar dibujar después de la desconexión
@@ -549,7 +553,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             }
         }
     
-        if (!gameState || !socket || socket.readyState !== WebSocket.OPEN) return;
+        if (!gameState || !socket || window.socket.readyState !== WebSocket.OPEN) return;
     
         console.log(`🔑 Tecla: ${e.key} | Player: ${window.currentPlayer} | Game: ${gameId}`);
 
@@ -559,7 +563,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
             return;
         }
 
-        socket.send(JSON.stringify({
+        window.socket.send(JSON.stringify({
             player: window.currentPlayer,
             key: key
         }));
@@ -580,7 +584,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         const gameDuration = 42;
         
         // Inform backend that game is over
-        socket.send(JSON.stringify({
+        window.socket.send(JSON.stringify({
             player: window.currentPlayer,
             game_over: true
         }));
@@ -616,8 +620,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
         markPlayersAsFinished();
         
         // Close WebSocket connection
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+        if (socket && window.socket.readyState === WebSocket.OPEN) {
+            window.socket.close();
         }
     }
     
@@ -625,8 +629,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
     window.addEventListener("beforeunload", function () {
         console.log("🎮 Cerrando WebSocket y limpiando intervalos...");
         
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+        if (socket && window.socket.readyState === WebSocket.OPEN) {
+            window.socket.close();
         }
     
         // Opcional: Remover event listeners si has agregado más
