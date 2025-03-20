@@ -79,7 +79,16 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         game.status = "finalizado"
         game.save(update_fields=["status"])
 
-  
+    @database_sync_to_async
+    def get_game(self, game_id):
+        return Game.objects.get(id=game_id)
+
+    @database_sync_to_async
+    def check_tournament_next_round(self, game):
+    if game.tournament:
+        game.tournament.check_next_round()
+
+
     async def end_game(self, winner_side, state):
         state["game_over"] = True
         state["ball"]["dx"] = 0
@@ -106,10 +115,11 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         await self.save_game_result(game_id, winner_side, score_winner, score_loser, duration)
 
         # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
-        game = await Game.objects.aget(id=game_id)
+        game = await self.get_game(game_id)
+
         logger.info(f"Juego {game.game_id} terminado")
         if game.tournament:
-            game.tournament.check_next_round()
+            await self.check_tournament_next_round(game)
 
         # Enviar estado final
         await self.channel_layer.group_send(
