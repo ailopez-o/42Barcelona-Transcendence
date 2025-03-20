@@ -88,24 +88,30 @@ class Tournament(models.Model):
 
         match_pairs = [(players[i], players[i + 1]) for i in range(0, len(players), 2)]
         for player1, player2 in match_pairs:
-            Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self)
+            Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self, round_number=1)
             logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
     def check_next_round(self):
         """Verifica si deben generarse nuevas partidas en el torneo"""
         logger.info(f"Siguiente ronda del torneo {self.name}")
+        
         # Obtener todas las partidas activas de este torneo
         games_in_progress = self.games.filter(status__in=["pendiente", "en_curso"])
         if games_in_progress.exists():
+            logger.info("Aún hay partidas en curso, no se puede avanzar de ronda.")
             return  # Todavía hay partidas sin finalizar
 
-        # Obtener los ganadores de las partidas anteriores
-        results = GameResult.objects.filter(game__tournament=self)
-        winners_ids = results.values_list('winner_id', flat=True)
+        # Obtener la ronda más alta jugada hasta ahora
+        max_round = self.games.aggregate(Max('round_number'))['round_number__max'] or 1
+        logger.info(f"Última ronda completada: {max_round}")
 
+        # Obtener ganadores de la última ronda
+        last_round_games = self.games.filter(round_number=max_round)
+        results = GameResult.objects.filter(game__in=last_round_games)
+        winners_ids = results.values_list('winner_id', flat=True)
+        
         # Convertir a conjunto para evitar duplicados
         winners = list(set(winners_ids))
-
         logger.info(f"{len(winners)} ganadores para la siguiente ronda")
 
         if len(winners) == 1:
@@ -117,6 +123,7 @@ class Tournament(models.Model):
             return
 
         # Preparar siguiente ronda
+        next_round = max_round + 1
         shuffle(winners)
         match_pairs = [(winners[i], winners[i + 1]) for i in range(0, len(winners), 2)]
 
@@ -128,16 +135,16 @@ class Tournament(models.Model):
                 player2_id = pair[1]
             except IndexError:
                 # Número impar: player1 pasa a la siguiente ronda automáticamente
-                self.create_bye_win(player1_id)
+                self.create_bye_win(player1_id, round_number=next_round)
                 continue
 
             player1 = User.objects.get(id=player1_id)
             player2 = User.objects.get(id=player2_id)
-            Game.objects.create(player1=player1,player2=player2,status='pendiente',tournament=self)
+            Game.objects.create(player1=player1,player2=player2,status='pendiente',tournament=self, round_number=next_round)
             logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
 
-    def create_bye_win(self, player_id):
+    def create_bye_win(self, player_id, round_number):
         """Registra una victoria automática para jugadores sin oponente (bye)"""
         player = User.objects.get(id=player_id)
         # Crear partida simulada y resultado
@@ -146,12 +153,13 @@ class Tournament(models.Model):
             player2=player,  # puede ser sí mismo o null
             status='finalizado',
             tournament=self
+            round_number=round_number
         )
         GameResult.objects.create(
             game=bye_game,
             winner=player,
             loser=player,
-            score_winner=0,
+            score_winner=10,
             score_loser=0,
             duration=0
         )
@@ -177,7 +185,7 @@ class Game(models.Model):
     ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
     background_color = models.CharField(max_length=7, default="#000000")  # Formato hexadecimal, ejemplo: negro
     game_mode = models.BooleanField(default=True) # Game mode true si es 2d
-
+    round_number = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"
