@@ -105,7 +105,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         await self.save_game_result(game_id, winner_side, score_winner, score_loser, duration)
 
         # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
-        game = Game.objects.get(id=game_id)
+        game = await Game.objects.get(id=game_id)
         if game.tournament:
             game.tournament.check_next_round()
 
