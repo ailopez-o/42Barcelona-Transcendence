@@ -25,7 +25,7 @@ Bugs:
 - invite un user para jugar. Aunque el perca sale como vencedor en la ultima pantalla. [img bug04]
 
 - aunque maricarmen tenga ganado (la verdad davifern ha ganado) sale como si todavía estuviera en curso. [img bug05]
-
+- 20/03/25 : Cuando se ha terminado la partida el resultado que aparece es 9 - 7 en vez de 10 que son los puntos totales que hay seteados
 
 Fixed:
 
