@@ -1,3 +1,4 @@
+
 (function () {
     console.log("🎮 Script cargado.");
 
@@ -42,9 +43,13 @@
 
         console.log("🎮 Setup Game 2D ejecutado.");
     
-        document.removeEventListener("keydown", handleKeyDown);
-        document.addEventListener("keydown", handleKeyDown);
-
+        // Para añadir un solo listener
+        if (!window.listenerAdded) {
+            console.log("listener añadido")
+            document.addEventListener("keydown", handleKeyDown);
+            window.listenerAdded = true;
+        }
+ 
         gameState = {};
     
         // Verificar si existen los elementos en el DOM

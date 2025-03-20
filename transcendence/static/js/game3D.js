@@ -45,9 +45,12 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 
         console.log("🎮 Setup Game 3D ejecutado.");
 
-
-        document.removeEventListener("keydown", handleKeyDown);
-        document.addEventListener("keydown", handleKeyDown);
+        // Para añadir un solo listener
+        if (!window.listenerAdded) {
+            console.log("listener añadido")
+            document.addEventListener("keydown", handleKeyDown);
+            window.listenerAdded = true;
+        }
     
         gameState = {};
         animationItems = {};
