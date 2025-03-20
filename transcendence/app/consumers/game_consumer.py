@@ -80,11 +80,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         game.save(update_fields=["status"])
 
     @database_sync_to_async
-    def get_game(self, game_id):
-        return Game.objects.get(id=game_id)
-
-    @database_sync_to_async
-    def check_tournament_next_round(self, game):
+    def check_tournament_next_round(self, game_id):
+        game = Game.objects.select_related('tournament').get(id=game_id)
         if game.tournament:
             game.tournament.check_next_round()
 
@@ -118,8 +115,8 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         game = await self.get_game(game_id)
 
         logger.info(f"Juego {game.game_id} terminado")
-        if game.tournament:
-            await self.check_tournament_next_round(game)
+
+        await self.check_tournament_next_round(game_id)
 
         # Enviar estado final
         await self.channel_layer.group_send(
