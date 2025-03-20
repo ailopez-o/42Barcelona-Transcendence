@@ -6,7 +6,6 @@ Que en una partida al pulsar por ejemplo F10 se termine la partida con un ganado
 
 
 Bugs:
-
 - Intento loggearme SIN 42 y cada vez que fallas en la contraseña se duplica el titulo "Iniciar Sesión" y el botón de loggeo de 42.
 - En el momento de finalizar la partida falta el número de segundos, cuando ya esta finalizada y te metes si sale.
 
@@ -26,6 +25,11 @@ Bugs:
 
 - aunque maricarmen tenga ganado (la verdad davifern ha ganado) sale como si todavía estuviera en curso. [img bug05]
 - 20/03/25 : Cuando se ha terminado la partida el resultado que aparece es 9 - 7 en vez de 10 que son los puntos totales que hay seteados
+- Torneo poder elegir 3D, fondo y max score. Igual al de la partida
+- Mejorar el panel de crear torneo
+- Quitar aridas ganadas del profile
+- Acept/Reject partida en profile
+- Revisar forzar final de partida
 
 Fixed:
 
