@@ -40,7 +40,7 @@
 
     function setupGame() {
 
-        console.log("🎮 Setup Game ejecutado.");
+        console.log("🎮 Setup Game 2D ejecutado.");
     
         document.removeEventListener("keydown", handleKeyDown);
         document.addEventListener("keydown", handleKeyDown);

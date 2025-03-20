@@ -43,7 +43,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 
     function setupGame() {
 
-        console.log(" 🎮 Setup Game ejecutado.");
+        console.log("🎮 Setup Game 3D ejecutado.");
 
 
         document.removeEventListener("keydown", handleKeyDown);
