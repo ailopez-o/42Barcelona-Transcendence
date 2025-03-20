@@ -152,7 +152,7 @@ class Tournament(models.Model):
             player1=player,
             player2=player,  # puede ser sí mismo o null
             status='finalizado',
-            tournament=self
+            tournament=self,
             round_number=round_number
         )
         GameResult.objects.create(
