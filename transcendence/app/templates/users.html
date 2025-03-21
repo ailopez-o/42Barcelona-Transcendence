@@ -1,45 +1,45 @@
 {% load static %}
 
 <div class="container mt-4" id="main-content">
-    <h2 class="text-center mb-4">Lista de Usuarios</h2>
+    <h2 class="text-center mb-4 text-white font-orbitron">Lista de Usuarios</h2>
 
     <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle">
-            <thead class="table-primary text-center">
+        <table class="table table-dark table-hover text-center align-middle border-0">
+            <thead>
                 <tr>
-                    <th>Usuario</th>
-                    <th>Nombre Visible</th>
-                    <th>Total Games</th>
-                    <th>Total Wins</th>
-                    <th>Total Losses</th>
-                    <th>Torneos Ganados</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-start">Usuario</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center">Nombre Visible</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center">Total Games</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center">Total Wins</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center">Total Losses</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center">Torneos Ganados</th>
                     {% if user.is_superuser %}
-                        <th>Acciones</th>
+                        <th style="background-color: #323539 !important;" class="border-0 text-center">Acciones</th>
                     {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <td class="d-flex align-items-center">
+                    <td class="d-flex align-items-center border-0 text-start">
                         <div style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; margin-right: 10px;">
                             <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <span>{{ user.username }}</span>
+                        <span class="text-white">{{ user.username }}</span>
                     </td>
-                    <td class="text-center">{{ user.display_name }}</td>
-                    <td class="text-center">{{ user.total_games }}</td>
-                    <td class="text-center">{{ user.total_wins }}</td>
-                    <td class="text-center">{{ user.total_losses }}</td>
-                    <td class="text-center">{{ user.tournaments_won }}</td>
+                    <td class="text-white border-0 text-center">{{ user.display_name }}</td>
+                    <td class="text-white border-0 text-center">{{ user.total_games }}</td>
+                    <td class="text-white border-0 text-center">{{ user.total_wins }}</td>
+                    <td class="text-white border-0 text-center">{{ user.total_losses }}</td>
+                    <td class="text-white border-0 text-center">{{ user.tournaments_won }}</td>
 
                     {% if request.user.is_superuser %}
-                    <td class="text-center">
+                    <td class="border-0 text-center">
                         <button 
                             hx-post="{% url 'delete_user' user.id %}" 
                             hx-target="#main-content"
                             hx-confirm="¿Estás seguro de eliminar a {{ user.username }}?"
-                            class="btn btn-outline-danger btn-sm"
+                            class="btn btn-danger text-white btn-sm"
                             title="Eliminar">
                             <i class="bi bi-trash3"></i>
                         </button>

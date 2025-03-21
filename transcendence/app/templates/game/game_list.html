@@ -1,33 +1,33 @@
 {% load static %}
 
-<h2 class="text-center mb-4">Lista de Partidas</h2>
+<h2 class="text-center mb-4 text-white font-orbitron">Lista de Partidas</h2>
 
 <div class="table-responsive">
-    <table class="table table-hover table-bordered align-middle">
-        <thead class="table-primary text-center">
+    <table class="table table-dark table-hover text-center align-middle border-0">
+        <thead>
             <tr>
-                <th>Game ID</th>
-                <th>Jugador 1</th>
-                <th>Jugador 2</th>
-                <th>Estado</th>
-                <th>Torneo</th>
-                <th>Ganador</th>
-                <th>Resultado</th>
-                <th>Detalles</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Game ID</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-start py-3">Jugador 1</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-start py-3">Jugador 2</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Estado</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Torneo</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Ganador</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Resultado</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Detalles</th>
                 {% if request.user.is_superuser %}
-                    <th>Acciones</th>
+                    <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Acciones</th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for game in games %}
             <tr>
-                <td class="text-center">{{ game.id }}</td>
-                <td class="text-center">{{ game.player1.username }}</td>
-                <td class="text-center">{{ game.player2.username }}</td>
+                <td class="text-white border-0 text-center py-3">{{ game.id }}</td>
+                <td class="text-white border-0 text-start py-3">{{ game.player1.username }}</td>
+                <td class="text-white border-0 text-start py-3">{{ game.player2.username }}</td>
 
                 <!-- Estado con badge de color -->
-                <td class="text-center">
+                <td class="border-0 text-center py-3">
                     <span class="badge 
                         {% if game.status == 'pendiente' %}bg-warning
                         {% elif game.status == 'en_curso' %}bg-success
@@ -39,30 +39,30 @@
                 </td>
 
                 <!-- Torneo -->
-                <td class="text-center">
+                <td class="text-white border-0 text-center py-3">
                     {% if game.tournament %}
                         {{ game.tournament.name }}
                     {% else %}
-                        <span class="text-muted">-</span>
+                        <span class="text-secondary">-</span>
                     {% endif %}
                 </td>
 
                 <!-- Ganador -->
                 {% if game.result %}
-                    <td class="text-center">{{ game.result.winner.username }}</td>
-                    <td class="text-center">{{ game.result.score_winner }} - {{ game.result.score_loser }}</td>
+                    <td class="text-white border-0 text-center py-3">{{ game.result.winner.username }}</td>
+                    <td class="text-white border-0 text-center py-3">{{ game.result.score_winner }} - {{ game.result.score_loser }}</td>
                 {% else %}
-                    <td class="text-center text-muted">-</td>
-                    <td class="text-center text-muted">-</td>
+                    <td class="text-secondary border-0 text-center py-3">-</td>
+                    <td class="text-secondary border-0 text-center py-3">-</td>
                 {% endif %}
 
                 <!-- Botón Ver Detalles -->
-                <td class="text-center">
+                <td class="border-0 text-center py-3">
                     <button 
                         hx-get="{% url 'game_detail' game.id %}" 
                         hx-target="#main-content" 
                         hx-push-url="true"
-                        class="btn btn-outline-primary btn-sm"
+                        class="btn btn-outline-secondary btn-sm"
                         title="Ver Detalles">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -70,12 +70,12 @@
 
                 <!-- Botón Eliminar (solo superuser) -->
                 {% if request.user.is_superuser %}
-                <td class="text-center">
+                <td class="border-0 text-center py-3">
                     <button 
                         hx-post="{% url 'delete_game' game.id %}" 
                         hx-target="#main-content" 
                         hx-confirm="¿Seguro que deseas eliminar la partida {{ game.id }}?"
-                        class="btn btn-outline-danger btn-sm"
+                        class="btn btn-danger text-white btn-sm"
                         title="Eliminar Partida">
                         <i class="bi bi-trash3"></i>
                     </button>
@@ -84,7 +84,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" class="text-center text-muted">No hay partidas registradas.</td>
+                <td colspan="9" class="text-secondary border-0 text-center py-3">No hay partidas registradas.</td>
             </tr>
             {% endfor %}
         </tbody>

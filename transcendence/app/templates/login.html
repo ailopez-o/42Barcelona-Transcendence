@@ -1,40 +1,44 @@
-<div id="login-container">
-    <h2>Iniciar Sesión</h2>
+<div class="d-flex flex-column align-items-center" id="login-container">
+    <h2 class="text-center text-white mb-5">Iniciar Sesión</h2>
 
     <!-- Botón para alternar -->
-    <button id="toggle_login_btn" class="btn btn-outline-secondary mb-3" type="button" onclick="toggleLoginMethod()">
+    
+    <!-- Formulario de login -->
+    <button id="toggle_login_btn" class="btn btn-outline-secondary text-center mb-3 w-300 " type="button" onclick="toggleLoginMethod()">
         Ingresar con 42
     </button>
-
-    <!-- Formulario de login -->
-    <div id="credentials_login" style="display: block;">
+    <div id="credentials_login" style="display: block;" class="min-w-300">
         <form id="login_form" method="post" 
               hx-post="{% url 'login' %}" 
               hx-target="#login-container" 
               hx-swap="outerHTML">
             {% csrf_token %}
-            <div class="form-group d-flex flex-column">
-                <label for="{{ form.username.id_for_label }}">Usuario:</label>
-                {{ form.username }}
-                <div class="form-error">{{ form.username.errors }}</div>
+            <div class="form-group d-flex flex-column w-100 mb-2">
+                <label for="{{ form.username.id_for_label }}" class="text-white">Usuario:</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" 
+                       class="form-control bg-dark text-white border-secondary" 
+                       placeholder="Ingresa tu usuario">
+                <div class="form-error text-danger">{{ form.username.errors }}</div>
             </div>
-            <div class="form-group d-flex flex-column">
-                <label for="{{ form.password.id_for_label }}">Contraseña:</label>
-                {{ form.password }}
-                <div class="form-error">{{ form.password.errors }}</div>
+            <div class="form-group d-flex flex-column w-100 mb-2">
+                <label for="{{ form.password.id_for_label }}" class="text-white">Contraseña:</label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
+                       class="form-control bg-dark text-white border-secondary" 
+                       placeholder="Ingresa tu contraseña">
+                <div class="form-error text-danger">{{ form.password.errors }}</div>
             </div>
-            <div class="non-field-error">
+            <div class="non-field-error text-danger">
                 {{ form.non_field_errors }}
             </div>
-            <button class="btn btn-outline-dark" type="submit">Ingresar</button>
+            <button class="btn btn-outline-secondary text-center" type="submit">Ingresar</button>
         </form>
     </div>
 
     <!-- Login con 42 -->
     <div id="intra_login" style="display: none;">
-        <div class="text-center">
-            <p class="text-white mb-4">Inicia sesión con tu cuenta de 42</p>
-            <button class="btn btn-outline-dark" 
+        <div class="text-center min-w-300">
+            <p class="text-white mb-2">Inicia con tu cuenta de 42:</p>
+            <button class="btn btn-outline-secondary text-center w-100" 
                     hx-get="{% url 'login_42' %}" 
                     hx-trigger="click"
                     hx-target="body"

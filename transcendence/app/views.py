@@ -108,8 +108,8 @@ def profile_view(request):
     all_games = Game.objects.filter(player1=user) | Game.objects.filter(player2=user)
 
     # Separar las partidas en categorías
-    individual_games = all_games.filter(tournament__isnull=True)
-    tournament_games = all_games.filter(tournament__isnull=False)
+    individual_games = all_games.filter(tournament__isnull=True).exclude(status="finalizado")
+    tournament_games = all_games.filter(tournament__isnull=False).exclude(status="finalizado")
     finished_games = all_games.filter(status="finalizado")
 
     context = {

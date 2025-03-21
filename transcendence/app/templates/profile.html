@@ -2,73 +2,78 @@
 
 <div class="container mt-4">
     <!-- Perfil del Usuario -->
-    <div class="card shadow-lg mb-4">
-        <div class="card-body d-flex align-items-center">
-            <!-- Avatar -->
-            <div class="me-4">
-                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="rounded-circle border border-primary shadow" width="100" height="100">
+    <div class="card shadow-lg mb-4 bg-dark border-secondary">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <!-- Columna del Avatar -->
+            <div class="col-auto">
+              <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="rounded-circle border border-secondary shadow" width="100" height="100">
             </div>
-
-            <!-- Información del Usuario -->
-            <div>
-                <h2 class="text-primary mb-1">
-                    <i class="bi bi-person-circle"></i> {{ user.display_name }}
-                </h2>
-                <p class="text-muted"><i class="bi bi-envelope"></i> {{ user.email }}</p>
-
-                <!-- Estadísticas -->
-                <div class="row text-center mt-3">
-                    <div class="col">
-                        <span class="fw-bold">{{ user.total_games }}</span><br>
-                        <small class="text-muted">Total Juegos</small>
-                    </div>
-                    <div class="col">
-                        <span class="fw-bold text-success">{{ user.total_wins }}</span><br>
-                        <small class="text-muted">Ganados</small>
-                    </div>
-                    <div class="col">
-                        <span class="fw-bold text-danger">{{ user.total_losses }}</span><br>
-                        <small class="text-muted">Perdidos</small>
-                    </div>
-                    <div class="col">
-                        <span class="fw-bold text-warning">{{ user.tournaments_won }}</span><br>
-                        <small class="text-muted">Torneos Ganados</small>
-                    </div>
+      
+            <!-- Columna de Información del Usuario -->
+            <div class="col d-flex flex-column justify-content-center">
+              <h2 class="text-white mb-1 font-orbitron">
+                <i class="bi bi-person-circle"></i> {{ user.display_name }}
+              </h2>
+              <p class="text-secondary"><i class="bi bi-envelope"></i> {{ user.email }}</p>
+            </div>
+      
+            <!-- Columna de Estadísticas -->
+            <div class="col-auto">
+              <div class="d-flex">
+                <div class="text-center me-3">
+                  <span class="text-white font-orbitron">{{ user.total_games }}</span><br>
+                  <small class="text-secondary">Total Juegos</small>
                 </div>
+                <div class="text-center me-3">
+                  <span class="text-success font-orbitron">{{ user.total_wins }}</span><br>
+                  <small class="text-secondary">Ganados</small>
+                </div>
+                <div class="text-center me-3">
+                  <span class="text-danger font-orbitron">{{ user.total_losses }}</span><br>
+                  <small class="text-secondary">Perdidos</small>
+                </div>
+                <div class="text-center">
+                  <span class="text-warning font-orbitron">{{ user.tournaments_won }}</span><br>
+                  <small class="text-secondary">Torneos Ganados</small>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
+      
 
     <!-- Partidas Activas (Individuales y Torneo) -->
     <div class="row">
         <!-- Individuales -->
         <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-controller"></i> Partidas Individuales</h5>
+            <div class="card shadow-sm mb-4 bg-dark border-secondary">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 font-orbitron"><i class="bi bi-controller"></i> Partidas Individuales</h5>
                 </div>
                 <div class="card-body">
                     {% if individual_games.exists %}
-                        <table class="table table-hover text-center align-middle">
-                            <thead class="table-primary">
+                        <table class="table table-dark table-hover text-center align-middle border-0">
+                            <thead class="bg-secondary">
                                 <tr>
-                                    <th>Oponente</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
+                                    <th class="grey-text border-0">Oponente</th>
+                                    <th class="grey-text border-0">Estado</th>
+                                    <th class="grey-text border-0">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for game in individual_games %}
                                     {% if game.status != 'finalizado' %}
                                     <tr>
-                                        <td>
+                                        <td class="text-white border-0">
                                             {% if game.player1 == user %}
                                                 {{ game.player2.username }}
                                             {% else %}
                                                 {{ game.player1.username }}
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td class="border-0">
                                             <span class="badge 
                                                 {% if game.status == 'pendiente' %}bg-warning
                                                 {% elif game.status == 'en_curso' %}bg-success
@@ -78,11 +83,11 @@
                                                 {{ game.get_status_display }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="border-0">
                                             <button hx-get="{% url 'game_detail' game.id %}" 
                                                     hx-target="#main-content" 
                                                     hx-push-url="true"
-                                                    class="btn btn-outline-primary btn-sm" title="Ver Partida">
+                                                    class="btn btn-outline-secondary btn-sm" title="Ver Partida">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                         </td>
@@ -92,7 +97,9 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted text-center">No tienes partidas individuales activas.</p>
+                        <div class="text-center">
+                            <p class="text-secondary">No tienes partidas individuales activas.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -100,34 +107,34 @@
 
         <!-- Torneos -->
         <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-trophy-fill"></i> Partidas de Torneo</h5>
+            <div class="card shadow-sm mb-4 bg-dark border-secondary">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 font-orbitron"><i class="bi bi-trophy-fill"></i> Partidas de Torneo</h5>
                 </div>
                 <div class="card-body">
                     {% if tournament_games.exists %}
-                        <table class="table table-hover text-center align-middle">
-                            <thead class="table-info">
+                        <table class="table table-dark table-hover text-center align-middle border-0">
+                            <thead class="bg-secondary">
                                 <tr>
-                                    <th>Torneo</th>
-                                    <th>Oponente</th>
-                                    <th>Estado</th>
-                                    <th>Acción</th>
+                                    <th class="grey-text border-0">Torneo</th>
+                                    <th class="grey-text border-0">Oponente</th>
+                                    <th class="grey-text border-0">Estado</th>
+                                    <th class="grey-text border-0">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for game in tournament_games %}
                                     {% if game.status != 'finalizado' %}
                                     <tr>
-                                        <td>{{ game.tournament.name }}</td>
-                                        <td>
+                                        <td class="text-white border-0">{{ game.tournament.name }}</td>
+                                        <td class="text-white border-0">
                                             {% if game.player1 == user %}
                                                 {{ game.player2.username }}
                                             {% else %}
                                                 {{ game.player1.username }}
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td class="border-0">
                                             <span class="badge 
                                                 {% if game.status == 'pendiente' %}bg-warning
                                                 {% elif game.status == 'en_curso' %}bg-success
@@ -137,11 +144,11 @@
                                                 {{ game.get_status_display }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="border-0">
                                             <button hx-get="{% url 'game_detail' game.id %}" 
                                                     hx-target="#main-content" 
                                                     hx-push-url="true"
-                                                    class="btn btn-outline-info btn-sm" title="Ver Partida">
+                                                    class="btn btn-outline-secondary btn-sm" title="Ver Partida">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                         </td>
@@ -151,7 +158,9 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted text-center">No tienes partidas de torneo activas.</p>
+                        <div class="text-center">
+                            <p class="text-secondary">No tienes partidas de torneo activas.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -159,50 +168,50 @@
     </div>
 
     <!-- Partidas Finalizadas -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4 bg-dark border-secondary">
         <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0"><i class="bi bi-flag-checkered"></i> Partidas Finalizadas</h5>
+            <h5 class="mb-0 font-orbitron"><i class="bi bi-flag-checkered"></i> Partidas Finalizadas</h5>
         </div>
         <div class="card-body">
             {% if finished_games.exists %}
-                <table class="table table-hover text-center align-middle">
-                    <thead class="table-dark">
+                <table class="table table-dark table-hover text-center align-middle border-0">
+                    <thead class="bg-secondary">
                         <tr>
-                            <th>Oponente</th>
-                            <th>Torneo</th>
-                            <th>Resultado</th>
-                            <th>Acción</th>
+                            <th class="grey-text border-0">Oponente</th>
+                            <th class="grey-text border-0">Torneo</th>
+                            <th class="grey-text border-0">Resultado</th>
+                            <th class="grey-text border-0">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for game in finished_games %}
                             <tr>
-                                <td>
+                                <td class="text-white border-0">
                                     {% if game.player1 == user %}
                                         {{ game.player2.username }}
                                     {% else %}
                                         {{ game.player1.username }}
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="text-white border-0">
                                     {% if game.tournament %}
                                         {{ game.tournament.name }}
                                     {% else %}
-                                        <span class="text-muted">Partida Simple</span>
+                                        <span class="text-secondary">Partida Simple</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="border-0">
                                     {% if game.result.winner == user %}
-                                        <span class="text-success fw-bold"><i class="bi bi-trophy"></i> Ganaste</span>
+                                        <span class="text-success font-orbitron"><i class="bi bi-trophy"></i> Ganaste</span>
                                     {% else %}
-                                        <span class="text-danger fw-bold"><i class="bi bi-emoji-frown"></i> Perdiste</span>
+                                        <span class="text-danger font-orbitron"><i class="bi bi-emoji-frown"></i> Perdiste</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="border-0">
                                     <button hx-get="{% url 'game_detail' game.id %}" 
                                             hx-target="#main-content" 
                                             hx-push-url="true"
-                                            class="btn btn-outline-dark btn-sm" title="Ver Detalles">
+                                            class="btn btn-outline-secondary btn-sm" title="Ver Detalles">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </td>
@@ -211,7 +220,9 @@
                     </tbody>
                 </table>
             {% else %}
-                <p class="text-muted text-center">No tienes partidas finalizadas.</p>
+                <div class="text-center">
+                    <p class="text-secondary">No tienes partidas finalizadas.</p>
+                </div>
             {% endif %}
         </div>
     </div>
