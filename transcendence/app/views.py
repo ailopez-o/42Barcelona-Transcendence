@@ -323,10 +323,12 @@ def leave_tournament(request, tournament_id):
 def tournament_detail(request, tournament_id):
     """Ver detalles del torneo"""
     tournament = get_object_or_404(Tournament, id=tournament_id)
+    games = tournament.games.order_by('round_number')
+
     if request.headers.get("HX-Request"):  # Si es HTMX, devolvemos solo el formulario
-        return render(request, "tournaments/tournament_detail.html", {"tournament": tournament})
+        return render(request, "tournaments/tournament_detail.html", {"tournament": tournament,"games": games})
     else:  # Si es una carga normal, devolvemos base.html con tournament.html dentro
-        return render(request, "base.html", {"content_template": "tournaments/tournament_detail.html", "tournament": tournament})
+        return render(request, "base.html", {"content_template": "tournaments/tournament_detail.html", "tournament": tournament,"games": games})
 
 @csrf_exempt  # En producción, usa CSRF correctamente
 @login_required
