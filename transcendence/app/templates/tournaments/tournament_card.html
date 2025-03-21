@@ -10,7 +10,16 @@
             <!-- Centro: Nombre del torneo -->
             <div class="flex-grow-1 text-center">
                 <h5 class="mb-0 text-uppercase font-orbitron text-white">{{ tournament.name }}</h5>
+                <button 
+                    hx-get="{% url 'tournament_detail' tournament.id %}" 
+                    hx-target="#main-content" 
+                    hx-swap="innerHTML" 
+                    hx-push-url="true"
+                    class="btn btn-outline-light btn-sm mt-1 d-flex align-items-center gap-1">
+                    <i class="bi bi-eye"></i> Ver Detalle
+                </button>
             </div>
+            
 
             <!-- Derecha: Botón borrar si aplica -->
             <div>
