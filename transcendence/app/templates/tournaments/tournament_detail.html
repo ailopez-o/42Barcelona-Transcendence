@@ -12,27 +12,6 @@
             <div class="flex-grow-1 text-center">
                 <h5 class="mb-0 text-uppercase">{{ tournament.name }}</h5>
             </div>
-
-            <!-- Derecha: Botón borrar si aplica -->
-            <div>
-                {% if request.user.is_superuser %}
-                    <button 
-                        hx-delete="{% url 'delete_tournament' tournament.id %}"
-                        hx-target="#tournament-list"
-                        hx-swap="outerHTML"                        
-                        class="btn btn-danger btn-sm d-flex align-items-center gap-1">
-                        <i class="bi bi-trash"></i> Borrar
-                    </button>
-                {% elif request.user == tournament.creator and tournament.status != "en_curso" %}
-                    <button 
-                        hx-delete="{% url 'delete_tournament' tournament.id %}"
-                        hx-target="#tournament-list"
-                        hx-swap="outerHTML"                        
-                        class="btn btn-danger btn-sm d-flex align-items-center gap-1">
-                        <i class="bi bi-trash"></i> Borrar
-                    </button>
-                {% endif %}
-            </div>
         </div>
 
         <!-- Estado centrado debajo -->
