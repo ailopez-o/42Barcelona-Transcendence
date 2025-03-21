@@ -25,8 +25,7 @@ Bugs:
 
 - aunque maricarmen tenga ganado (la verdad davifern ha ganado) sale como si todavía estuviera en curso. [img bug05]
 - 20/03/25 : Cuando se ha terminado la partida el resultado que aparece es 9 - 7 en vez de 10 que son los puntos totales que hay seteados
-- Torneo poder elegir 3D, fondo y max score. Igual al de la partida
-- Mejorar el panel de crear torneo
+
 - Quitar aridas ganadas del profile
 - Acept/Reject partida en profile
 - Revisar forzar final de partida
@@ -45,7 +44,9 @@ Fixed:
 17/03/2025: Restyling
 17/03/2025: Todos nuestros usuarios de 42 son superusers
 17/03/2025: Logger
-17/03/2025: Manda dos notificaciones cuando se acaba una partida. 
+17/03/2025: Manda dos notificaciones cuando se acaba una partida.
+21/03/2025: Torneo poder elegir 3D, fondo y max score. Igual al de la partida
+21/03/2025: Mejorar el panel de crear torneo
 
 Testing:
 
