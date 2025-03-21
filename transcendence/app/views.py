@@ -547,3 +547,6 @@ def view_logs(request):
     })
 
 
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
