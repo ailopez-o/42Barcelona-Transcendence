@@ -1,0 +1,7 @@
+<div id="tournament-list" class="tournament-list d-flex flex-column gap-4">
+    {% for tournament in tournaments %}
+        {% include "tournaments/tournament_card.html" %}
+    {% empty %}
+        <p class="text-center text-muted">No hay torneos disponibles en este momento.</p>
+    {% endfor %}
+</div>

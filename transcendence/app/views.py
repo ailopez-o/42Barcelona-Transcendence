@@ -228,39 +228,55 @@ def create_tournament(request):
         if not name:
             return HttpResponse("El nombre es obligatorio", status=400)
 
-        # Convertimos el valor de max_participants a entero
         try:
             max_participants = int(max_participants)
         except ValueError:
             return HttpResponse("Número de participantes inválido", status=400)
-
-        # Creamos el torneo
-        tournament = Tournament.objects.create(
+        
+        # Crear torneo
+        Tournament.objects.create(
             creator=request.user,
             name=name,
             max_participants=max_participants,
-            created_at=now()
+            difficulty = request.POST.get('difficulty', 'medio'),
+            points = request.POST.get('points', 10),
+            paddle_color = request.POST.get('paddle_color', "#0000ff"),
+            ball_color = request.POST.get('ball_color', "#ff0000"),
+            background_color = request.POST.get('background_color', "#000000"),
+            game_mode = request.POST.get('game_mode', '2d') == '2d'
         )
 
-        # Devolvemos solo la tarjeta del nuevo torneo para HTMX
-        return render(request, "tournaments/tournament_card.html", {"tournament": tournament, "user": request.user})
+        tournaments = Tournament.objects.all()
 
-    # Si no es un POST, devolvemos el formulario vacío para HTMX
+        if request.headers.get("HX-Request"):
+            return render(request, "tournaments/tournament_cards.html", {"tournaments": tournaments})
+
+        return redirect("tournament_list")
+
     return render(request, "tournaments/tournament_create_form.html")
 
 @csrf_exempt 
 @login_required
 def delete_tournament(request, tournament_id):
     """Permite al creador eliminar un torneo si NO está en curso"""
-    tournament = get_object_or_404(Tournament, id=tournament_id, creator=request.user)
+    tournament = get_object_or_404(Tournament, id=tournament_id)
 
-    if tournament.status != "en_curso":  # Se puede eliminar en cualquier estado excepto "en_curso"
-        tournament.delete()
+    # Permitir solo si es el creador o superuser
+    if tournament.creator != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("No tienes permisos para eliminar este torneo.")
 
-        # Retornamos un HTML vacío para que HTMX elimine la card correctamente
-        return HttpResponse("<!-- Eliminado -->", status=200)
+    # No permitir borrar si está en curso (excepto superuser)
+    if tournament.status == "en_curso" and not request.user.is_superuser:
+        return HttpResponse("No puedes eliminar un torneo en curso.", status=403)
 
-    return HttpResponse("No puedes eliminar un torneo en curso.", status=403)
+    tournament.delete()
+
+    tournaments = Tournament.objects.all()  # Lista actualizada
+
+    if request.headers.get("HX-Request"):
+        return render(request, "tournaments/tournament_cards.html", {"tournaments": tournaments})
+
+    return redirect("tournament_list")
 
 @login_required
 def tournament_list(request):
@@ -372,95 +388,6 @@ def game_list_view(request):
         return render(request, "base.html", {"content_template": "game/game_list.html", **context})
 
 
-
-# {
-#     "game_id": 123,
-#     "winner_id": 5,
-#     "loser_id": 7,
-#     "score_winner": 5,
-#     "score_loser": 3,
-#     "duration": 120
-# }
-
-
-# @csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
-# @require_POST
-# def game_save_view(request):
-#     try:
-
-#         logger.info("Recibida solicitud POST en game_result_view")
-#         logger.info("Headers: %s", request.headers)
-#         logger.info("Body: %s", request.body)
-#         data = json.loads(request.body)
-
-#         # Extraer datos
-#         game_id = data.get("game_id")
-#         winner_id = data.get("winner_id")
-#         loser_id = data.get("loser_id")
-#         score_winner = data.get("score_winner")
-#         score_loser = data.get("score_loser")
-#         duration = data.get("duration")
-
-#         # Validar que no falten datos
-#         if None in (game_id, winner_id, loser_id, score_winner, score_loser, duration):
-#             return JsonResponse({"status": "error", "message": "Faltan datos en la solicitud"}, status=400)
-
-#         # Obtener el juego manualmente para evitar que `get_object_or_404` devuelva HTML
-#         try:
-#             game = Game.objects.get(id=game_id)
-#         except ObjectDoesNotExist:
-#             return JsonResponse({"status": "error", "message": f"No se encontró el juego con id {game_id}"}, status=404)
-
-#         # Obtener los usuarios manualmente
-#         try:
-#             winner = User.objects.get(id=winner_id)
-#         except ObjectDoesNotExist:
-#             return JsonResponse({"status": "error", "message": f"No se encontró el usuario ganador con id {winner_id}"}, status=404)
-
-#         try:
-#             loser = User.objects.get(id=loser_id)
-#         except ObjectDoesNotExist:
-#             return JsonResponse({"status": "error", "message": f"No se encontró el usuario perdedor con id {loser_id}"}, status=404)
-
-#         # Crear o actualizar el resultado de la partida
-#         result, created = GameResult.objects.update_or_create(
-#             game=game,
-#             defaults={
-#                 "winner": winner,
-#                 "loser": loser,
-#                 "score_winner": score_winner,
-#                 "score_loser": score_loser,
-#                 "duration": duration,
-#             }
-#         )
-
-#         game.status = "finalizado"
-#         game.save()
-
-#         logger.info(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
-
-#         # Enviar notificación a todos los usuarios
-#         # Solo enviar notificación si fue la PRIMERA vez que se guardó el resultado
-#         if created:
-#             send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
-
-#         # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
-#         if game.tournament:
-#             logger.info(f"Llamando a check_next_round para el torneo: {game.tournament.name}")
-#             max_round = game.round_number 
-#             game.tournament.check_next_round(max_round)
-
-#         return JsonResponse({
-#             "status": "success",
-#             "message": "Resultado guardado correctamente",
-#             "created": created
-#         }, status=201 if created else 200)
-
-#     except json.JSONDecodeError:
-#         return JsonResponse({"status": "error", "message": "Formato JSON inválido"}, status=400)
-#     except Exception as e:
-#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    
 def login_with_42(request):
     """Redirige al usuario a la plataforma de autenticación de 42."""
     

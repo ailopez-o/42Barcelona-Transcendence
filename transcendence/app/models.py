@@ -65,6 +65,12 @@ class Tournament(models.Model):
     max_participants = models.PositiveIntegerField(default=8)
     created_at = models.DateTimeField(auto_now_add=True)
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="won_tournaments")
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medio')
+    points = models.PositiveIntegerField(default=10)
+    paddle_color = models.CharField(max_length=7, default="#0000ff")  # Formato hexadecimal, ejemplo: azul
+    ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
+    background_color = models.CharField(max_length=7, default="#000000")  # Formato hexadecimal, ejemplo: negro
+    game_mode = models.BooleanField(default=True) # Game mode true si es 2d
 
     def __str__(self):
         return f"Torneo {self.name} - {self.status}"
@@ -88,7 +94,19 @@ class Tournament(models.Model):
 
         match_pairs = [(players[i], players[i + 1]) for i in range(0, len(players), 2)]
         for player1, player2 in match_pairs:
-            Game.objects.create(player1=player1, player2=player2, status='pendiente', tournament=self, round_number=1)
+            Game.objects.create(
+                player1=player1,
+                player2=player2,
+                status='pendiente',
+                tournament=self,
+                round_number=1,
+                points=self.points,
+                difficulty=self.difficulty,
+                paddle_color=self.paddle_color,
+                ball_color=self.ball_color,
+                background_color=self.background_color,
+                game_mode=self.game_mode
+            )
             logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
     def check_next_round(self, max_round):
@@ -139,7 +157,19 @@ class Tournament(models.Model):
 
             player1 = User.objects.get(id=player1_id)
             player2 = User.objects.get(id=player2_id)
-            Game.objects.create(player1=player1,player2=player2,status='pendiente',tournament=self, round_number=next_round)
+            Game.objects.create(
+                player1=player1,
+                player2=player2,
+                status='pendiente',
+                tournament=self,
+                round_number=next_round,
+                points=self.points,
+                difficulty=self.difficulty,
+                paddle_color=self.paddle_color,
+                ball_color=self.ball_color,
+                background_color=self.background_color,
+                game_mode=self.game_mode
+            )
             logger.info(f"Partida creada en torneo {self.name}: {player1.display_name} vs {player2.display_name}")
 
 
