@@ -201,6 +201,30 @@ table tr:nth-child(even) {
     background-color: #d6e6f5; /* Fondo para el chat de partida */
 }
 
+/* Estilo unificado para #chat-input en todos los chats */
+#chat-input,
+#chat-input:focus {
+    background-color: #323539 !important; /* igual que .bg-header */
+    color: #fff !important;
+    border-color: #6c757d !important;
+    box-shadow: none !important;
+}
+
+/* Estilo del placeholder */
+#chat-input::placeholder {
+    color: #C8C8C9;
+}
+
+/* Estilo para evitar fondo blanco en autocompletado */
+#chat-input:-webkit-autofill,
+#chat-input:-webkit-autofill:hover,
+#chat-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff !important;
+    -webkit-box-shadow: 0 0 0px 1000px #323539 inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+
 /* Estilos comunes para el formulario */
 #chat-form {
     margin-top: 10px;
