@@ -13,7 +13,7 @@
                         <h4 class="mb-1 text-white font-orbitron">Partida de Pong #{{ game.id }}</h4>
 
                         <!-- Tipo de partida: Local / Remota -->
-                        <div class="mt-2">
+                        <div class="mt-2 mb-2">
                             <span class="badge {% if not game.remote_mode %}bg-info{% else %}bg-secondary{% endif %}">
                                 {% if not game.remote_mode %}
                                     <i class="bi bi-controller"></i> Local
@@ -93,18 +93,18 @@
 
         <!-- Sección del chat -->
         <div class="col-12 col-md-4">
-            <div class="chat-section bg-dark border border-secondary rounded p-3 h-100">
-                <div class="chat-container bg-dark border border-secondary p-3 rounded shadow-sm h-100">
-                    <h4 class="text-center text-white font-orbitron">Chat en Vivo</h4>
+            <div class="chat-section bg-dark border border-secondary rounded p-3 h-100 d-flex flex-column">
+                <div class="chat-container bg-dark border border-secondary p-3 rounded shadow-sm h-100 d-flex flex-column">
+                    <h4 class="text-center text-white font-orbitron mb-3">Chat en Vivo</h4>
 
                     <!-- Contenedor para los mensajes de chat -->
-                    <div id="chat-section" class="chat-box border border-secondary rounded p-2 mb-2 bg-dark"
-                    style="height: 300px; overflow-y: auto;" hx-preserve>
+                    <div id="chat-section" class="chat-box border border-secondary rounded p-2 mb-2 bg-dark flex-grow-1" 
+                        style="overflow-y: auto;" hx-preserve>
                         <!-- Los mensajes se cargarán dinámicamente aquí -->
                     </div>
 
                     <!-- Formulario para enviar mensajes -->
-                    <form id="chat-form" class="d-flex" hx-boost="false">
+                    <form id="chat-form" class="d-flex mt-auto">
                         <input type="text" id="chat-input" class="form-control bg-header text-white border-secondary me-2" placeholder="Escribe tu mensaje..." required autocomplete="off">
                         <button type="submit" class="btn btn-outline-secondary">
                             <i class="bi bi-send"></i>

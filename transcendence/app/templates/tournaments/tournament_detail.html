@@ -1,17 +1,20 @@
 <div class="card shadow-sm bg-dark border-secondary">
     <!-- Header igual al de la card -->
     <div class="card-header bg-header text-white">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-grid" style="grid-template-columns: 200px 1fr 200px; gap: 1rem;">
             <!-- Izquierda: Avatar y nombre del creador -->
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-start">
                 <img src="{{ tournament.creator.avatar_url }}" alt="{{ tournament.creator.display_name }}" class="rounded-circle me-2" width="30" height="30">
                 <strong class="text-white">{{ tournament.creator.display_name }}</strong>
             </div>
 
             <!-- Centro: Nombre del torneo -->
-            <div class="flex-grow-1 text-center">
+            <div class="d-flex justify-content-center">
                 <h5 class="mb-0 text-uppercase text-white">{{ tournament.name }}</h5>
             </div>
+
+            <!-- Derecha: Columna vacía para mantener simetría -->
+            <div></div>
         </div>
 
         <!-- Estado centrado debajo -->
