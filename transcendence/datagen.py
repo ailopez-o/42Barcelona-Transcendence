@@ -3,7 +3,7 @@ from app.models import User, Game, GameResult, Tournament
 import random
 
 # Crear 50 usuarios regulares
-for i in range(1, 51):
+for i in range(1, 11):
     username = f"user{i}"
     if not User.objects.filter(username=username).exists():
         User.objects.create_user(username=username, password="123456", email=f"{username}@example.com", display_name=f"User_{i}")
