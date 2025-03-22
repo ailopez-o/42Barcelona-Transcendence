@@ -38,22 +38,36 @@
             </div>
 
             <div class="form-group d-flex flex-column w-100 mb-2">
-                <label class="text-white">Modo de juego:</label>
+                <label class="text-white">Tipo de partida:</label>
                 <div class="d-flex gap-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="game_mode" id="game_mode_2d" value="2d" checked>
-                        <label class="form-check-label text-white" for="game_mode_2d">
-                            2D
+                        <input class="form-check-input" type="radio" name="play_mode" id="mode_remote" value="remote" checked>
+                        <label class="form-check-label text-white" for="mode_remote">
+                            Remoto
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="game_mode" id="game_mode_3d" value="3d">
-                        <label class="form-check-label text-white" for="game_mode_3d">
-                            3D
+                        <input class="form-check-input" type="radio" name="play_mode" id="mode_local" value="local">
+                        <label class="form-check-label text-white" for="mode_local">
+                            Local
                         </label>
                     </div>
                 </div>
             </div>
+            
+            <div class="form-group d-flex flex-column w-100 mb-2" id="mode-selectors">
+                <label class="text-white">Modo de juego:</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="game_mode" id="game_mode_2d" value="2d" checked>
+                        <label class="form-check-label text-white" for="game_mode_2d">2D</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="game_mode" id="game_mode_3d" value="3d">
+                        <label class="form-check-label text-white" for="game_mode_3d">3D</label>
+                    </div>
+                </div>
+            </div>            
             
             <div class="form-group d-flex flex-column w-100 mb-2">
                 <label for="paddle_color" class="text-white">Color de las palas:</label>
@@ -83,3 +97,49 @@
         </form>
     </div>
 </div>
+
+
+<script>
+
+if (window.listenerAdded === undefined) window.listenerAdded = false;
+
+   function setupListener() {
+        if (window.listenerAdded) 
+            return;
+
+        window.listenerAdded = true;
+        const modeSelectors = document.querySelectorAll('input[name="game_mode"]');
+        const playModeRadios = document.querySelectorAll('input[name="play_mode"]');
+    
+        function updateGameModeOptions() {
+            const isLocal = document.getElementById("mode_local").checked;
+    
+            modeSelectors.forEach(input => {
+                input.disabled = isLocal;
+            });
+    
+            if (isLocal) {
+                document.getElementById("game_mode_2d").checked = true;
+            }
+        }
+    
+        playModeRadios.forEach(radio => {
+            radio.addEventListener("change", updateGameModeOptions);
+        });
+    
+        updateGameModeOptions(); // Inicializar
+    }
+
+    
+// Se ejecuta cuando hay recarga HTMX
+if (document.readyState === "complete") {
+    setupListener(); // Si el DOM ya está listo, ejecuta directamente
+}
+
+// Se ejecuta cuando hay recarga completa
+document.addEventListener("DOMContentLoaded", function () {
+    setupListener(); // Si el DOM ya está listo, ejecuta directamente
+});
+
+</script>
+    

@@ -37,7 +37,19 @@
                 {{ tournament.difficulty|title }}
             </span>
         </p>
-    
+
+		<!-- Mostrar tipo de torneo -->
+		<p class="text-white">
+			<strong>Tipo de Torneo:</strong> 
+			<span class="badge {% if not tournament.remote_mode %}bg-info{% else %}bg-secondary{% endif %}">
+				{% if not tournament.remote_mode %}
+					<i class="bi bi-controller"></i> Local
+				{% else %}
+					<i class="bi bi-globe2"></i> Remoto
+				{% endif %}
+			</span>
+		</p>
+
         <!-- Mostrar modo de juego -->
         <p class="text-white">
             <strong>Modo de Juego:</strong>

@@ -71,6 +71,7 @@ class Tournament(models.Model):
     ball_color = models.CharField(max_length=7, default="#ff0000")    # Formato hexadecimal, ejemplo: rojo
     background_color = models.CharField(max_length=7, default="#000000")  # Formato hexadecimal, ejemplo: negro
     game_mode = models.BooleanField(default=True) # Game mode true si es 2d
+    remote_mode = models.BooleanField(default=True) # Local / Remote
 
     def __str__(self):
         return f"Torneo {self.name} - {self.status}"
@@ -215,6 +216,7 @@ class Game(models.Model):
     background_color = models.CharField(max_length=7, default="#000000")  # Formato hexadecimal, ejemplo: negro
     game_mode = models.BooleanField(default=True) # Game mode true si es 2d
     round_number = models.PositiveIntegerField(default=1)
+    remote_mode = models.BooleanField(default=True) # Local / Remote
 
     def __str__(self):
         return f"Game {self.id}: {self.player1} vs {self.player2} ({self.status})"

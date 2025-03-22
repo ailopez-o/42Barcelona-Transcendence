@@ -10,6 +10,8 @@
                 <th style="background-color: #323539 !important;" class="border-0 text-start py-3">Jugador 1</th>
                 <th style="background-color: #323539 !important;" class="border-0 text-start py-3">Jugador 2</th>
                 <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Estado</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Modo</th>
+                <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Vista</th>
                 <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Torneo</th>
                 <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Ganador</th>
                 <th style="background-color: #323539 !important;" class="border-0 text-center py-3">Resultado</th>
@@ -38,10 +40,31 @@
                     </span>
                 </td>
 
-                <!-- Torneo -->
+                <!-- Modo Local / Remoto -->
+                <td class="border-0 text-center py-3">
+                    <span class="badge {% if not game.remote_mode %}bg-info{% else %}bg-secondary{% endif %}">
+                        {% if not game.remote_mode %}
+                            <i class="bi bi-controller"></i> Local
+                        {% else %}
+                            <i class="bi bi-globe2"></i> Remota
+                        {% endif %}
+                    </span>
+                </td>
+
+                <!-- Vista 2D / 3D -->
+                <td class="border-0 text-center py-3">
+                    {% if game.game_mode %}
+                        <span class="badge bg-primary">2D</span>
+                    {% else %}
+                        <span class="badge bg-dark">3D</span>
+                    {% endif %}
+                </td>
+
+                <!-- Torneo + Ronda -->
                 <td class="text-white border-0 text-center py-3">
                     {% if game.tournament %}
-                        {{ game.tournament.name }}
+                        {{ game.tournament.name }}<br>
+                        <small class="text-secondary">Ronda {{ game.round_number }}</small>
                     {% else %}
                         <span class="text-secondary">-</span>
                     {% endif %}
@@ -84,7 +107,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" class="text-secondary border-0 text-center py-3">No hay partidas registradas.</td>
+                <td colspan="11" class="text-secondary border-0 text-center py-3">No hay partidas registradas.</td>
             </tr>
             {% endfor %}
         </tbody>
