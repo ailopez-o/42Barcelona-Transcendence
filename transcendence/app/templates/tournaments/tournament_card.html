@@ -1,5 +1,5 @@
 <div class="card shadow-sm bg-dark border-secondary">
-    <div class="card-header bg-secondary text-white">
+    <div class="card-header bg-header text-white">
         <div class="d-flex justify-content-between align-items-center">
             <!-- Izquierda: Avatar y nombre del creador -->
             <div class="d-flex align-items-center">
@@ -46,7 +46,7 @@
 
         <!-- Estado centrado debajo -->
         <div class="text-center mt-2">
-            <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-secondary{% endif %}">
+            <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-header{% endif %}">
                 {{ tournament.get_status_display }}
             </span>
         </div>
@@ -70,7 +70,7 @@
         <!-- Mostrar tipo de torneo -->
         <p class="text-white">
             <strong>Tipo de Torneo:</strong> 
-            <span class="badge {% if not tournament.remote_mode %}bg-info{% else %}bg-secondary{% endif %}">
+            <span class="badge {% if not tournament.remote_mode %}bg-info{% else %}bg-header{% endif %}">
                 {% if not tournament.remote_mode %}
                     <i class="bi bi-controller"></i> Local
                 {% else %}
