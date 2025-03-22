@@ -30,6 +30,13 @@ if (window.gameStarted === undefined) window.gameStarted = false;
 if (window.gameStartTime === undefined) window.gameStartTime = null;
 if (window.gameEnded === undefined) window.gameEnded = false;
 
+console.log("listenerAdded", window.listenerAdded)
+if (!window.listenerAdded) {
+    document.addEventListener("keydown", handleKeyDown);
+    window.listenerAdded = true;
+    console.log("🎮 Listener añadido");
+}
+
 function handleKeyDown(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -54,16 +61,10 @@ function handleKeyDown(e) {
     }));
 }
 
-if (!window.listenerAdded) {
-    document.addEventListener("keydown", handleKeyDown);
-    window.listenerAdded = true;
-    console.log("🎮 Listener añadido");
-}
-
 window.setupGame = function () {
     console.log("🎮 Setup Game ejecutado.");
-
-	// Se actulizara con lo que llegue del backend
+  	
+    // Se actulizara con lo que llegue del backend
 	window.gameEnded = false; 
 	window.gameStarted = false;
 
