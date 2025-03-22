@@ -386,6 +386,83 @@ def game_list_view(request):
     else:  # Si es una carga normal, devolvemos base.html con game_list.html dentro
         return render(request, "base.html", {"content_template": "game/game_list.html", **context})
 
+@csrf_exempt  # En producción, es mejor gestionar el CSRF correctamente.
+@require_POST
+def game_save_view(request):
+    try:
+
+        logger.info("Recibida solicitud POST en game_result_view")
+        logger.info("Headers: %s", request.headers)
+        logger.info("Body: %s", request.body)
+        data = json.loads(request.body)
+
+        # Extraer datos
+        game_id = data.get("game_id")
+        winner_id = data.get("winner_id")
+        loser_id = data.get("loser_id")
+        score_winner = data.get("score_winner")
+        score_loser = data.get("score_loser")
+        duration = data.get("duration")
+
+        # Validar que no falten datos
+        if None in (game_id, winner_id, loser_id, score_winner, score_loser, duration):
+            return JsonResponse({"status": "error", "message": "Faltan datos en la solicitud"}, status=400)
+
+        # Obtener el juego manualmente para evitar que `get_object_or_404` devuelva HTML
+        try:
+            game = Game.objects.get(id=game_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el juego con id {game_id}"}, status=404)
+
+        # Obtener los usuarios manualmente
+        try:
+            winner = User.objects.get(id=winner_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el usuario ganador con id {winner_id}"}, status=404)
+
+        try:
+            loser = User.objects.get(id=loser_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "message": f"No se encontró el usuario perdedor con id {loser_id}"}, status=404)
+
+        # Crear o actualizar el resultado de la partida
+        result, created = GameResult.objects.update_or_create(
+            game=game,
+            defaults={
+                "winner": winner,
+                "loser": loser,
+                "score_winner": score_winner,
+                "score_loser": score_loser,
+                "duration": duration,
+            }
+        )
+
+        game.status = "finalizado"
+        game.save()
+
+        logger.info(f"¡Nueva partida guardada entre {game.player1} y {game.player2}! Ganador: {winner}")
+
+        # Enviar notificación a todos los usuarios
+        # Solo enviar notificación si fue la PRIMERA vez que se guardó el resultado
+        if created:
+            send_notification_to_all(f"¡Nueva partida terminada entre {game.player1} y {game.player2}! Ganador: {winner}")
+
+        # Si el juego pertenece a un torneo, verificar si se debe avanzar a la siguiente ronda
+        if game.tournament:
+            logger.info(f"Llamando a check_next_round para el torneo: {game.tournament.name}")
+            max_round = game.round_number 
+            game.tournament.check_next_round(max_round)
+
+        return JsonResponse({
+            "status": "success",
+            "message": "Resultado guardado correctamente",
+            "created": created
+        }, status=201 if created else 200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Formato JSON inválido"}, status=400)
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 def login_with_42(request):
     """Redirige al usuario a la plataforma de autenticación de 42."""

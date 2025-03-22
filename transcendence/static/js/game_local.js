@@ -53,9 +53,11 @@ window.Paddle = class {
 };
 
 // Setup global
-setupGame = function () {
+window.setupGame = function () {
     console.log("🎮 Setup Game Local ejecutado");
     window.gameEnded = false;
+    window.gameStartTime = null; // No iniciar el tiempo hasta que empiece el juego
+    window.gameStarted = false; // Nueva variable para controlar si el juego ha empezado
 
     const canvasElement = document.getElementById("pongCanvas");
     const gameDataElement = document.getElementById("game-data");
@@ -90,17 +92,42 @@ setupGame = function () {
     document.addEventListener("keydown", handleLocalKeyDown);
     document.addEventListener("keyup", handleLocalKeyUp);
 
-    window.gameLoopInterval = setInterval(gameLoop, 1000 / 60); // 60 FPS
+    // Dibujar el mensaje inicial
+    drawInitialMessage();
 };
+
+function drawInitialMessage() {
+    window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
+    window.ctx.fillStyle = window.gameData.background_color || "black";
+    window.ctx.fillRect(0, 0, window.canvas.width, window.canvas.height);
+
+    window.ctx.fillStyle = "white";
+    window.ctx.font = "bold 30px Orbitron";
+    window.ctx.textAlign = "center";
+    window.ctx.fillText("Presiona ESPACIO para comenzar", 400, 200);
+}
 
 function handleLocalKeyDown(e) {
     const key = e.key.toLowerCase();
-    if (["w", "s", "arrowup", "arrowdown"].includes(key)) e.preventDefault();
+    if (["w", "s", "arrowup", "arrowdown", " "].includes(key)) e.preventDefault();
 
-    if (key === "w") window.gameState.paddles.left.setDirection(-1);
-    if (key === "s") window.gameState.paddles.left.setDirection(1);
-    if (key === "arrowup") window.gameState.paddles.right.setDirection(-1);
-    if (key === "arrowdown") window.gameState.paddles.right.setDirection(1);
+    if (!window.gameStarted && key === " ") {
+        startGame();
+        return;
+    }
+
+    if (window.gameStarted) {
+        if (key === "w") window.gameState.paddles.left.setDirection(-1);
+        if (key === "s") window.gameState.paddles.left.setDirection(1);
+        if (key === "arrowup") window.gameState.paddles.right.setDirection(-1);
+        if (key === "arrowdown") window.gameState.paddles.right.setDirection(1);
+    }
+}
+
+function startGame() {
+    window.gameStarted = true;
+    window.gameStartTime = Date.now();
+    window.gameLoopInterval = setInterval(gameLoop, 1000 / 60); // 60 FPS
 }
 
 function handleLocalKeyUp(e) {
@@ -158,7 +185,9 @@ function gameLoop() {
         else ball.reset(400, 200, 5);
     }
 
-    drawGame();
+    if (!window.gameEnded) {
+        drawGame();
+    }
 }
 
 function drawGame() {
@@ -199,13 +228,82 @@ function updateScore() {
 function endGame(winner) {
     window.gameEnded = true;
     clearInterval(window.gameLoopInterval);
-    drawGame();
 
-    window.ctx.fillStyle = "white";
-    window.ctx.font = "bold 30px Orbitron";
-    window.ctx.textAlign = "center";
-    window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", 400, 150);
-    window.ctx.fillText(`🎉 GANADOR: ${winner}`, 400, 220);
+    // Obtener los datos del juego y los jugadores
+    const gameData = JSON.parse(document.getElementById("game-data").textContent);
+    const playerData = JSON.parse(document.getElementById("player-data").textContent);
+
+    // Determinar el ganador y perdedor basado en el parámetro winner
+    const isPlayer1Winner = winner === "Player 1";
+    const winnerId = isPlayer1Winner ? playerData.player1.id : playerData.player2.id;
+    const loserId = isPlayer1Winner ? playerData.player2.id : playerData.player1.id;
+    const winnerName = isPlayer1Winner ? playerData.player1.username : playerData.player2.username;
+
+    // Preparar los datos para enviar al servidor
+    const resultData = {
+        game_id: gameData.id,
+        winner_id: winnerId,
+        loser_id: loserId,
+        score_winner: isPlayer1Winner ? window.score1 : window.score2,
+        score_loser: isPlayer1Winner ? window.score2 : window.score1,
+        duration: Math.floor((Date.now() - window.gameStartTime) / 1000) // duración en segundos
+    };
+
+    // Enviar los resultados al servidor
+    fetch('/game/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resultData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Resultado guardado:', data);
+        
+        // Limpiar completamente el canvas antes de mostrar el mensaje final
+        window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
+        window.ctx.fillStyle = window.gameData.background_color || "black";
+        window.ctx.fillRect(0, 0, window.canvas.width, window.canvas.height);
+
+        // Mostrar el mensaje de victoria y la respuesta del servidor
+        window.ctx.fillStyle = "white";
+        window.ctx.font = "bold 30px Orbitron";
+        window.ctx.textAlign = "center";
+        window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", 400, 150);
+        window.ctx.fillText(`🎉 GANADOR: ${winnerName}`, 400, 220);
+
+        // Mostrar la respuesta del servidor
+        window.ctx.font = "16px Orbitron";
+        window.ctx.fillText("Respuesta del servidor:", 400, 280);
+        window.ctx.font = "14px Orbitron";
+        const jsonStr = JSON.stringify(data, null, 2);
+        const lines = jsonStr.split('\n');
+        lines.forEach((line, index) => {
+            window.ctx.fillText(line, 400, 310 + (index * 20));
+        });
+    })
+    .catch(error => {
+        console.error('Error al guardar el resultado:', error);
+        
+        // Limpiar completamente el canvas antes de mostrar el mensaje de error
+        window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
+        window.ctx.fillStyle = window.gameData.background_color || "black";
+        window.ctx.fillRect(0, 0, window.canvas.width, window.canvas.height);
+
+        // Mostrar el mensaje de victoria y el error
+        window.ctx.fillStyle = "white";
+        window.ctx.font = "bold 30px Orbitron";
+        window.ctx.textAlign = "center";
+        window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", 400, 150);
+        window.ctx.fillText(`🎉 GANADOR: ${winnerName}`, 400, 220);
+        
+        // Mostrar el error
+        window.ctx.font = "16px Orbitron";
+        window.ctx.fillStyle = "#ff4444";
+        window.ctx.fillText("Error al guardar:", 400, 280);
+        window.ctx.fillText(error.message, 400, 310);
+    });
 }
 
 // Se ejecuta cuando hay recarga HTMX
