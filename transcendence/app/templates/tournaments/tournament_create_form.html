@@ -80,13 +80,13 @@
 
 <script>
 
-    if (window.listenerAdded === undefined) window.listenerAdded = false;
+    if (window.listenerCreateAdded === undefined) window.listenerCreateAdded = false;
     
        function setupListener() {
-            if (window.listenerAdded) 
+            if (window.listenerCreateAdded) 
                 return;
     
-            window.listenerAdded = true;
+            window.listenerCreateAdded = true;
             const modeSelectors = document.querySelectorAll('input[name="game_mode"]');
             const playModeRadios = document.querySelectorAll('input[name="play_mode"]');
         

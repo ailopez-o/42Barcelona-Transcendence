@@ -101,13 +101,13 @@
 
 <script>
 
-if (window.listenerAdded === undefined) window.listenerAdded = false;
+if (window.listenerNew === undefined) window.listenerNew = false;
 
    function setupListener() {
-        if (window.listenerAdded) 
+        if (window.listenerNew) 
             return;
 
-        window.listenerAdded = true;
+        window.listenerNew = true;
         const modeSelectors = document.querySelectorAll('input[name="game_mode"]');
         const playModeRadios = document.querySelectorAll('input[name="play_mode"]');
     
