@@ -32,6 +32,20 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label text-white">Tipo de Torneo</label>
+        <div class="d-flex gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="play_mode" id="mode_remote" value="remote" checked>
+                <label class="form-check-label text-white" for="mode_remote">Remoto</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="play_mode" id="mode_local" value="local">
+                <label class="form-check-label text-white" for="mode_local">Local</label>
+            </div>
+        </div>
+    </div>    
+
+    <div class="mb-3" id="mode-selectors">
         <label class="form-label text-white">Modo de juego</label>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="game_mode" id="game_mode_2d" value="2d" checked>
@@ -41,7 +55,7 @@
             <input class="form-check-input" type="radio" name="game_mode" id="game_mode_3d" value="3d">
             <label class="form-check-label text-white" for="game_mode_3d">3D</label>
         </div>
-    </div>
+    </div>    
 
     <div class="mb-3 d-flex align-items-center">
         <label for="paddle_color" class="form-label text-white me-2">Color de las palas</label>
@@ -62,3 +76,49 @@
         <button type="submit" class="btn btn-outline-secondary text-center w-100">Crear Torneo</button>
     </div>
 </form>
+
+
+<script>
+
+    if (window.listenerAdded === undefined) window.listenerAdded = false;
+    
+       function setupListener() {
+            if (window.listenerAdded) 
+                return;
+    
+            window.listenerAdded = true;
+            const modeSelectors = document.querySelectorAll('input[name="game_mode"]');
+            const playModeRadios = document.querySelectorAll('input[name="play_mode"]');
+        
+            function updateGameModeOptions() {
+                const isLocal = document.getElementById("mode_local").checked;
+        
+                modeSelectors.forEach(input => {
+                    input.disabled = isLocal;
+                });
+        
+                if (isLocal) {
+                    document.getElementById("game_mode_2d").checked = true;
+                }
+            }
+        
+            playModeRadios.forEach(radio => {
+                radio.addEventListener("change", updateGameModeOptions);
+            });
+        
+            updateGameModeOptions(); // Inicializar
+        }
+    
+        
+    // Se ejecuta cuando hay recarga HTMX
+    if (document.readyState === "complete") {
+        setupListener(); // Si el DOM ya está listo, ejecuta directamente
+    }
+    
+    // Se ejecuta cuando hay recarga completa
+    document.addEventListener("DOMContentLoaded", function () {
+        setupListener(); // Si el DOM ya está listo, ejecuta directamente
+    });
+    
+    </script>
+        

@@ -129,24 +129,20 @@ def profile_view(request):
 @login_required
 def new_game_view(request):
     if request.method == 'POST':
+
         opponent_id = request.POST.get('opponent')
         opponent = get_object_or_404(User, id=opponent_id)
-        difficulty = request.POST.get('difficulty', 'medio')
-        points = request.POST.get('points', 10)
-        paddle_color = request.POST.get('paddle_color', "#0000ff")
-        ball_color = request.POST.get('ball_color', "#ff0000")
-        background_color = request.POST.get('background_color', "#000000")
-        game_mode = request.POST.get('game_mode', '2d') == '2d'
-
+   
         game = Game.objects.create(
             player1=request.user,
             player2=opponent,
-            difficulty=difficulty,
-            points=points,
-            paddle_color=paddle_color,
-            ball_color=ball_color,
-            background_color=background_color,
-            game_mode=game_mode
+            difficulty=request.POST.get('difficulty', 'medio'),
+            points=request.POST.get('points', 10),
+            paddle_color=request.POST.get('paddle_color', "#0000ff"),
+            ball_color=request.POST.get('ball_color', "#ff0000"),
+            background_color=request.POST.get('background_color', "#000000"),
+            game_mode=request.POST.get('game_mode', '2d') == '2d',
+            remote_mode = request.POST.get('play_mode', 'remote') == 'remote'
         )
 
         context = {
@@ -243,7 +239,8 @@ def create_tournament(request):
             paddle_color = request.POST.get('paddle_color', "#0000ff"),
             ball_color = request.POST.get('ball_color', "#ff0000"),
             background_color = request.POST.get('background_color', "#000000"),
-            game_mode = request.POST.get('game_mode', '2d') == '2d'
+            game_mode = request.POST.get('game_mode', '2d') == '2d',
+            remote_mode = request.POST.get('play_mode', 'remote') == 'remote'
         )
 
         tournaments = Tournament.objects.all()

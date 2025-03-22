@@ -189,12 +189,6 @@ function drawGame() {
     ctx.beginPath();
     ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, Math.PI * 2);
     ctx.fill();
-
-    // Marcador
-    ctx.fillStyle = "white";
-    ctx.font = "30px Orbitron";
-    ctx.textAlign = "center";
-    ctx.fillText(`${window.score1} - ${window.score2}`, 400, 40);
 }
 
 function updateScore() {
