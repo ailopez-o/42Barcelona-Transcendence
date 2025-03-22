@@ -61,7 +61,7 @@ function connectWebSocket(currentUsername) {
         if (!chatContainer) return;
 
         const msgDiv = document.createElement("div");
-        msgDiv.classList.add("chat-message", "p-2", "border", "rounded", "mb-1", "bg-light");
+        msgDiv.classList.add("chat-message", "p-2", "rounded", "mb-1", "bg-header");
 
         // Crear un span para el nombre de usuario con color dinámico
         const usernameSpan = document.createElement("span");
