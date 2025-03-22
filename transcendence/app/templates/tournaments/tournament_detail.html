@@ -1,22 +1,22 @@
-<div class="card shadow-sm">
+<div class="card shadow-sm bg-dark border-secondary">
     <!-- Header igual al de la card -->
-    <div class="card-header bg-primary text-white">
+    <div class="card-header bg-header text-white">
         <div class="d-flex justify-content-between align-items-center">
             <!-- Izquierda: Avatar y nombre del creador -->
             <div class="d-flex align-items-center">
                 <img src="{{ tournament.creator.avatar_url }}" alt="{{ tournament.creator.display_name }}" class="rounded-circle me-2" width="30" height="30">
-                <strong>{{ tournament.creator.display_name }}</strong>
+                <strong class="text-white">{{ tournament.creator.display_name }}</strong>
             </div>
 
             <!-- Centro: Nombre del torneo -->
             <div class="flex-grow-1 text-center">
-                <h5 class="mb-0 text-uppercase">{{ tournament.name }}</h5>
+                <h5 class="mb-0 text-uppercase text-white">{{ tournament.name }}</h5>
             </div>
         </div>
 
         <!-- Estado centrado debajo -->
         <div class="text-center mt-2">
-            <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-secondary{% endif %}">
+            <span class="badge {% if tournament.status == 'inscripcion' %}bg-success{% elif tournament.status == 'en_curso' %}bg-warning{% else %}bg-header{% endif %}">
                 {{ tournament.get_status_display }}
             </span>
         </div>
@@ -24,11 +24,11 @@
 
     <!-- Detalles -->
     <div class="card-body">
-        <p><strong>Máximo de Jugadores:</strong> {{ tournament.max_participants }}</p>
-        <p><strong>Jugadores Registrados:</strong> {{ tournament.participants.count }}/{{ tournament.max_participants }}</p>
+        <p class="text-white"><strong>Máximo de Jugadores:</strong> {{ tournament.max_participants }}</p>
+        <p class="text-white"><strong>Jugadores Registrados:</strong> {{ tournament.participants.count }}/{{ tournament.max_participants }}</p>
     
         <!-- Mostrar dificultad -->
-        <p>
+        <p class="text-white">
             <strong>Dificultad:</strong> 
             <span class="badge 
                 {% if tournament.difficulty == 'facil' %}bg-success
@@ -39,7 +39,7 @@
         </p>
     
         <!-- Mostrar modo de juego -->
-        <p>
+        <p class="text-white">
             <strong>Modo de Juego:</strong>
             {% if tournament.game_mode %}
                 <i class="bi bi-square-fill text-info"></i> 2D
@@ -50,52 +50,52 @@
     
         <!-- Vista previa de colores -->
         <div class="mb-3">
-            <strong>Colores:</strong>
+            <strong class="text-white">Colores:</strong>
             <div class="d-flex gap-3 mt-2">
                 <div class="d-flex flex-column align-items-center">
-                    <span class="small">Palas</span>
-                    <div style="width: 30px; height: 30px; background-color: {{ tournament.paddle_color }}; border: 1px solid #ccc;"></div>
+                    <span class="small text-white">Palas</span>
+                    <div style="width: 30px; height: 30px; background-color: {{ tournament.paddle_color }}; border: 1px solid #2c2c2c;"></div>
                 </div>
                 <div class="d-flex flex-column align-items-center">
-                    <span class="small">Pelota</span>
-                    <div style="width: 30px; height: 30px; background-color: {{ tournament.ball_color }}; border: 1px solid #ccc;"></div>
+                    <span class="small text-white">Pelota</span>
+                    <div style="width: 30px; height: 30px; background-color: {{ tournament.ball_color }}; border: 1px solid #2c2c2c;"></div>
                 </div>
                 <div class="d-flex flex-column align-items-center">
-                    <span class="small">Fondo</span>
-                    <div style="width: 30px; height: 30px; background-color: {{ tournament.background_color }}; border: 1px solid #ccc;"></div>
+                    <span class="small text-white">Fondo</span>
+                    <div style="width: 30px; height: 30px; background-color: {{ tournament.background_color }}; border: 1px solid #2c2c2c;"></div>
                 </div>
             </div>
         </div>
     
         <!-- Participantes -->
-        <p><strong>Participantes:</strong></p>
+        <p class="text-white"><strong>Participantes:</strong></p>
         <div class="list-group mb-3">
             {% for participant in tournament.participants.all %}
-                <div class="list-group-item d-flex align-items-center">
+                <div class="list-group-item bg-dark border-secondary d-flex align-items-center">
                     <img src="{{ participant.avatar_url }}" alt="{{ participant.display_name }}" class="rounded-circle me-3" width="40" height="40">
-                    <span>{{ participant.display_name }}</span>
+                    <span class="text-white">{{ participant.display_name }}</span>
                 </div>
             {% empty %}
-                <div class="list-group-item text-muted">Aún no hay jugadores inscritos.</div>
+                <div class="list-group-item bg-dark border-secondary text-secondary">Aún no hay jugadores inscritos.</div>
             {% endfor %}
         </div>
 
         <!-- Partidas -->
         {% if games %}
-            <p><strong>Partidas del Torneo:</strong></p>
+            <p class="text-white"><strong>Partidas del Torneo:</strong></p>
             <ul class="list-group mb-3">
                 {% for game in games %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Ronda {{ game.round_number }}: {{ game.player1.display_name }} vs {{ game.player2.display_name }}
-						<button 
-							hx-get="{% url 'game_detail' game.id %}" 
-							hx-target="#main-content" 
-							hx-swap="innerHTML" 
-							hx-push-url="true"
-							class="btn btn-outline-primary btn-sm"
-							title="Ver Detalles">
-							<i class="bi bi-eye"></i>
-						</button>
+                    <li class="list-group-item bg-dark border-secondary d-flex justify-content-between align-items-center">
+                        <span class="text-white">Ronda {{ game.round_number }}: {{ game.player1.display_name }} vs {{ game.player2.display_name }}</span>
+                        <button 
+                            hx-get="{% url 'game_detail' game.id %}" 
+                            hx-target="#main-content" 
+                            hx-swap="innerHTML" 
+                            hx-push-url="true"
+                            class="btn btn-outline-secondary btn-sm"
+                            title="Ver Detalles">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </li>
                 {% endfor %}
             </ul>

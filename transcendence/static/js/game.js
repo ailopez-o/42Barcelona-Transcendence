@@ -235,7 +235,7 @@ function updateStatusMessage() {
 
 function drawGame() {
 	window.ctx.clearRect(0, 0,  window.canvas.width,  window.canvas.height);
-	window.ctx.fillStyle = "black";
+	window.ctx.fillStyle = window.gameData.background_color || "black";
 	window.ctx.fillRect(0, 0,  window.canvas.width,  window.canvas.height);
 	
 	// Dibujar las palas

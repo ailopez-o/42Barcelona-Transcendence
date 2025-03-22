@@ -1,22 +1,29 @@
 {% load static %}
 
-<h2>Chat Global</h2>
+<div class="container-fluid mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="chat-section bg-dark border border-secondary rounded p-3">
+                <div class="chat-container bg-dark border border-secondary p-3 rounded shadow-sm">
+                    <h2 class="text-center text-white font-orbitron mb-4">Chat Global</h2>
 
-<div class="global-chat">
-    <!-- Contenedor para los mensajes de chat -->
-    <div id="chat-section" class="chat-box border rounded p-2 mb-2"
-    style="height: 300px; overflow-y: auto;" hx-preserve>
-        <!-- Mensajes se insertarán aquí -->
+                    <!-- Contenedor para los mensajes de chat -->
+                    <div id="chat-section" class="chat-box border border-secondary rounded p-2 mb-2 bg-dark"
+                    style="height: 500px; overflow-y: auto;" hx-preserve>
+                        <!-- Mensajes se insertarán aquí -->
+                    </div>
 
+                    <!-- Formulario para enviar mensajes -->
+                    <form id="chat-form" class="d-flex" hx-boost="false">
+                        <input type="text" id="chat-input" class="form-control bg-header text-white border-secondary me-2" placeholder="Escribe tu mensaje..." required autocomplete="off">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Formulario para enviar mensajes -->
-    <form id="chat-form" class="d-flex" hx-boost="false">
-        <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-send"></i>
-        </button>
-    </form>
 </div>
 
 <!-- Información del usuario actual -->
@@ -33,3 +40,10 @@
 
 <!-- Cargar el script del chat global -->
 <script src="{% static 'js/chat.js' %}"></script>
+
+<style>
+    /* Estilo para el placeholder del input */
+    #chat-input::placeholder {
+        color: #C8C8C9;
+    }
+</style>

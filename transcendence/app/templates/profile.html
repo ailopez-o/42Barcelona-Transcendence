@@ -49,13 +49,13 @@
         <!-- Individuales -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4 bg-dark border-secondary">
-                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-header text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 font-orbitron"><i class="bi bi-controller"></i> Partidas Individuales</h5>
                 </div>
                 <div class="card-body">
                     {% if individual_games.exists %}
                         <table class="table table-dark table-hover text-center align-middle border-0">
-                            <thead class="bg-secondary">
+                            <thead class="bg-header">
                                 <tr>
                                     <th class="grey-text border-0">Oponente</th>
                                     <th class="grey-text border-0">Estado</th>
@@ -77,7 +77,7 @@
                                             <span class="badge 
                                                 {% if game.status == 'pendiente' %}bg-warning
                                                 {% elif game.status == 'en_curso' %}bg-success
-                                                {% elif game.status == 'finalizado' %}bg-secondary
+                                                {% elif game.status == 'finalizado' %}bg-header
                                                 {% elif game.status == 'cancelado' %}bg-danger
                                                 {% endif %}">
                                                 {{ game.get_status_display }}
@@ -108,13 +108,13 @@
         <!-- Torneos -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4 bg-dark border-secondary">
-                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-header text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 font-orbitron"><i class="bi bi-trophy-fill"></i> Partidas de Torneo</h5>
                 </div>
                 <div class="card-body">
                     {% if tournament_games.exists %}
                         <table class="table table-dark table-hover text-center align-middle border-0">
-                            <thead class="bg-secondary">
+                            <thead class="bg-header">
                                 <tr>
                                     <th class="grey-text border-0">Torneo</th>
                                     <th class="grey-text border-0">Oponente</th>
@@ -138,7 +138,7 @@
                                             <span class="badge 
                                                 {% if game.status == 'pendiente' %}bg-warning
                                                 {% elif game.status == 'en_curso' %}bg-success
-                                                {% elif game.status == 'finalizado' %}bg-secondary
+                                                {% elif game.status == 'finalizado' %}bg-header
                                                 {% elif game.status == 'cancelado' %}bg-danger
                                                 {% endif %}">
                                                 {{ game.get_status_display }}
@@ -169,13 +169,13 @@
 
     <!-- Partidas Finalizadas -->
     <div class="card shadow-sm mb-4 bg-dark border-secondary">
-        <div class="card-header bg-secondary text-white">
+        <div class="card-header bg-header text-white">
             <h5 class="mb-0 font-orbitron"><i class="bi bi-flag-checkered"></i> Partidas Finalizadas</h5>
         </div>
         <div class="card-body">
             {% if finished_games.exists %}
                 <table class="table table-dark table-hover text-center align-middle border-0">
-                    <thead class="bg-secondary">
+                    <thead class="bg-header">
                         <tr>
                             <th class="grey-text border-0">Oponente</th>
                             <th class="grey-text border-0">Torneo</th>

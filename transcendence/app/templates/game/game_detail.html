@@ -1,102 +1,102 @@
 {% load static %}
 
-<div class="container-fluid">
+<div class="container-fluid mb-5">
     <div class="row flex-column flex-md-row">
         <!-- Sección del juego -->
         <div class="col-12 col-md-8 mb-3 mb-md-0" id="game-container" data-game-id="{{ game.id }}" data-username="{{ request.user.username }}">
-            
-            <!-- Información del juego y jugadores -->
-            <div class="game-header bg-light p-3 rounded shadow-sm text-center mb-3">
+            <div class="game-section bg-dark border border-secondary rounded p-3">
+                <!-- Información del juego y jugadores -->
+                <div class="game-header bg-dark border border-secondary p-3 rounded shadow-sm text-center mb-3">
 
-                <!-- Título y Torneo -->
-                <div class="mb-3">
-                    <h4 class="mb-1">Partida de Pong #{{ game.id }}</h4>
-                    {% if game.tournament %}
-                        <div>
-                            <span class="badge bg-warning text-dark fs-6">
-                                <i class="bi bi-trophy-fill"></i> Torneo: 
-                                <a href="{% url 'tournament_detail' game.tournament.id %}" 
-                                    hx-get="{% url 'tournament_detail' game.tournament.id %}" 
-                                    hx-target="#main-content" 
-                                    hx-swap="innerHTML"
-                                    hx-push-url="true"
-                                    class="text-dark text-decoration-none fw-bold">
-                                    {{ game.tournament.name }}
-                                </a>
-                            </span>
-                            <div class="mt-1 text-muted">
-                                <i class="bi bi-diagram-3-fill"></i> Ronda: <strong>{{ game.round_number }}</strong>
+                    <!-- Título y Torneo -->
+                    <div class="mb-3">
+                        <h4 class="mb-1 text-white font-orbitron">Partida de Pong #{{ game.id }}</h4>
+                        {% if game.tournament %}
+                            <div>
+                                <span class="badge bg-warning text-dark fs-6">
+                                    <i class="bi bi-trophy-fill"></i> Torneo: 
+                                    <a href="{% url 'tournament_detail' game.tournament.id %}" 
+                                        hx-get="{% url 'tournament_detail' game.tournament.id %}" 
+                                        hx-target="#main-content" 
+                                        hx-swap="innerHTML"
+                                        hx-push-url="true"
+                                        class="text-dark text-decoration-none fw-bold">
+                                        {{ game.tournament.name }}
+                                    </a>
+                                </span>
+                                <div class="mt-1 text-secondary">
+                                    <i class="bi bi-diagram-3-fill"></i> Ronda: <strong>{{ game.round_number }}</strong>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Jugador 1 -->
+                        <div class="player-info d-flex align-items-center gap-3">
+                            <img src="{{ game.player1.avatar_url }}" alt="{{ game.player1.username }}" 
+                                class="avatar rounded-circle border border-secondary" 
+                                style="width: 60px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h5 class="mb-0 text-white">{{ game.player1.username }}</h5>
+                                <span id="player1-ready-status" class="badge bg-warning text-dark">PENDING</span>
                             </div>
                         </div>
-                    {% endif %}
-                </div>
 
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <!-- Jugador 1 -->
-                    <div class="player-info d-flex align-items-center gap-3">
-                            <img src="{{ game.player1.avatar_url }}" alt="{{ game.player1.username }}" 
-                                class="avatar rounded-circle border border-2" 
-                                style="width: 60px; height: 60px; object-fit: cover;">
-                        <div>
-                            <h5 class="mb-0">{{ game.player1.username }}</h5>
-                            <span id="player1-ready-status" class="badge bg-warning">PENDING</span>
+                        <!-- Puntuación -->
+                        <div class="game-score text-center">
+                            <h3 class="mb-0 text-white"><span id="left-score">0</span> - <span id="right-score">0</span></h3>
+                            <small class="text-secondary">Puntuación</small>
                         </div>
-                    </div>
 
-
-                    <!-- Puntuación -->
-                    <div class="game-score text-center">
-                        <h3 class="mb-0"><span id="left-score">0</span> - <span id="right-score">0</span></h3>
-                        <small class="text-muted">Puntuación</small>
-                    </div>
-
-                    <!-- Jugador 2 -->
-                    <div class="player-info d-flex align-items-center gap-3">
-                        <div class="text-end">
-                            <h5 class="mb-0">{{ game.player2.username }}</h5>
-                            <span id="player2-ready-status" class="badge bg-warning">PENDING</span>
-                        </div>
+                        <!-- Jugador 2 -->
+                        <div class="player-info d-flex align-items-center gap-3">
+                            <div class="text-end">
+                                <h5 class="mb-0 text-white">{{ game.player2.username }}</h5>
+                                <span id="player2-ready-status" class="badge bg-warning text-dark">PENDING</span>
+                            </div>
                             <img src="{{ game.player2.avatar_url }}" alt="{{ game.player2.username }}" 
-                                class="avatar rounded-circle border border-2" 
+                                class="avatar rounded-circle border border-secondary" 
                                 style="width: 60px; height: 60px; object-fit: cover;">
+                        </div>
                     </div>
-
                 </div>
-            </div>
 
-            <!-- Canvas del juego -->
-            <div id="canvasContainer" class="text-center">
-                <canvas id="pongCanvas" width="800" height="400" 
-                        class="border border-dark rounded shadow img-fluid"
-                        style="display: block; margin: auto;">
-                </canvas>
-            </div>
+                <!-- Canvas del juego -->
+                <div id="canvasContainer" class="text-center">
+                    <canvas id="pongCanvas" width="800" height="400" 
+                            class="border border-secondary rounded shadow img-fluid"
+                            style="display: block; margin: auto;">
+                    </canvas>
+                </div>
 
-            <!-- Controles del juego -->
-            <div class="game-controls text-center mt-3">
-                <p><strong>Controles:</strong> Pulsa <kbd>ESPACIO</kbd> para indicar que estás listo. Usa <kbd>↑</kbd> y <kbd>↓</kbd> para mover tu paleta.</p>
+                <!-- Controles del juego -->
+                <div class="game-controls text-center mt-3">
+                    <p class="text-white"><strong>Controles:</strong> Pulsa <kbd class="bg-secondary text-white">ESPACIO</kbd> para indicar que estás listo. Usa <kbd class="bg-secondary text-white">↑</kbd> y <kbd class="bg-secondary text-white">↓</kbd> para mover tu paleta.</p>
+                </div>
             </div>
         </div>
 
         <!-- Sección del chat -->
         <div class="col-12 col-md-4">
-            <div class="chat-container bg-light p-3 rounded shadow-sm">
-                <h4 class="text-center">Chat en Vivo</h4>
+            <div class="chat-section bg-dark border border-secondary rounded p-3 h-100">
+                <div class="chat-container bg-dark border border-secondary p-3 rounded shadow-sm h-100">
+                    <h4 class="text-center text-white font-orbitron">Chat en Vivo</h4>
 
-                <!-- Contenedor para los mensajes de chat -->
-                <div id="chat-section" class="chat-box border rounded p-2 mb-2"
-                style="height: 300px; overflow-y: auto;" hx-preserve>
-               <!-- Mensajes del chat -->
+                    <!-- Contenedor para los mensajes de chat -->
+                    <div id="chat-section" class="chat-box border border-secondary rounded p-2 mb-2 bg-dark"
+                    style="height: 300px; overflow-y: auto;" hx-preserve>
+                        <!-- Los mensajes se cargarán dinámicamente aquí -->
+                    </div>
+
+                    <!-- Formulario para enviar mensajes -->
+                    <form id="chat-form" class="d-flex" hx-boost="false">
+                        <input type="text" id="chat-input" class="form-control bg-header text-white border-secondary me-2" placeholder="Escribe tu mensaje..." required autocomplete="off">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </form>                
                 </div>
-
-                <!-- Formulario para enviar mensajes -->
-                <form id="chat-form" class="d-flex" hx-boost="false">
-                    <input type="text" id="chat-input" class="form-control me-2" placeholder="Escribe tu mensaje..." required>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i>
-                    </button>
-                </form>                
             </div>
         </div>
     </div>
@@ -144,3 +144,27 @@
 <script type="module" src="{% static 'js/game3D.js' %}"></script>
 {% endif %}
 <script src="{% static 'js/chat.js' %}"></script>
+
+<style>
+    /* Estilo para el placeholder del input */
+    #chat-input::placeholder {
+        color: #C8C8C9;
+    }
+
+    /* Estilos para el input cuando está enfocado */
+    #chat-input:focus {
+        background-color: #323539 !important;
+        color: #fff !important;
+        box-shadow: none;
+        border-color: #6c757d !important;
+    }
+
+    /* Desactivar el estilo de autocompletado */
+    #chat-input:-webkit-autofill,
+    #chat-input:-webkit-autofill:hover,
+    #chat-input:-webkit-autofill:focus {
+        -webkit-text-fill-color: #fff !important;
+        -webkit-box-shadow: 0 0 0px 1000px #323539 inset !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+</style>
