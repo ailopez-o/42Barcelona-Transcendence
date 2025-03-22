@@ -54,16 +54,17 @@ function handleKeyDown(e) {
     }));
 }
 
-if (!window.listenerAdded) {
-    document.addEventListener("keydown", handleKeyDown);
-    window.listenerAdded = true;
-    console.log("🎮 Listener añadido");
-}
 
 window.setupGame = function () {
     console.log("🎮 Setup Game ejecutado.");
-
-	// Se actulizara con lo que llegue del backend
+    
+    if (!window.listenerAdded) {
+        document.addEventListener("keydown", handleKeyDown);
+        window.listenerAdded = true;
+        console.log("🎮 Listener añadido");
+    }
+	
+    // Se actulizara con lo que llegue del backend
 	window.gameEnded = false; 
 	window.gameStarted = false;
 
