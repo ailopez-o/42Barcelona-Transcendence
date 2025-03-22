@@ -1,5 +1,3 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
-
 console.log("🎮 Script cargado.");
 
 // Definir Ball y Paddle solo una vez
@@ -62,6 +60,19 @@ if (!window.listenerAdded) {
     document.addEventListener("keydown", handleKeyDown);
     window.listenerAdded = true;
     console.log("🎮 Listener añadido");
+}
+
+window.loadThreeJS = function(callback) {
+    console.log("🎮 Cargando Three.js...");
+    if (window.THREE) {
+        callback(); // Three.js is already loaded
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"; // Load non-module version
+    script.onload = callback;
+    document.head.appendChild(script);
 }
 
 window.setupGame = function () {
@@ -276,7 +287,7 @@ function startScene() {
 
     // Create the field
     const fieldGeometry = new THREE.PlaneGeometry( 800, 400 );
-    const fieldMaterial = new THREE.MeshStandardMaterial( { color: 0x00cd00, side: THREE.DoubleSide } );
+    const fieldMaterial = new THREE.MeshStandardMaterial( { color: gameData.background_color, side: THREE.DoubleSide } );
     const field = new THREE.Mesh( fieldGeometry, fieldMaterial );
     field.position.set(400, 200, 0);
     field.receiveShadow = true; // Enable shadows for the field
@@ -430,14 +441,11 @@ function randomlyEndGame() {
 // Se ejecuta cuando hay recarga HTMX
 if (document.readyState === "complete") {
 	console.log("🎮 El DOM ya está listo HTMX");
-	setupGame(); // Si el DOM ya está listo, ejecuta directamente
+	loadThreeJS(setupGame); // Si el DOM ya está listo, ejecuta directamente
 }
 
 // Se ejecuta cuando hay recarga completa
 document.addEventListener("DOMContentLoaded", function () {
 	console.log("🎮 DOM completamente cargado.");
-	setupGame(); // Si el DOM ya está listo, ejecuta directamente
+	loadThreeJS(setupGame); // Si el DOM ya está listo, ejecuta directamente
 });
-
-
-

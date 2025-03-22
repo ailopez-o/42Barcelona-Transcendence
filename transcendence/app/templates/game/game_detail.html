@@ -153,10 +153,10 @@
 </script> 
 
 {% if game.remote_mode %}
-    {% if game.game_mode %}
+    {% if game.game_mode or game_result %}
     <script src="{% static 'js/game.js' %}"></script>
     {% else %}
-    <script type="module" src="{% static 'js/game3D.js' %}"></script>
+    <script src="{% static 'js/game3D.js' %}?v={{ game.id }}"></script>
     {% endif %}
 {% else %}
     <script src="{% static 'js/game_local.js' %}"></script>
