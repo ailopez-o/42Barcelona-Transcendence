@@ -13,6 +13,7 @@ Bugs:
 - Acept/Reject partida en profile
 - Ordenar torneos por fecha
 - csrf
+- Sacar el script de crear usuarios
 
 Fixed:
 
