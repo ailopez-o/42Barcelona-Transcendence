@@ -273,15 +273,6 @@ function endGame(winner) {
         window.ctx.fillText("🏆 PARTIDA FINALIZADA 🏆", 400, 150);
         window.ctx.fillText(`🎉 GANADOR: ${winnerName}`, 400, 220);
 
-        // Mostrar la respuesta del servidor
-        window.ctx.font = "16px Orbitron";
-        window.ctx.fillText("Respuesta del servidor:", 400, 280);
-        window.ctx.font = "14px Orbitron";
-        const jsonStr = JSON.stringify(data, null, 2);
-        const lines = jsonStr.split('\n');
-        lines.forEach((line, index) => {
-            window.ctx.fillText(line, 400, 310 + (index * 20));
-        });
     })
     .catch(error => {
         console.error('Error al guardar el resultado:', error);
