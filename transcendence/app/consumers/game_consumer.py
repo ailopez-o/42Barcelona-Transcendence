@@ -214,14 +214,9 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         logger.info(f"Mensaje recibido en {self.room_name} de {username}: {data}")
         state = global_room_states[self.room_name]
         
-        # Comprobar si el evento viene de uno de los jugadores válidos
-        if "player" not in data or data["player"] not in ["player1", "player2"]:
-            # Si no es un jugador válido, ignoramos el evento
-            logger.info(f"Evento ignorado: no proviene de un jugador válido: {data}")
-            return
-        
         # Si se fuerza una finalización de la partida
         if "action" in data and data["action"] == "finish":
+            logger.info(f"Fin forzado de la partida {data["game"]}")
             # creamos un resultado aleatorio
             winner_side, score_winner, score_loser = generate_random_result(state["max_points"])
             if (winner_side == "left"):
@@ -233,7 +228,13 @@ class PongGameConsumer(AsyncWebsocketConsumer):
 
             # fornzamos el final de la partida
             await self.end_game(winner_side, state)
+            return
 
+        # Comprobar si el evento viene de uno de los jugadores válidos
+        if "player" not in data or data["player"] not in ["player1", "player2"]:
+            # Si no es un jugador válido, ignoramos el evento
+            logger.info(f"Evento ignorado: no proviene de un jugador válido: {data}")
+            return
 
         # Manejar mensaje de inicialización con dificultad
         if "init_game" in data and "difficulty" in data:
@@ -352,21 +353,6 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     }
                 )
 
-        def generate_random_result(max_points):
-            # score_loser debe ser < max_points // 2 para que el winner tenga más puntos
-            max_loser_score = max_points - 1
-            score_loser = random.randint(1, max_loser_score - 1)
-            score_winner = max_points - score_loser
-
-            # Asegurar que winner tiene más puntos
-            if score_loser >= score_winner:
-                score_loser, score_winner = score_winner, score_loser
-            if score_loser == score_winner:
-                score_winner += 1
-                score_loser -= 1
-
-            winner_side = random.choice(["left", "right"])
-            return winner_side, score_winner, score_loser
 
     async def game_loop(self):
         """ Bucle principal del juego que actualiza el estado y lo difunde a todos los clientes. """
@@ -459,3 +445,20 @@ class PongGameConsumer(AsyncWebsocketConsumer):
         username = self.user.username if self.user.is_authenticated else "Anónimo"
         logger.info(f"Desconexion del juego {self.room_name} de {username}")
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
+
+
+def generate_random_result(max_points):
+    # score_loser debe ser < max_points // 2 para que el winner tenga más puntos
+    max_loser_score = max_points - 1
+    score_loser = random.randint(1, max_loser_score - 1)
+    score_winner = max_points - score_loser
+
+    # Asegurar que winner tiene más puntos
+    if score_loser >= score_winner:
+        score_loser, score_winner = score_winner, score_loser
+    if score_loser == score_winner:
+        score_winner += 1
+        score_loser -= 1
+
+    winner_side = random.choice(["left", "right"])
+    return winner_side, score_winner, score_loser

@@ -42,6 +42,7 @@ function handleKeyDown(e) {
     console.log(`🔑 Tecla: ${e.key} | Player: ${window.currentPlayer} | Game: ${window.gameId}`);
 
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r' && !window.gameEnded) {
+        console.log("Fin forzado solicitado en:",  window.gameId)
         e.preventDefault();
         randomlyEndGame();
         return;
@@ -329,7 +330,8 @@ function randomlyEndGame() {
     // Mandamos al backend la info de que ya se ha terminado
     window.socket.send(JSON.stringify({
         player: window.currentPlayer,
-        action: "finish"
+        action: "finish",
+        game: window.gameId
     }));
 }
 
