@@ -374,7 +374,7 @@ class PongGameConsumer(AsyncWebsocketConsumer):
                     "state": state
                 }
             )
-            await asyncio.sleep(0.03)  # Aproximadamente 30 FPS
+            await asyncio.sleep(0.01)  # Aproximadamente 30 FPS
 
     async def update_ball(self, state):
         """ Actualiza la posición de la bola y maneja colisiones y puntuaciones. """
