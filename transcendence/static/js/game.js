@@ -128,7 +128,21 @@ window.setupGame = function () {
         const data = JSON.parse(event.data);
         if (!data) return;
         console.log('INFO', data);
+        
+        if (data.scores) {
+            const leftScore = document.getElementById("left-score");
+            const rightScore = document.getElementById("right-score");
 
+            // Actualizamos el JSON recibido del html para que se mentenga vivo
+            window.gameData.player1_score = data.scores.left
+            window.gameData.player2_score = data.scores.right
+
+            if (leftScore && rightScore) {
+                leftScore.textContent = data.scores.left;
+                rightScore.textContent = data.scores.right;
+            }
+        }
+        
         if (data.game_over) {
 			window.gameEnded = true;
             console.warn("🎮 Juego finalizado. Desconectando WebSocket.");
@@ -168,19 +182,6 @@ window.setupGame = function () {
             window.gameData.duration = data.duration
         }
 
-        if (data.scores) {
-            const leftScore = document.getElementById("left-score");
-            const rightScore = document.getElementById("right-score");
-
-            // Actualizamos el JSON recibido del html para que se mentenga vivo
-            window.gameData.player1_score = data.scores.left
-            window.gameData.player2_score = data.scores.right
-
-            if (leftScore && rightScore) {
-                leftScore.textContent = data.scores.left;
-                rightScore.textContent = data.scores.right;
-            }
-        }
 
         drawGame();
     };
